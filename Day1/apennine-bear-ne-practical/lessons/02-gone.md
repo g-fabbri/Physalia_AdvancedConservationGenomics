@@ -10,6 +10,8 @@ Which non-demographic processes can generate LD? Consider migrants, pooled subpo
 
 ## Prepare PED/MAP input
 
+### Step 1 — Define inputs and outputs
+
 ```bash
 CHROM=chrN
 VCF=data/teaching/population.${CHROM}.vcf.gz
@@ -18,12 +20,22 @@ PREFIX="$OUTDIR/population_${CHROM}"
 mkdir -p "$OUTDIR"
 ```
 
+**Expected:** nothing is printed. Confirm the VCF exists with `ls -lh "$VCF"`.
+
+### Step 2 — Measure the unfiltered dataset
+
 Count samples and biallelic SNPs:
 
 ```bash
 bcftools query -l "$VCF" | wc -l
 bcftools view -m2 -M2 -v snps "$VCF" -Ou | bcftools view -H | wc -l
 ```
+
+**Expected:** two integers: the number of individuals and the number of biallelic SNP records. Write both down; later comparisons require a baseline.
+
+### Step 3 — Filter and convert
+
+**Input:** the population VCF. **Output:** `${PREFIX}.ped`, `${PREFIX}.map`, and `${PREFIX}.log`.
 
 ```bash
 plink \
@@ -37,6 +49,21 @@ plink \
   --recode \
   --out "$PREFIX"
 ```
+
+**Expected:** PLINK prints progress and ends without `Error:`. Its log reports the samples and variants remaining after filters.
+
+```bash
+ls -lh "${PREFIX}.ped" "${PREFIX}.map" "${PREFIX}.log"
+tail -20 "${PREFIX}.log"
+```
+
+**Check:** both PED and MAP files are non-empty. The PED has one row per individual; the MAP has one row per retained locus:
+
+```bash
+wc -l "${PREFIX}.ped" "${PREFIX}.map"
+```
+
+The first count should equal the population sample count from Lesson 00 unless individuals were explicitly filtered.
 
 | Flag | Effect | Decision question |
 |---|---|---|
@@ -68,9 +95,20 @@ Which threshold would you choose, and why?
 
 ## Inspect the genetic map
 
+### Step 4 — Decide how recombination will be represented
+
 ```bash
 head "${PREFIX}.map"
 ```
+
+Expected four-column shape:
+
+```text
+chrN    marker_1    0    10543
+chrN    marker_2    0    11302
+```
+
+If the third column is entirely zero, the file contains physical positions but no genetic positions.
 
 PLINK MAP columns are chromosome, marker ID, genetic position in centimorgans, and physical position. If column 3 is zero, legacy GONE uses the average recombination-rate setting `cMMb`.
 
@@ -83,6 +121,8 @@ Discuss:
 
 ## Run the official GONE workflow
 
+### Step 5 — Inspect parameters before execution
+
 The instructor supplies a tested copy of the appropriate folder from the [official GONE repository](https://github.com/esrud/GONE).
 
 ```bash
@@ -90,6 +130,12 @@ cp "${PREFIX}.ped" software/GONE/
 cp "${PREFIX}.map" software/GONE/
 cd software/GONE
 less INPUT_PARAMETERS_FILE
+```
+
+**Expected:** a plain-text parameter file. Do not edit it until you can explain the selected values. Keep an untouched copy:
+
+```bash
+cp INPUT_PARAMETERS_FILE INPUT_PARAMETERS_FILE.original
 ```
 
 Before running, identify:
@@ -108,6 +154,21 @@ Run using the basename without `.ped` or `.map`:
 bash script_GONE.sh population_chrN
 ```
 
+**Expected:** the script reads `population_chrN.ped` and `.map`, runs replicate LD analyses, and writes GONE output tables. Exact filenames vary with the official version, so list newly modified files:
+
+```bash
+find . -maxdepth 2 -type f -mmin -10 -print
+```
+
+**Check:** locate a non-empty table containing generation and `Ne` estimates. Confirm that multiple generations are present and scan logs for errors. Ask the instructor before interpreting if no replicate outputs are present.
+
+Return to the course repository after the run:
+
+```bash
+cd ../..
+pwd
+```
+
 The instructor must test the basename and exact behavior with the downloaded version. For the 30-minute exercise, use fewer replicates and compare with a precomputed full run.
 
 ## Diagnose before interpreting
@@ -119,4 +180,5 @@ The instructor must test the basename and exact behavior with the downloaded ver
 - How much confidence is possible from one chromosome?
 
 Continue to [NeEstimator](03-neestimator.md).
+
 
