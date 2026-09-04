@@ -11,7 +11,7 @@ Which dataset should contain one individual, and which should contain several? W
 
 **Purpose:** use short, consistent names and avoid repeatedly typing paths.
 
-**Input:** the chromosome identifier selected by the instructor.
+**Input:** the chromosome identifier selected.
 
 ```bash
 CHROM=Scaffold_34
