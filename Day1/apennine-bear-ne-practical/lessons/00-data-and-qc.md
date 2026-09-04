@@ -3,10 +3,6 @@
 Estimated time: 10 minutes.
 
 
-## Before starting
-
-Which dataset should contain one individual, and which should contain several? Why?
-
 ## Step 1 — Name the input files
 
 **Purpose:** use short, consistent names and avoid repeatedly typing paths.
