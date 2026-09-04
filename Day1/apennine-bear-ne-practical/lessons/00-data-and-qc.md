@@ -91,6 +91,14 @@ Expected format—your coordinates will differ:
 ```text
 Scaffold_34     0       740
 Scaffold_34     769     1567
+Scaffold_34     1914    2013
+Scaffold_34     2102    3531
+Scaffold_34     3575    4060
+Scaffold_34     4171    6326
+Scaffold_34     6403    6506
+Scaffold_34     6890    7221
+Scaffold_34     7874    8952
+Scaffold_34     8989    9807
 ```
 
 Sum interval lengths:
