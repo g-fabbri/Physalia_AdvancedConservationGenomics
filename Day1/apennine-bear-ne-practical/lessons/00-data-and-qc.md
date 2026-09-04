@@ -14,10 +14,10 @@ Which dataset should contain one individual, and which should contain several? W
 **Input:** the chromosome identifier selected by the instructor.
 
 ```bash
-CHROM=chrN
-SINGLE=data/teaching/single_bear.${CHROM}.vcf.gz
-POP=data/teaching/population.${CHROM}.vcf.gz
-MASK=data/teaching/single_bear.${CHROM}.callable.bed.gz
+CHROM=Scaffold_34
+SINGLE=data/UrArMa_4573_s34.vcf.gz
+POP=data/UrArMa_10i_s34.vcf.gz
+MASK=data/UrArMa_callable.bed.gz
 ```
 
 **Expected:** nothing is printed because these commands assign shell variables.
