@@ -35,11 +35,7 @@ The VCF contains the observed genotypes or heterozygous variants. The callable m
 
 Starting from BAM files would require alignment QC, genotype calling, depth and quality thresholds, and callable-region construction. Those operations are important but constitute a separate practical.
 
-## Predict
 
-1. Is a region without heterozygous sites informative if it was not callable?
-2. Which ends of a one-chromosome trajectory will be least reliable?
-3. Should a chromosome result be noisier than a genome-wide result?
 
 ## Prepare the input
 
