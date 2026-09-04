@@ -32,10 +32,10 @@ printf 'Chromosome: %s\nSingle VCF: %s\nPopulation VCF: %s\nMask: %s\n' \
 Expected shape:
 
 ```text
-Chromosome: chrN
-Single VCF: data/teaching/single_bear.chrN.vcf.gz
-Population VCF: data/teaching/population.chrN.vcf.gz
-Mask: data/teaching/single_bear.chrN.callable.bed.gz
+Chromosome: Scaffold_34
+Single VCF: data/UrArMa_4573_s34.vcf.gz
+Population VCF: data/UrArMa_10i_s34.vcf.gz
+Mask: data/UrArMa_callable.bed.gz
 ```
 
 ## Step 2 — Verify that the files exist
