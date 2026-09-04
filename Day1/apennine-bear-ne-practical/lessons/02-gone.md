@@ -4,7 +4,7 @@ Estimated practical time: 30 minutes.
 
 GONE uses linkage disequilibrium at different recombination distances to infer effective population size over recent generations. Drift creates LD; recombination removes it. The method therefore requires genotypes from **multiple individuals**, not the single MSMC2 genome.
 
-## What students need to understand
+## What we should consider
 
 The original Apennine bear driver script performs many bookkeeping operations internally. We will not reproduce all of them. Our practical focuses on decisions that can change the biological result:
 
