@@ -4,6 +4,37 @@ Estimated practical time: 30 minutes.
 
 MSMC2 uses the spacing of heterozygous sites and the amount of callable sequence to infer coalescence rates through time.
 
+## What input does MSMC2 require?
+
+MSMC2 does **not** read BAM or VCF files directly. Its input is a text file in `multihetsep` format.
+
+The complete workflow is:
+
+```text
+BAM + reference genome
+        ↓ variant calling and callable-site assessment
+VCF + callable mask + optional mappability mask
+        ↓ generate_multihetsep.py
+multihetsep file
+        ↓ MSMC2
+coalescence-rate and demographic trajectory
+```
+
+For this short practical, read alignment and variant calling have already been completed. Students begin with:
+
+```text
+data/teaching/single_bear.chrN.vcf.gz
+data/teaching/single_bear.chrN.vcf.gz.tbi
+data/teaching/single_bear.chrN.callable.bed.gz
+data/teaching/chrN.mappability.bed.gz     # when available
+```
+
+The VCF contains the observed genotypes or heterozygous variants. The callable mask identifies positions where a genotype could be assessed reliably. A mappability mask excludes regions where short reads cannot be placed uniquely.
+
+> A variant-only VCF cannot distinguish a confidently homozygous-reference position from a position with no usable data. It must not be used by itself to construct the callable mask.
+
+Starting from BAM files would require alignment QC, genotype calling, depth and quality thresholds, and callable-region construction. Those operations are important but constitute a separate practical.
+
 ## Predict
 
 1. Is a region without heterozygous sites informative if it was not callable?
@@ -28,7 +59,7 @@ mkdir -p "$OUTDIR"
 
 ### Step 2 — Convert VCF plus mask to multihetsep
 
-**Input:** one diploid VCF and its callable-region mask.
+**Input:** one diploid VCF and its callable-region mask. These are inputs to `generate_multihetsep.py`; the resulting multihetsep file is the input to MSMC2 itself.
 
 ```bash
 generate_multihetsep.py \
