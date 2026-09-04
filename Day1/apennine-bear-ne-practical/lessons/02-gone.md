@@ -2,15 +2,31 @@
 
 Estimated practical time: 30 minutes.
 
-Drift creates associations between alleles and recombination breaks them down. LD at different recombination distances therefore contains information about different recent generations. GONE requires **multiple individuals**.
+GONE uses linkage disequilibrium at different recombination distances to infer effective population size over recent generations. Drift creates LD; recombination removes it. The method therefore requires genotypes from **multiple individuals**, not the single MSMC2 genome.
 
-## Predict
+## What students need to understand
 
-Which non-demographic processes can generate LD? Consider migrants, pooled subpopulations, relatives, selection, and genotype error.
+The original Apennine bear driver script performs many bookkeeping operations internally. We will not reproduce all of them. Our practical focuses on decisions that can change the biological result:
 
-## Prepare PED/MAP input
+```text
+population sample and variant filtering
+                 ↓
+chromosome and recombination information
+                 ↓
+LD-distance and replicate parameters
+                 ↓
+GONE estimate and diagnostic checks
+```
 
-### Step 1 — Define inputs and outputs
+The driver will handle temporary control files, splitting, LD-bin aggregation, and output renaming. Those are useful for software development, but not central learning objectives here.
+
+## Predict before running
+
+Which factors can generate LD besides small population size? Consider relatives, migrants, pooled populations, selection, physical linkage, and genotype errors.
+
+## Step 1 — Define the dataset
+
+Replace `chrN` with the chromosome selected by the instructor:
 
 ```bash
 CHROM=chrN
@@ -20,22 +36,21 @@ PREFIX="$OUTDIR/population_${CHROM}"
 mkdir -p "$OUTDIR"
 ```
 
-**Expected:** nothing is printed. Confirm the VCF exists with `ls -lh "$VCF"`.
-
-### Step 2 — Measure the unfiltered dataset
-
-Count samples and biallelic SNPs:
+Check the input:
 
 ```bash
+ls -lh "$VCF"
 bcftools query -l "$VCF" | wc -l
 bcftools view -m2 -M2 -v snps "$VCF" -Ou | bcftools view -H | wc -l
 ```
 
-**Expected:** two integers: the number of individuals and the number of biallelic SNP records. Write both down; later comparisons require a baseline.
+**Expected:** a non-empty VCF, the number of sampled individuals, and the number of biallelic SNPs. Record both counts.
 
-### Step 3 — Filter and convert
+### Question
 
-**Input:** the population VCF. **Output:** `${PREFIX}.ped`, `${PREFIX}.map`, and `${PREFIX}.log`.
+Is the number of individuals sufficient to estimate LD precisely? More SNPs cannot completely compensate for very few independently sampled individuals.
+
+## Step 2 — Filter variants and create PED/MAP input
 
 ```bash
 plink \
@@ -47,137 +62,237 @@ plink \
   --geno 0.10 \
   --mac 2 \
   --recode \
-  --out "$PREFIX"
+  --out "${PREFIX}_original_label"
 ```
-
-**Expected:** PLINK prints progress and ends without `Error:`. Its log reports the samples and variants remaining after filters.
-
-```bash
-ls -lh "${PREFIX}.ped" "${PREFIX}.map" "${PREFIX}.log"
-tail -20 "${PREFIX}.log"
-```
-
-**Check:** both PED and MAP files are non-empty. The PED has one row per individual; the MAP has one row per retained locus:
-
-```bash
-wc -l "${PREFIX}.ped" "${PREFIX}.map"
-```
-
-The first count should equal the population sample count from Lesson 00 unless individuals were explicitly filtered.
 
 | Flag | Effect | Decision question |
 |---|---|---|
-| `--double-id` | Uses sample ID as family and individual ID | Are real relationships known? |
-| `--allow-extra-chr` | Accepts non-human chromosome labels | Are small contigs mixed with autosomes? |
-| `--snps-only just-acgt` | Keeps canonical SNP alleles | Why exclude indels here? |
-| `--biallelic-only strict` | Keeps exactly two alleles | Is this required downstream? |
-| `--geno 0.10` | Removes loci with >10% missing genotypes | Is 10% sensible for this sample size? |
-| `--mac 2` | Requires two minor-allele copies | Would three copies be safer but discard too much? |
-| `--recode` | Produces PED/MAP files | Does your GONE version expect these? |
+| `--double-id` | Uses sample ID as family and individual ID | Are relatives known and removed? |
+| `--allow-extra-chr` | Accepts non-human chromosome labels | Are only autosomal markers included? |
+| `--snps-only just-acgt` | Keeps canonical SNP alleles | Why exclude indels? |
+| `--biallelic-only strict` | Keeps exactly two alleles | Is this appropriate for GONE? |
+| `--geno 0.10` | Removes loci with >10% missing genotypes | Is 10% reasonable for this sample size? |
+| `--mac 2` | Requires at least two minor-allele copies | Would three copies be more defensible? |
+| `--recode` | Writes PED/MAP files | Does the GONE version expect these? |
 
-### MAF or MAC?
-
-For 10 diploid individuals, `--maf 0.02` corresponds to less than one chromosome copy and therefore does almost nothing. Re-run with `--mac 3` and compare logs:
+Inspect the output:
 
 ```bash
-plink \
-  --vcf "$VCF" --double-id --allow-extra-chr \
-  --snps-only just-acgt --biallelic-only strict \
-  --geno 0.10 --mac 3 --recode \
-  --out "${PREFIX}_mac3"
+tail -20 "${PREFIX}_original_label.log"
+wc -l "${PREFIX}_original_label.ped" "${PREFIX}_original_label.map"
+head "${PREFIX}_original_label.map"
 ```
 
+**Expected:** PED rows equal sampled individuals and MAP rows equal retained loci. PLINK should finish without `Error:`.
+
+### Why use MAC instead of MAF here?
+
+For 10 diploid individuals, `--maf 0.02` represents less than one chromosome copy and removes almost nothing. `--mac 2` expresses the desired minimum allele count directly. Calculate what `--mac 2` and `--mac 3` mean as sample frequencies in your dataset.
+
+## Step 3 — Create a one-chromosome GONE MAP
+
+The supplied Apennine script assumes chromosomes are numbered consecutively from 1 and obtains the chromosome count from the final MAP row. Therefore, a selected chromosome labelled `12` would incorrectly make it expect 12 chromosomes.
+
+Copy the PED and recode only column 1 of the derived MAP:
+
 ```bash
-grep -E 'variants.*remaining|variants loaded' "$OUTDIR"/*.log
+cp "${PREFIX}_original_label.ped" "${PREFIX}.ped"
+awk 'BEGIN {OFS="\t"} {$1=1; print $1,$2,$3,$4}' \
+  "${PREFIX}_original_label.map" > "${PREFIX}.map"
 ```
 
-Which threshold would you choose, and why?
-
-## Inspect the genetic map
-
-### Step 4 — Decide how recombination will be represented
+Validate:
 
 ```bash
+cut -f1 "${PREFIX}.map" | sort -u
 head "${PREFIX}.map"
+wc -l "${PREFIX}.ped" "${PREFIX}.map"
 ```
 
-Expected four-column shape:
+**Expected:** the chromosome check prints only `1`. Physical positions and locus count remain unchanged. Record the original biological chromosome name separately.
 
-```text
-chrN    marker_1    0    10543
-chrN    marker_2    0    11302
-```
+## Step 4 — Choose the parameters
 
-If the third column is entirely zero, the file contains physical positions but no genetic positions.
+The supplied Apennine bear analysis used:
 
-PLINK MAP columns are chromosome, marker ID, genetic position in centimorgans, and physical position. If column 3 is zero, legacy GONE uses the average recombination-rate setting `cMMb`.
+| Parameter | Original value | Biological or computational meaning |
+|---|---:|---|
+| `PHASE` | `2` | Genotypes have unknown phase |
+| `cMMb` | `1` | Assumed cM/Mb if MAP genetic distances are zero |
+| `DIST` | `1` | Haldane mapping correction |
+| `NGEN` | `2000` | Generations represented by LD bins |
+| `NBIN` | `400` | 400 bins: five generations per bin |
+| `MAF` | `0.0` | No additional internal frequency filter |
+| `ZERO` | `1` | Allow missing genotype codes |
+| `maxNCHROM` | `-99` | Analyze all detected chromosomes—one here |
+| `maxNSNP` | `50000` | Approximate SNP cap per chromosome |
+| `hc` | `0.01` | Maximum recombination fraction used |
+| `REPS` | `40` | Replicate estimates |
+| `threads` | `10` | Parallel workers |
 
-Discuss:
+Discuss before editing:
 
-1. Is a species-specific recombination map available?
-2. What evidence supports an assumed cM/Mb value?
-3. Is a constant rate realistic across the chromosome?
-4. How could an incorrect rate distort the inferred time axis?
+1. If genetic positions in the MAP are zero, what evidence supports `cMMb=1`?
+2. Why might `hc=0.01` have been chosen instead of the general `0.05` recommendation?
+3. Does `NGEN=2000` mean the data truly resolve 2,000 generations?
+4. Which parameters affect the inference, and which primarily affect runtime?
 
-## Run the official GONE workflow
+For the live run, keep the biological settings and change only:
 
-### Step 5 — Inspect parameters before execution
+- `REPS=5` to shorten computation;
+- `threads` to the number of cores allocated by the instructor.
 
-The instructor supplies a tested copy of the appropriate folder from the [official GONE repository](https://github.com/esrud/GONE).
+Compare the live output with a precomputed run using the original `REPS=40`.
+
+## Step 5 — Create a private run directory
+
+The original driver uses generic temporary filenames and removes previous results. Each group therefore needs a private copy of GONE.
 
 ```bash
-cp "${PREFIX}.ped" software/GONE/
-cp "${PREFIX}.map" software/GONE/
-cd software/GONE
+COURSE_DIR=$(pwd)
+DATA_DIR="$COURSE_DIR/results/gone"
+GONE_SOURCE="$COURSE_DIR/software/GONE"
+GROUP=group01
+RUN_DIR="$COURSE_DIR/work/gone_${CHROM}_${GROUP}"
+FILE=population_chrN
+mkdir -p "$COURSE_DIR/work"
+cp -R "$GONE_SOURCE" "$RUN_DIR"
+```
+
+Replace `group01` with your group and `population_chrN` with the basename used in Step 3. `RUN_DIR` must be new; do not reuse another group's directory.
+
+Enter it and inspect the configuration:
+
+```bash
+cd "$RUN_DIR"
 less INPUT_PARAMETERS_FILE
 ```
 
-**Expected:** a plain-text parameter file. Do not edit it until you can explain the selected values. Keep an untouched copy:
+Press `q`, then edit `REPS` and `threads`:
 
 ```bash
-cp INPUT_PARAMETERS_FILE INPUT_PARAMETERS_FILE.original
+nano INPUT_PARAMETERS_FILE
 ```
 
-Before running, identify:
-
-- number of replicates;
-- maximum recombination distance;
-- `cMMb` if no genetic map is supplied;
-- maximum SNPs sampled per chromosome;
-- number of generations reported.
-
-For each, state the classroom value, a possible final-analysis value, and whether changing it affects runtime, resolution, bias, or several of these.
-
-Run using the basename without `.ped` or `.map`:
+Save using `Ctrl-O`, Enter, then exit with `Ctrl-X`. Confirm:
 
 ```bash
-bash script_GONE.sh population_chrN
+grep -E '^(PHASE|cMMb|DIST|NGEN|NBIN|MAF|ZERO|maxNCHROM|maxNSNP|hc|REPS|threads)=' \
+  INPUT_PARAMETERS_FILE
 ```
 
-**Expected:** the script reads `population_chrN.ped` and `.map`, runs replicate LD analyses, and writes GONE output tables. Exact filenames vary with the official version, so list newly modified files:
+## Step 6 — Run GONE
 
 ```bash
-find . -maxdepth 2 -type f -mmin -10 -print
+bash script_GONE.sh "$FILE" "$DATA_DIR"
 ```
 
-**Check:** locate a non-empty table containing generation and `Ne` estimates. Confirm that multiple generations are present and scan logs for errors. Ask the instructor before interpreting if no replicate outputs are present.
+The first argument is the PED/MAP basename without an extension. The second is the directory containing the inputs and receiving results.
 
-Return to the course repository after the run:
+Expected progress:
+
+```text
+DIVIDE .ped AND .map FILES IN CHROMOSOMES
+RUNNING ANALYSIS OF CHROMOSOMES ...
+CHROMOSOME ANALYSES took ... seconds
+Running GONE
+GONE run took ... seconds
+END OF ANALYSES
+```
+
+Internally, the driver runs four important components:
+
+| Component | Role |
+|---|---|
+| `MANAGE_CHROMOSOMES2` | Prepares and optionally subsamples chromosome data |
+| `LD_SNP_REAL3` | Calculates LD in recombination-distance bins |
+| `SUMM_REP_CHROM3` | Standardizes and combines LD summaries |
+| `GONEparallel.sh` | Performs replicate demographic inference |
+
+Students do not need to manage the temporary files produced between these programs.
+
+## Step 7 — Validate outputs
+
+Return to the repository:
 
 ```bash
-cd ../..
-pwd
+cd "$COURSE_DIR"
+ls -lh "$DATA_DIR"
 ```
 
-The instructor must test the basename and exact behavior with the downloaded version. For the 30-minute exercise, use fewer replicates and compare with a precomputed full run.
+Expected principal outputs:
 
-## Diagnose before interpreting
+```text
+OUTPUT_population_chrN
+Output_Ne_population_chrN
+Output_d2_population_chrN
+outfileHWD
+timefile
+seedfile
+TEMPORARY_FILES/
+```
 
-- Were close relatives removed?
-- Does `Fis` suggest departure from panmixia?
-- Could structure or immigration mimic a sharp recent decline?
-- How variable are replicate trajectories?
-- How much confidence is possible from one chromosome?
+Inspect them:
+
+```bash
+head "$DATA_DIR/Output_Ne_${FILE}"
+cat "$DATA_DIR/timefile"
+cat "$DATA_DIR/outfileHWD"
+```
+
+**Check:** the `Ne` file is non-empty and contains multiple generations; `timefile` shows completed stages; `outfileHWD` contains the Hardy–Weinberg diagnostic.
+
+## Step 8 — Plot the trajectory
+
+Start R:
+
+```bash
+R
+```
+
+Read the result first, without assuming its columns:
+
+```r
+gone <- read.table("results/gone/Output_Ne_population_chrN", header=TRUE)
+names(gone)
+head(gone)
+```
+
+If the first row of the file contains numbers rather than column names, read it with `header=FALSE` and assign names after inspecting it:
+
+```r
+gone <- read.table("results/gone/Output_Ne_population_chrN", header=FALSE)
+names(gone)[1:2] <- c("Generation", "Ne")
+```
+
+Identify the columns representing generation and `Ne`, then plot them. Replace the placeholder column names below with the names printed by `names(gone)`:
+
+```r
+plot(gone$Generation, gone$Ne,
+     type="l", log="y", lwd=2,
+     xlab="Generations before present",
+     ylab="Effective population size")
+```
+
+If the most recent generation should appear on the right, reverse the x-axis:
+
+```r
+plot(gone$Generation, gone$Ne,
+     type="l", log="y", lwd=2,
+     xlim=rev(range(gone$Generation)),
+     xlab="Generations before present",
+     ylab="Effective population size")
+```
+
+Do not copy the example column names blindly. Inspect the real output first.
+
+## Interpret before moving on
+
+1. Could structure, relatives, or migration produce the recent pattern?
+2. Does the Hardy–Weinberg diagnostic support panmixia?
+3. How variable is the five-replicate classroom result compared with 40 replicates?
+4. What information is lost by using one chromosome?
+5. Which portion of the trajectory would you avoid interpreting?
 
 Continue to [NeEstimator](03-neestimator.md).
 
