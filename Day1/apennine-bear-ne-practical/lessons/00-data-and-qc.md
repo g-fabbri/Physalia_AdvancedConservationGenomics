@@ -79,14 +79,6 @@ bcftools index -n "$POP"
 
 **Expected:** one integer from each command. This is the number of VCF records, not the number of callable bases.
 
-If an index is missing:
-
-```bash
-bcftools index -t "$SINGLE"
-bcftools index -f "$POP"
-```
-
-Repeat the count after indexing.
 
 ## Step 5 — Inspect callable sequence
 
