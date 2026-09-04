@@ -2,7 +2,6 @@
 
 Estimated time: 10 minutes.
 
-Every exercise follows the same pattern: **purpose → input → command → expected output → check → question**. Do not continue merely because a command finishes without an error; inspect what it produced.
 
 ## Before starting
 
