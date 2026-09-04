@@ -89,8 +89,8 @@ zcat "$MASK" | head
 Expected format—your coordinates will differ:
 
 ```text
-chrN    1000    5200
-chrN    5400    9100
+Scaffold_34     0       740
+Scaffold_34     769     1567
 ```
 
 Sum interval lengths:
