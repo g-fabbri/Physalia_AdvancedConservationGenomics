@@ -138,4 +138,3 @@ The package contains batch-processing support, but control files must be prepare
 Did the estimate change more or less than its uncertainty? Is an infinite upper bound informative? Does precision guarantee that structure, relatives, and linkage were handled correctly?
 
 Continue to [synthesis](04-synthesis.md).
-

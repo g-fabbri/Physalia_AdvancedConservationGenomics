@@ -178,4 +178,3 @@ Repeat with alternative values and explain:
 - Which axis changes with generation time?
 
 Exit R using `q()`. Continue to [GONE](02-gone.md).
-

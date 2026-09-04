@@ -254,14 +254,39 @@ cp -R "$GONE_SOURCE" "$RUN_DIR"
 cd "$RUN_DIR"
 ```
 
-Inspect and edit the parameter file:
+Preserve the supplied parameter file:
 
 ```bash
-less INPUT_PARAMETERS_FILE
-nano INPUT_PARAMETERS_FILE
+cp INPUT_PARAMETERS_FILE INPUT_PARAMETERS_FILE.original
 ```
 
-In `less`, press `q` to exit. In `nano`, use `Ctrl-O`, Enter to save, and `Ctrl-X` to exit.
+Create the classroom parameter file by copying and pasting this complete block:
+
+```bash
+cat > INPUT_PARAMETERS_FILE <<'EOF'
+PHASE=2
+cMMb=1
+DIST=1
+NGEN=2000
+NBIN=400
+MAF=0.0
+ZERO=1
+maxNCHROM=-99
+maxNSNP=50000
+hc=0.01
+REPS=5
+threads=2
+EOF
+```
+
+The line containing only `EOF` finishes the file. Do not add spaces before or after it.
+
+This classroom file retains the original biological settings and changes:
+
+- `REPS` from `40` to `5` to reduce runtime;
+- `threads` from `10` to `2`, assuming two cores per group.
+
+If the instructor allocates a different number of cores, replace `threads=2` before running. Do not set it higher than the allocated resources.
 
 **Expected output**
 
@@ -273,6 +298,8 @@ INPUT_PARAMETERS_FILE
 PROGRAMMES/
 ```
 
+`INPUT_PARAMETERS_FILE.original` contains the supplied settings, while `INPUT_PARAMETERS_FILE` contains the short classroom configuration.
+
 The group also has a private data/output directory under `results/gone/group01/`, preventing simultaneous runs from overwriting generic files such as `timefile` and `outfileHWD`.
 
 **Check**
@@ -280,10 +307,11 @@ The group also has a private data/output directory under `results/gone/group01/`
 ```bash
 grep -E '^(PHASE|cMMb|DIST|NGEN|NBIN|MAF|ZERO|maxNCHROM|maxNSNP|hc|REPS|threads)=' \
   INPUT_PARAMETERS_FILE
+diff -u INPUT_PARAMETERS_FILE.original INPUT_PARAMETERS_FILE
 ls PROGRAMMES
 ```
 
-Confirm `REPS=5`, the assigned thread count, and the presence of all required GONE programs.
+The first command should reproduce the complete classroom parameter block. `diff` should show changes only to `REPS` and `threads` if the original supplied file has the values listed above. `diff` returning status `1` is normal when differences are found. Confirm the presence of all required GONE programs.
 
 ## Step 6 — Run GONE
 
@@ -463,5 +491,3 @@ Exit R with `q()`.
 10. Which portion of the trajectory is sufficiently stable to interpret?
 
 Continue to [NeEstimator](03-neestimator.md).
-
-

@@ -45,7 +45,15 @@ Expected interpretation: the middle of the curve is generally more defensible th
 
 Ask students why the full LD pattern—not an LD-pruned panel—is needed. Recent migrants, Wahlund effects, and relatives can create LD that is not due solely to historical population size.
 
-The GONE workflow is platform-sensitive. Confirm the input basename expected by `script_GONE.sh` and provide the exact tested directory. Never make compilation the objective of a 30-minute exercise.
+The GONE lesson uses the supplied Apennine bear `script_GONE.sh` after students have explicitly prepared and validated the population sample, filters, one-chromosome MAP, recombination assumptions, LD parameters, replicates, and private run directory. The driver handles fragile bookkeeping through `MANAGE_CHROMOSOMES2`, `LD_SNP_REAL3`, `SUMM_REP_CHROM3`, and `GONEparallel.sh`. This balance keeps biological choices visible without spending the practical on internal control files.
+
+The supplied script assumes chromosomes are consecutively numbered beginning at 1 and infers `NCHR` from the last MAP row. The lesson therefore creates a derived one-chromosome MAP whose chromosome code is `1`. Confirm that marker order and physical coordinates are preserved.
+
+Give every student or group both a **private copy** of the GONE directory and a private results subdirectory. The script deletes and recreates `TEMPORARY_FILES`, uses generic intermediate filenames such as `data.ped`, and returns generic results such as `timefile` and `outfileHWD`. It is unsafe for concurrent runs in one shared software or output directory.
+
+Prepare two parameter files or checkpoints: a short live run with approximately five replicates, and the original 40-replicate setting for interpretation. The original supplied values were `PHASE=2`, `cMMb=1`, `DIST=1`, `NGEN=2000`, `NBIN=400`, `MAF=0.0`, `ZERO=1`, `maxNCHROM=-99`, `maxNSNP=50000`, `hc=0.01`, `REPS=40`, and `threads=10`.
+
+The workflow is platform-sensitive. Never make compilation the objective of a 30-minute exercise.
 
 ### NeEstimator
 
