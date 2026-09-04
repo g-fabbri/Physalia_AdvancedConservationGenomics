@@ -23,10 +23,10 @@ coalescence-rate and demographic trajectory
 For this short practical, read alignment and variant calling have already been completed. Students begin with:
 
 ```text
-data/teaching/single_bear.chrN.vcf.gz
-data/teaching/single_bear.chrN.vcf.gz.tbi
-data/teaching/single_bear.chrN.callable.bed.gz
-data/teaching/chrN.mappability.bed.gz     # when available
+data/UrArMa_4573_s34.vcf.gz
+data/UrArMa_4573_s34.vcf.gz.tbi
+data/UrArMa_callable.bed.gz
+data/Scaffold_34.mappability.bed.gz     # when available
 ```
 
 The VCF contains the observed genotypes or heterozygous variants. The callable mask identifies positions where a genotype could be assessed reliably. A mappability mask excludes regions where short reads cannot be placed uniquely.
@@ -48,9 +48,9 @@ Starting from BAM files would require alignment QC, genotype calling, depth and 
 **Purpose:** keep derived files separate from immutable teaching inputs.
 
 ```bash
-CHROM=chrN
-VCF=data/teaching/single_bear.${CHROM}.vcf.gz
-MASK=data/teaching/single_bear.${CHROM}.callable.bed.gz
+CHROM=Scaffold_34
+VCF=data/UrArMa_4573_s34.vcf.gz
+MASK=data/UrArMa_callable.bed.gz
 OUTDIR=results/msmc2
 mkdir -p "$OUTDIR"
 ```
@@ -72,8 +72,8 @@ generate_multihetsep.py \
 **Expected:** the command writes a new text file and normally prints little or nothing to the terminal. A typical record has four fields:
 
 ```text
-chrN    68306    44    TC
-chrN    87563    259    AG
+Scaffold_34    68306    44    TC
+Scaffold_34    87563    259    AG
 ```
 
 These values illustrate the format only. The fields represent chromosome, position, callable distance from the preceding segregating site, and observed alleles/haplotypes.
@@ -103,8 +103,8 @@ The official tool can intersect sample callability with a mappability mask:
 ```bash
 generate_multihetsep.py \
   --chr "$CHROM" \
-  --mask data/teaching/sample_callable.bed.gz \
-  --mask data/teaching/mappable_regions.bed.gz \
+  --mask "$MASK" \
+  --mask data/Scaffold_34.mappability.bed.gz \
   "$VCF" > "$OUTDIR/two_masks.multihetsep.txt"
 ```
 
