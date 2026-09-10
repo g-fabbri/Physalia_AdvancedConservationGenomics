@@ -4,7 +4,7 @@
 
 The Apennine brown bear is a small and isolated population in central Italy. Slovak brown bears belong to a larger and more connected European population. Their contrasting histories give us a biological question:
 
-> Do genomes from Apennine and Slovak bears record different histories of effective population size?
+> Do genomes from Apennine brown bears (ABB) and Slovak brown bears (SBB) record different histories of effective population size?
 
 We will not search for one definitive value. Instead, we will use three genomic signals:
 
@@ -22,10 +22,10 @@ Our chromosome-level dataset contains 18 individuals:
 
 | Population | Identification | Sample size |
 |---|---|---:|
-| Apennine | IDs not beginning with U | 10 |
-| Slovak | IDs beginning with U | 8 |
+| ABB — Apennine brown bears | IDs not beginning with U | 10 |
+| SBB — Slovak brown bears | IDs beginning with U | 8 |
 
-For the individual-genome comparison, we use Apennine bear **4573** and Slovak bear **U1916**.
+For the individual-genome comparison, we use ABB individual **4573** and SBB individual **U1916**. These abbreviations are used throughout the practical.
 
 All analyses use **Scaffold_34** to keep computation short. A single scaffold is appropriate for learning the workflow, but provides less information and greater stochastic variation than a genome-wide analysis.
 
@@ -78,7 +78,7 @@ data/UrArMa_U1916_s34.vcf.gz.csi
 data/UrArMa_callable.bed.gz
 ~~~
 
-The 18-individual VCF supplies population data. The two single-individual VCFs provide the Apennine and Slovak representatives for the historical comparison.
+The 18-individual VCF supplies population data. The two already-filtered single-individual VCFs provide the ABB and SBB representatives for the historical comparison.
 
 ### About the callable mask
 
