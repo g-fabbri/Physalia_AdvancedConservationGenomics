@@ -16,7 +16,7 @@ Our biological question is:
 MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a format that combines segregating sites with the amount of callable sequence between them.
 
 ~~~text
-  filtered VCF + callable mask
+already-filtered VCF + callable mask
                ↓ generate_multihetsep.py
            multihetsep
                ↓ MSMC2
@@ -129,11 +129,11 @@ If the program reports `invalid literal for int() with base 10: '.'`, a missing 
 **Input:** the two multihetsep files.
 
 ~~~bash
-msmc2 -t 2 -p '4+25*2+4+6' \
+msmc2 -t 2 -p '1*2+15*1+1*2' \
   -o "$OUTDIR/ABB_${ABB_ID}" \
   "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt"
 
-msmc2 -t 2 -p '4+25*2+4+6' \
+msmc2 -t 2 -p '1*2+15*1+1*2' \
   -o "$OUTDIR/SBB_${SBB_ID}" \
   "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
 ~~~
@@ -160,7 +160,7 @@ head "$OUTDIR/ABB_${ABB_ID}.final.txt"
 head "$OUTDIR/SBB_${SBB_ID}.final.txt"
 ~~~
 
-Both tables should contain time boundaries and a coalescence-rate column named **lambda**.
+Both tables should contain time boundaries and a coalescence-rate column named **lambda** or **lambda_00**.
 
 ## Step 4 — Scale and compare the trajectories
 
@@ -215,6 +215,151 @@ Exit R without saving the workspace:
 q(save="no")
 ~~~
 
+## Optional extension — block bootstrap
+
+**Purpose:** explore how strongly the inferred trajectories depend on which genomic regions were sampled.
+
+The official [multihetsep bootstrap utility](https://github.com/stschiff/msmc-tools/blob/master/multihetsep_bootstrap.py) resamples genomic blocks with replacement and constructs pseudo-scaffolds. MSMC2 is then run independently on each bootstrap replicate. This extension is computationally longer than the main practical; ten replicates are useful for demonstration, whereas a formal analysis should use substantially more.
+
+### Step A — Choose the block layout
+
+**Input:** the callable mask and the multihetsep files produced above.
+
+Use 5 Mb blocks, the default used by **multihetsep_bootstrap.py**, and calculate how many blocks are needed to approximate the length of Scaffold_34:
+
+~~~bash
+CHUNK_SIZE=5000000
+N_BOOT=10
+BOOTDIR="$OUTDIR/bootstrap"
+
+SCAFFOLD_END=$(zcat "$MASK" |
+  awk -v chrom="$CHROM" '$1 == chrom && $3 > end {end=$3} END {print end}')
+
+N_CHUNKS=$(( (SCAFFOLD_END + CHUNK_SIZE - 1) / CHUNK_SIZE ))
+
+mkdir -p "$BOOTDIR"
+printf 'Scaffold length: %s bp\nBootstrap blocks per replicate: %s\n' \
+  "$SCAFFOLD_END" "$N_CHUNKS"
+~~~
+
+**Expected:** a positive scaffold length and a positive number of blocks. The final block may be shorter than 5 Mb, so the reconstructed length is approximate.
+
+### Step B — Generate bootstrap multihetsep files
+
+~~~bash
+multihetsep_bootstrap.py \
+  -n "$N_BOOT" \
+  -s "$CHUNK_SIZE" \
+  --chunks_per_chromosome "$N_CHUNKS" \
+  --nr_chromosomes 1 \
+  --seed 12345 \
+  "$BOOTDIR/ABB" \
+  "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt"
+
+multihetsep_bootstrap.py \
+  -n "$N_BOOT" \
+  -s "$CHUNK_SIZE" \
+  --chunks_per_chromosome "$N_CHUNKS" \
+  --nr_chromosomes 1 \
+  --seed 12345 \
+  "$BOOTDIR/SBB" \
+  "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
+~~~
+
+| Option | Meaning |
+|---|---|
+| **-n 10** | Generate ten bootstrap replicates |
+| **-s 5000000** | Resample blocks of 5 Mb |
+| **--chunks_per_chromosome** | Preserve approximately the original scaffold length |
+| **--nr_chromosomes 1** | Create one pseudo-scaffold per replicate |
+| **--seed 12345** | Make the classroom resampling reproducible |
+
+**Expected:** directories named **ABB_1** to **ABB_10** and **SBB_1** to **SBB_10**, each containing one bootstrap multihetsep file.
+
+**Check:**
+
+~~~bash
+find "$BOOTDIR" -name 'bootstrap_multihetsep.chr1.txt' | sort
+find "$BOOTDIR" -name 'bootstrap_multihetsep.chr1.txt' | wc -l
+~~~
+
+The count should be **20**: ten ABB replicates and ten SBB replicates.
+
+### Step C — Run MSMC2 on every replicate
+
+~~~bash
+for REP in $(seq 1 "$N_BOOT"); do
+  msmc2 -t 2 -p '1*2+15*1+1*2' \
+    -o "$BOOTDIR/ABB_${REP}/ABB_${REP}" \
+    "$BOOTDIR/ABB_${REP}/bootstrap_multihetsep.chr1.txt"
+done
+
+for REP in $(seq 1 "$N_BOOT"); do
+  msmc2 -t 2 -p '1*2+15*1+1*2' \
+    -o "$BOOTDIR/SBB_${REP}/SBB_${REP}" \
+    "$BOOTDIR/SBB_${REP}/bootstrap_multihetsep.chr1.txt"
+done
+~~~
+
+**Expected:** each bootstrap directory receives an MSMC2 result, including one **.final.txt** file.
+
+**Check:**
+
+~~~bash
+find "$BOOTDIR" -name '*.final.txt' | wc -l
+~~~
+
+The count should be **20**. If classroom time is limited, run two or three replicates together and leave the remaining runs as an exercise.
+
+### Step D — Display bootstrap variation
+
+Start R again and paste:
+
+~~~r
+mu <- 4.5e-9
+generation_time <- 10
+
+scale_msmc <- function(x) {
+  lambda <- if ("lambda_00" %in% names(x)) x$lambda_00 else x$lambda
+  midpoint <- sqrt(x$left_time_boundary * x$right_time_boundary)
+  data.frame(
+    years = midpoint / mu * generation_time,
+    Ne = 1 / (2 * mu * lambda)
+  )
+}
+
+abb <- scale_msmc(read.table(
+  "results/msmc2/ABB_4573.final.txt", header=TRUE))
+sbb <- scale_msmc(read.table(
+  "results/msmc2/SBB_U1916.final.txt", header=TRUE))
+
+plot(abb$years, abb$Ne, type="n", log="xy",
+     xlab="Years before present", ylab="Effective population size",
+     xlim=range(c(abb$years, sbb$years)),
+     ylim=range(c(abb$Ne, sbb$Ne)))
+
+for (f in Sys.glob("results/msmc2/bootstrap/ABB_*/*.final.txt")) {
+  x <- scale_msmc(read.table(f, header=TRUE))
+  lines(x$years, x$Ne, type="s",
+        col=adjustcolor("firebrick", alpha.f=0.20))
+}
+
+for (f in Sys.glob("results/msmc2/bootstrap/SBB_*/*.final.txt")) {
+  x <- scale_msmc(read.table(f, header=TRUE))
+  lines(x$years, x$Ne, type="s",
+        col=adjustcolor("steelblue", alpha.f=0.20))
+}
+
+lines(abb$years, abb$Ne, type="s", lwd=3, col="firebrick")
+lines(sbb$years, sbb$Ne, type="s", lwd=3, col="steelblue")
+legend("topleft", legend=c("ABB: 4573", "SBB: U1916"),
+       col=c("firebrick", "steelblue"), lwd=3)
+~~~
+
+**Expected:** the original ABB and SBB estimates appear as thick lines, surrounded by faint bootstrap trajectories.
+
+The spread of ten replicates is a teaching visualization, not a precise confidence interval. Bootstrapping one scaffold measures sensitivity to blocks within that scaffold; it cannot compensate for limited genome coverage, systematic callability bias, or uncertainty in mutation rate and generation time.
+
 ## Interpretation questions
 
 1. Where do the ABB and SBB trajectories begin to differ, and where do they overlap?
@@ -223,5 +368,7 @@ q(save="no")
 4. How might using only Scaffold_34 affect the smoothness and uncertainty of the curves?
 5. Which assumptions are shared by both curves, and which sources of bias could differ between ABB and SBB?
 6. What happens to the time axis if generation time increases? What happens to both axes if the mutation rate changes?
+7. In which periods are the bootstrap trajectories most variable? What does that imply about confidence in the ABB–SBB contrast?
 
 Record the main comparison and its limitations in the [answer sheet](../answers/student_answers.md). Continue to [GONE](02-gone.md).
+
