@@ -16,7 +16,7 @@ Our biological question is:
 MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a format that combines segregating sites with the amount of callable sequence between them.
 
 ~~~text
-already-filtered VCF + callable mask
+  filtered VCF + callable mask
                ↓ generate_multihetsep.py
            multihetsep
                ↓ MSMC2
