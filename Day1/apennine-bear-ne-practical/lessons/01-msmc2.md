@@ -68,8 +68,20 @@ generate_multihetsep.py \
 **Expected:** the command writes a new text file and normally prints little or nothing to the terminal. A typical record has four fields:
 
 ```text
-Scaffold_34    68306    44    TC
-Scaffold_34    87563    259    AG
+head $OUTDIR/single_bear.${CHROM}.multihetsep.txt
+```
+
+```text
+Scaffold_34     888733  523396  GC
+Scaffold_34     1576118 432519  AC
+Scaffold_34     2187011 263935  AC
+Scaffold_34     4273847 1412752 GC
+Scaffold_34     4462888 107554  TA
+Scaffold_34     4566435 71919   GC
+Scaffold_34     4663030 45793   GT
+Scaffold_34     4680344 12241   TC
+Scaffold_34     4809111 101795  CT
+Scaffold_34     4863369 42736   AG
 ```
 
 These values illustrate the format only. The fields represent chromosome, position, callable distance from the preceding segregating site, and observed alleles/haplotypes.
