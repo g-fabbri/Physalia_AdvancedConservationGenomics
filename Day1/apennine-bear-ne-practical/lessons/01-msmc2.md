@@ -316,8 +316,8 @@ The count should be **20**. If classroom time is limited, run two or three repli
 Start R again. The following code writes the figure explicitly to **results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf**:
 
 ~~~r
-mu <- 4.5e-9
-generation_time <- 10
+mu <- 1.82e-8
+generation_time <- 11
 
 scale_msmc <- function(x) {
   lambda <- if ("lambda_00" %in% names(x)) x$lambda_00 else x$lambda
