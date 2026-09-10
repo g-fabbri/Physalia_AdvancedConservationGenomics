@@ -160,7 +160,7 @@ head "$OUTDIR/ABB_${ABB_ID}.final.txt"
 head "$OUTDIR/SBB_${SBB_ID}.final.txt"
 ~~~
 
-Both tables should contain time boundaries and a coalescence-rate column named **lambda** or **lambda_00**.
+Both tables should contain time boundaries and a coalescence-rate column named **lambda**.
 
 ## Step 4 — Scale and compare the trajectories
 
