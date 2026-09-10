@@ -39,11 +39,11 @@ We will additionally identify and exclude missing genotypes separately for each 
 
 ~~~bash
 CHROM=Scaffold_34
-APN_RAW=data/UrArMa_4573_s34.vcf.gz
-SVK_RAW=data/UrArMa_U1916_s34.vcf.gz
+ABB_VCF=data/UrArMa_4573_s34.vcf.gz
+SBB_VCF=data/UrArMa_U1916_s34.vcf.gz
+ABB_ID=4573
+SBB_ID=U1916
 MASK=data/UrArMa_callable.bed.gz
-APN_ID=4573
-SVK_ID=U1916
 OUTDIR=results/msmc2
 mkdir -p "$OUTDIR"
 ~~~
@@ -53,39 +53,14 @@ mkdir -p "$OUTDIR"
 **Check:**
 
 ~~~bash
-ls -lh "$APN_RAW" "$SVK_RAW" "$MASK"
-bcftools query -l "$APN_RAW" | grep -x "$APN_ID"
-bcftools query -l "$SVK_RAW" | grep -x "$SVK_ID"
+ls -lh "$ABB_VCF" "$SBB_VCF" "$MASK"
+bcftools query -l "$ABB_VCF" | grep -x "$ABB_ID"
+bcftools query -l "$SBB_VCF" | grep -x "$SBB_ID"
 ~~~
 
 Both identifiers should be printed.
 
-## Step 2 — Verify the prepared representative genomes
-
-**Purpose:** confirm that each prepared VCF contains only its intended representative.
-
-**Input:** `UrArMa_4573_s34.vcf.gz` and `UrArMa_U1916_s34.vcf.gz`.
-
-~~~bash
-bcftools query -l "$APN_RAW"
-bcftools query -l "$SVK_RAW"
-bcftools index -n "$APN_RAW"
-bcftools index -n "$SVK_RAW"
-~~~
-
-**Expected:** sample IDs `4573` and `U1916`, followed by one record count per VCF.
-
-**Check:**
-
-~~~bash
-bcftools query -l "$APN_RAW" | wc -l
-bcftools query -l "$SVK_RAW" | wc -l
-~~~
-
-Each command should print `1`.
-
-
-## Step 3 — Create the multihetsep files
+## Step 2 — Create the multihetsep files
 
 **Purpose:** combine allele and callability information in MSMC2 format.
 
@@ -95,14 +70,12 @@ Each command should print `1`.
 generate_multihetsep.py \
   --chr "$CHROM" \
   --mask "$MASK" \
-  --negative_mask "$OUTDIR/${APN_ID}.missing.bed.gz" \
-  "$OUTDIR/${APN_ID}.complete.vcf.gz" \
+  "$OUTDIR/${APN_VCF}" \
   > "$OUTDIR/${APN_ID}.${CHROM}.multihetsep.txt"
 
 generate_multihetsep.py \
   --chr "$CHROM" \
   --mask "$MASK" \
-  --negative_mask "$OUTDIR/${SVK_ID}.missing.bed.gz" \
   "$OUTDIR/${SVK_ID}.complete.vcf.gz" \
   > "$OUTDIR/${SVK_ID}.${CHROM}.multihetsep.txt"
 ~~~
