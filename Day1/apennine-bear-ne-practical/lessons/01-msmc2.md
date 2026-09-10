@@ -311,7 +311,7 @@ find "$BOOTDIR" -name '*.final.txt' | wc -l
 
 The count should be **20**. If classroom time is limited, run two or three replicates together and leave the remaining runs as an exercise.
 
-Step D — Display bootstrap variation
+### Step D — Display bootstrap variation
 
 Start R again. The following code writes the figure explicitly to **results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf**:
 
