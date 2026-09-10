@@ -35,11 +35,12 @@ We will additionally identify and exclude missing genotypes separately for each 
 
 **Purpose:** name the inputs and representatives.
 
-**Input:** the 18-individual VCF, common callable mask, and Scaffold_34.
+**Input:** two prepared single-sample VCFs, the common callable mask, and Scaffold_34.
 
 ~~~bash
 CHROM=Scaffold_34
-ALL_VCF=data/UrArMa_18i_s34.vcf.gz
+APN_RAW=data/UrArMa_4573_s34.vcf.gz
+SVK_RAW=data/UrArMa_U1916_s34.vcf.gz
 MASK=data/UrArMa_callable.bed.gz
 APN_ID=4573
 SVK_ID=U1916
@@ -52,63 +53,60 @@ mkdir -p "$OUTDIR"
 **Check:**
 
 ~~~bash
-bcftools query -l "$ALL_VCF" | grep -x "$APN_ID"
-bcftools query -l "$ALL_VCF" | grep -x "$SVK_ID"
+ls -lh "$APN_RAW" "$SVK_RAW" "$MASK"
+bcftools query -l "$APN_RAW" | grep -x "$APN_ID"
+bcftools query -l "$SVK_RAW" | grep -x "$SVK_ID"
 ~~~
 
 Both identifiers should be printed.
 
-## Step 2 — Extract one genome per population
+## Step 2 — Verify the prepared representative genomes
 
-**Purpose:** create single-sample VCFs with identical site definitions.
+**Purpose:** confirm that each prepared VCF contains only its intended representative.
 
-**Input:** the joint 18-individual VCF.
+**Input:** `UrArMa_4573_s34.vcf.gz` and `UrArMa_U1916_s34.vcf.gz`.
 
 ~~~bash
-bcftools view -s "$APN_ID" "$ALL_VCF" \
-  -Oz -o "$OUTDIR/${APN_ID}.raw.vcf.gz"
-
-bcftools view -s "$SVK_ID" "$ALL_VCF" \
-  -Oz -o "$OUTDIR/${SVK_ID}.raw.vcf.gz"
-
-bcftools index -t "$OUTDIR/${APN_ID}.raw.vcf.gz"
-bcftools index -t "$OUTDIR/${SVK_ID}.raw.vcf.gz"
+bcftools query -l "$APN_RAW"
+bcftools query -l "$SVK_RAW"
+bcftools index -n "$APN_RAW"
+bcftools index -n "$SVK_RAW"
 ~~~
 
-**Expected:** two compressed, indexed, single-sample VCFs.
+**Expected:** sample IDs `4573` and `U1916`, followed by one record count per VCF.
 
 **Check:**
 
 ~~~bash
-bcftools query -l "$OUTDIR/${APN_ID}.raw.vcf.gz"
-bcftools query -l "$OUTDIR/${SVK_ID}.raw.vcf.gz"
+bcftools query -l "$APN_RAW" | wc -l
+bcftools query -l "$SVK_RAW" | wc -l
 ~~~
 
-Each command should print exactly its requested individual.
+Each command should print `1`.
 
 ## Step 3 — Inspect and exclude missing genotypes
 
 **Purpose:** prevent missing genotypes such as **./.** from being parsed as alleles or treated as invariant sequence.
 
-**Input:** the two extracted VCFs.
+**Input:** the two prepared single-sample VCFs.
 
 Count genotype types:
 
 ~~~bash
-bcftools query -f '[%GT\n]' "$OUTDIR/${APN_ID}.raw.vcf.gz" | sort | uniq -c
-bcftools query -f '[%GT\n]' "$OUTDIR/${SVK_ID}.raw.vcf.gz" | sort | uniq -c
+bcftools query -f '[%GT\n]' "$APN_RAW" | sort | uniq -c
+bcftools query -f '[%GT\n]' "$SVK_RAW" | sort | uniq -c
 ~~~
 
 Create individual negative masks for missing sites:
 
 ~~~bash
 bcftools query -i 'GT="mis"' -f '%CHROM\t%POS\n' \
-  "$OUTDIR/${APN_ID}.raw.vcf.gz" | \
+  "$APN_RAW" | \
   awk 'BEGIN {OFS="\t"} {print $1,$2-1,$2}' | \
   bgzip -c > "$OUTDIR/${APN_ID}.missing.bed.gz"
 
 bcftools query -i 'GT="mis"' -f '%CHROM\t%POS\n' \
-  "$OUTDIR/${SVK_ID}.raw.vcf.gz" | \
+  "$SVK_RAW" | \
   awk 'BEGIN {OFS="\t"} {print $1,$2-1,$2}' | \
   bgzip -c > "$OUTDIR/${SVK_ID}.missing.bed.gz"
 ~~~
@@ -117,11 +115,11 @@ Create VCFs containing non-missing biallelic SNP genotypes:
 
 ~~~bash
 bcftools view -g ^miss -m2 -M2 -v snps \
-  "$OUTDIR/${APN_ID}.raw.vcf.gz" \
+  "$APN_RAW" \
   -Oz -o "$OUTDIR/${APN_ID}.complete.vcf.gz"
 
 bcftools view -g ^miss -m2 -M2 -v snps \
-  "$OUTDIR/${SVK_ID}.raw.vcf.gz" \
+  "$SVK_RAW" \
   -Oz -o "$OUTDIR/${SVK_ID}.complete.vcf.gz"
 
 bcftools index -t "$OUTDIR/${APN_ID}.complete.vcf.gz"
@@ -280,4 +278,3 @@ Exit R with **q()**.
 6. Why should a one-scaffold trajectory not be treated as a final demographic reconstruction?
 
 The first piece of evidence is now complete. Continue to [recent population history with GONE](02-gone.md).
-

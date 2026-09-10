@@ -10,7 +10,8 @@ Estimated time: 10 minutes.
 
 ~~~bash
 CHROM=Scaffold_34
-SINGLE=data/UrArMa_4573_s34.vcf.gz
+APN_SINGLE=data/UrArMa_4573_s34.vcf.gz
+SVK_SINGLE=data/UrArMa_U1916_s34.vcf.gz
 POP=data/UrArMa_18i_s34.vcf.gz
 MASK=data/UrArMa_callable.bed.gz
 ~~~
@@ -20,15 +21,16 @@ MASK=data/UrArMa_callable.bed.gz
 **Check:** display their values:
 
 ~~~bash
-printf 'Chromosome: %s\nSingle VCF: %s\nPopulation VCF: %s\nMask: %s\n' \
-  "$CHROM" "$SINGLE" "$POP" "$MASK"
+printf 'Chromosome: %s\nApennine VCF: %s\nSlovak VCF: %s\nPopulation VCF: %s\nMask: %s\n' \
+  "$CHROM" "$APN_SINGLE" "$SVK_SINGLE" "$POP" "$MASK"
 ~~~
 
 Expected shape:
 
 ~~~text
 Chromosome: Scaffold_34
-Single VCF: data/UrArMa_4573_s34.vcf.gz
+Apennine VCF: data/UrArMa_4573_s34.vcf.gz
+Slovak VCF: data/UrArMa_U1916_s34.vcf.gz
 Population VCF: data/UrArMa_18i_s34.vcf.gz
 Mask: data/UrArMa_callable.bed.gz
 ~~~
@@ -40,10 +42,10 @@ Mask: data/UrArMa_callable.bed.gz
 **Input:** the three paths defined above.
 
 ~~~bash
-ls -lh "$SINGLE" "$POP" "$MASK"
+ls -lh "$APN_SINGLE" "$SVK_SINGLE" "$POP" "$MASK"
 ~~~
 
-**Expected:** three lines containing file sizes greater than zero.
+**Expected:** four lines containing file sizes greater than zero.
 
 **Check:** “No such file or directory” means the working directory or input path is wrong. Run:
 
@@ -59,20 +61,22 @@ ls -lh data
 **Input:** the single-individual and population VCFs.
 
 ~~~bash
-bcftools query -l "$SINGLE"
+bcftools query -l "$APN_SINGLE"
+bcftools query -l "$SVK_SINGLE"
 bcftools query -l "$POP"
 ~~~
 
-**Expected:** the first command prints one sample ID. The second prints one ID per population sample.
+**Expected:** the first two commands print `4573` and `U1916`. The third prints one ID per population sample.
 
 **Check:** count the samples:
 
 ~~~bash
-bcftools query -l "$SINGLE" | wc -l
+bcftools query -l "$APN_SINGLE" | wc -l
+bcftools query -l "$SVK_SINGLE" | wc -l
 bcftools query -l "$POP" | wc -l
 ~~~
 
-**Expected:** **1** for the single-individual VCF and **18** for the population VCF. Record both observed counts.
+**Expected:** **1**, **1**, and **18**. Record all observed counts.
 
 Create population sample lists from the naming convention:
 
@@ -99,7 +103,8 @@ cat data/slovak.samples
 **Input:** both VCFs and the BED mask.
 
 ~~~bash
-bcftools query -f '%CHROM\n' "$SINGLE" | sort -u
+bcftools query -f '%CHROM\n' "$APN_SINGLE" | sort -u
+bcftools query -f '%CHROM\n' "$SVK_SINGLE" | sort -u
 bcftools query -f '%CHROM\n' "$POP" | sort -u
 gzip -cd "$MASK" | cut -f1 | sort -u | head
 ~~~
@@ -127,7 +132,8 @@ Do not continue if the result is **NOT FOUND**.
 **Input:** the two indexed VCFs.
 
 ~~~bash
-bcftools index -n "$SINGLE"
+bcftools index -n "$APN_SINGLE"
+bcftools index -n "$SVK_SINGLE"
 bcftools index -n "$POP"
 ~~~
 
@@ -136,16 +142,19 @@ bcftools index -n "$POP"
 **Check:** if an index is missing, create it and repeat:
 
 ~~~bash
-bcftools index -t "$SINGLE"
-bcftools index -t "$POP"
-bcftools index -n "$SINGLE"
+bcftools index -f "$APN_SINGLE"
+bcftools index -f "$SVK_SINGLE"
+bcftools index -f "$POP"
+bcftools index -n "$APN_SINGLE"
+bcftools index -n "$SVK_SINGLE"
 bcftools index -n "$POP"
 ~~~
 
 Inspect several records:
 
 ~~~bash
-bcftools view -H "$SINGLE" | head
+bcftools view -H "$APN_SINGLE" | head
+bcftools view -H "$SVK_SINGLE" | head
 bcftools view -H "$POP" | head
 ~~~
 

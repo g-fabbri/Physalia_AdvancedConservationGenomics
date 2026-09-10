@@ -70,13 +70,15 @@ By the end, you should be able to connect each estimator to its genomic signal a
 
 ~~~text
 data/UrArMa_18i_s34.vcf.gz
-data/UrArMa_18i_s34.vcf.gz.tbi
+data/UrArMa_18i_s34.vcf.gz.csi
 data/UrArMa_4573_s34.vcf.gz
-data/UrArMa_4573_s34.vcf.gz.tbi
+data/UrArMa_4573_s34.vcf.gz.csi
+data/UrArMa_U1916_s34.vcf.gz
+data/UrArMa_U1916_s34.vcf.gz.csi
 data/UrArMa_callable.bed.gz
 ~~~
 
-The 18-individual VCF supplies population data. The single-individual VCF is retained for comparison and troubleshooting.
+The 18-individual VCF supplies population data. The two single-individual VCFs provide the Apennine and Slovak representatives for the historical comparison.
 
 ### About the callable mask
 
@@ -114,4 +116,3 @@ Start with [Terminal orientation and data QC](lessons/00-data-and-qc.md).
 - Tutorial structure inspired by the narrative, command-first approach of the [Speciation & Population Genomics guide](https://speciationgenomics.github.io/pca/).
 
 Additional method references are listed in [REFERENCES.md](REFERENCES.md).
-
