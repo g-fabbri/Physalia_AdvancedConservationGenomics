@@ -84,60 +84,8 @@ bcftools query -l "$SVK_RAW" | wc -l
 
 Each command should print `1`.
 
-## Step 3 — Inspect and exclude missing genotypes
 
-**Purpose:** prevent missing genotypes such as **./.** from being parsed as alleles or treated as invariant sequence.
-
-**Input:** the two prepared single-sample VCFs.
-
-Count genotype types:
-
-~~~bash
-bcftools query -f '[%GT\n]' "$APN_RAW" | sort | uniq -c
-bcftools query -f '[%GT\n]' "$SVK_RAW" | sort | uniq -c
-~~~
-
-Create individual negative masks for missing sites:
-
-~~~bash
-bcftools query -i 'GT="mis"' -f '%CHROM\t%POS\n' \
-  "$APN_RAW" | \
-  awk 'BEGIN {OFS="\t"} {print $1,$2-1,$2}' | \
-  bgzip -c > "$OUTDIR/${APN_ID}.missing.bed.gz"
-
-bcftools query -i 'GT="mis"' -f '%CHROM\t%POS\n' \
-  "$SVK_RAW" | \
-  awk 'BEGIN {OFS="\t"} {print $1,$2-1,$2}' | \
-  bgzip -c > "$OUTDIR/${SVK_ID}.missing.bed.gz"
-~~~
-
-Create VCFs containing non-missing biallelic SNP genotypes:
-
-~~~bash
-bcftools view -g ^miss -m2 -M2 -v snps \
-  "$APN_RAW" \
-  -Oz -o "$OUTDIR/${APN_ID}.complete.vcf.gz"
-
-bcftools view -g ^miss -m2 -M2 -v snps \
-  "$SVK_RAW" \
-  -Oz -o "$OUTDIR/${SVK_ID}.complete.vcf.gz"
-
-bcftools index -t "$OUTDIR/${APN_ID}.complete.vcf.gz"
-bcftools index -t "$OUTDIR/${SVK_ID}.complete.vcf.gz"
-~~~
-
-**Expected:** two complete VCFs and two individual missing-site BED files.
-
-**Check:**
-
-~~~bash
-bcftools query -f '[%GT\n]' "$OUTDIR/${APN_ID}.complete.vcf.gz" | sort | uniq -c
-bcftools query -f '[%GT\n]' "$OUTDIR/${SVK_ID}.complete.vcf.gz" | sort | uniq -c
-~~~
-
-No **./.** or **.|.** genotype should remain. Do not replace missing genotypes with **0/0**.
-
-## Step 4 — Create the multihetsep files
+## Step 3 — Create the multihetsep files
 
 **Purpose:** combine allele and callability information in MSMC2 format.
 
@@ -180,7 +128,7 @@ wc -l "$OUTDIR/"*.multihetsep.txt
 
 Positions should increase, chromosome labels should match, and neither file should be empty.
 
-## Step 5 — Run MSMC2 separately
+## Step 4 — Run MSMC2 separately
 
 **Purpose:** estimate a historical trajectory for each diploid genome.
 
@@ -216,7 +164,7 @@ head "$OUTDIR/SVK_U1916.final.txt"
 
 Both should contain time boundaries and a lambda column.
 
-## Step 6 — Scale and compare the trajectories
+## Step 5 — Scale and compare the trajectories
 
 **Purpose:** apply the same mutation rate and generation time so the curves are directly comparable.
 
