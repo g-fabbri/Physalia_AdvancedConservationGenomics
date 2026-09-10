@@ -178,8 +178,8 @@ Then paste:
 abb <- read.table("results/msmc2/ABB_4573.final.txt", header=TRUE)
 sbb <- read.table("results/msmc2/SBB_U1916.final.txt", header=TRUE)
 
-mu <- 4.5e-9
-generation_time <- 10
+mu <- 1.82e-8
+generation_time <- 11
 
 scale_msmc <- function(x) {
   lambda <- if ("lambda_00" %in% names(x)) x$lambda_00 else x$lambda
