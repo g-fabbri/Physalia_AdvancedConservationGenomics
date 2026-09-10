@@ -67,8 +67,6 @@ generate_multihetsep.py \
 
 **Expected:** the command writes a new text file and normally prints little or nothing to the terminal. A typical record has four fields:
 
-
-
 ```text
 Scaffold_34     888733  523396  GC
 Scaffold_34     1576118 432519  AC
@@ -94,19 +92,6 @@ wc -l "$OUTDIR/single_bear.${CHROM}.multihetsep.txt"
 
 If the file is empty, check sample name, chromosome label, mask overlap, genotype filtering, and whether the VCF contains heterozygous variants.
 
-### Question: one mask or two?
-
-The official tool can intersect sample callability with a mappability mask:
-
-```bash
-generate_multihetsep.py \
-  --chr "$CHROM" \
-  --mask "$MASK" \
-  --mask data/Scaffold_34.mappability.bed.gz \
-  "$VCF" > "$OUTDIR/two_masks.multihetsep.txt"
-```
-
-Why is this preferable to treating every reference position as observable?
 
 ## Run MSMC2
 
