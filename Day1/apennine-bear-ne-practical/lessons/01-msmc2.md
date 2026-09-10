@@ -13,7 +13,7 @@ The complete workflow is:
 ```text
 BAM + reference genome
         ↓ variant calling and callable-site assessment
-VCF + callable mask + optional mappability mask
+VCF + callable mask
         ↓ generate_multihetsep.py
 multihetsep file
         ↓ MSMC2
