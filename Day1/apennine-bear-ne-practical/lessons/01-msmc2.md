@@ -311,41 +311,60 @@ find "$BOOTDIR" -name '*.final.txt' | wc -l
 
 The count should be **20**. If classroom time is limited, run two or three replicates together and leave the remaining runs as an exercise.
 
-### Step D — Display bootstrap variation
+Step D — Display bootstrap variation
 
-Start R again and paste:
+Start R again. The following code writes the figure explicitly to **results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf**:
 
 ~~~r
-mu <- 1.82e-8
-generation_time <- 11
+mu <- 4.5e-9
+generation_time <- 10
 
 scale_msmc <- function(x) {
   lambda <- if ("lambda_00" %in% names(x)) x$lambda_00 else x$lambda
   midpoint <- sqrt(x$left_time_boundary * x$right_time_boundary)
-  data.frame(
+  y <- data.frame(
     years = midpoint / mu * generation_time,
     Ne = 1 / (2 * mu * lambda)
   )
+  y[is.finite(y$years) & is.finite(y$Ne) &
+      y$years > 0 & y$Ne > 0, ]
 }
 
-abb <- scale_msmc(read.table(
-  "results/msmc2/ABB_4573.final.txt", header=TRUE))
-sbb <- scale_msmc(read.table(
-  "results/msmc2/SBB_U1916.final.txt", header=TRUE))
+read_scaled <- function(filename) {
+  scale_msmc(read.table(filename, header=TRUE))
+}
 
+abb <- read_scaled("results/msmc2/ABB_4573.final.txt")
+sbb <- read_scaled("results/msmc2/SBB_U1916.final.txt")
+
+abb_files <- Sys.glob(
+  "results/msmc2/bootstrap/ABB_*/*.final.txt")
+sbb_files <- Sys.glob(
+  "results/msmc2/bootstrap/SBB_*/*.final.txt")
+
+if (length(abb_files) == 0 || length(sbb_files) == 0) {
+  stop("No bootstrap final.txt files found; check BOOTDIR and Step C")
+}
+
+abb_boot <- lapply(abb_files, read_scaled)
+sbb_boot <- lapply(sbb_files, read_scaled)
+all_curves <- c(list(abb, sbb), abb_boot, sbb_boot)
+
+x_limits <- range(unlist(lapply(all_curves, function(x) x$years)))
+y_limits <- range(unlist(lapply(all_curves, function(x) x$Ne)))
+
+pdf("results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf",
+    width=7, height=5)
 plot(abb$years, abb$Ne, type="n", log="xy",
      xlab="Years before present", ylab="Effective population size",
-     xlim=range(c(abb$years, sbb$years)),
-     ylim=range(c(abb$Ne, sbb$Ne)))
+     xlim=x_limits, ylim=y_limits)
 
-for (f in Sys.glob("results/msmc2/bootstrap/ABB_*/*.final.txt")) {
-  x <- scale_msmc(read.table(f, header=TRUE))
+for (x in abb_boot) {
   lines(x$years, x$Ne, type="s",
         col=adjustcolor("firebrick", alpha.f=0.20))
 }
 
-for (f in Sys.glob("results/msmc2/bootstrap/SBB_*/*.final.txt")) {
-  x <- scale_msmc(read.table(f, header=TRUE))
+for (x in sbb_boot) {
   lines(x$years, x$Ne, type="s",
         col=adjustcolor("steelblue", alpha.f=0.20))
 }
@@ -354,9 +373,26 @@ lines(abb$years, abb$Ne, type="s", lwd=3, col="firebrick")
 lines(sbb$years, sbb$Ne, type="s", lwd=3, col="steelblue")
 legend("topleft", legend=c("ABB: 4573", "SBB: U1916"),
        col=c("firebrick", "steelblue"), lwd=3)
+
+dev.off()
+file.info("results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf")$size
 ~~~
 
-**Expected:** the original ABB and SBB estimates appear as thick lines, surrounded by faint bootstrap trajectories.
+**Expected:** **dev.off()** prints the name of the closed graphics device, followed by a positive PDF file size. The PDF contains the original ABB and SBB estimates as thick lines surrounded by faint bootstrap trajectories.
+
+Return to the terminal and check the result:
+
+~~~bash
+ls -lh results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf
+~~~
+
+If R stops with **No bootstrap final.txt files found**, run this in the terminal and compare the paths with Step C:
+
+~~~bash
+find results/msmc2/bootstrap -name '*.final.txt'
+~~~
+
+Do not call **pdf()** after the plotting commands: that would create a new, empty PDF device.
 
 The spread of ten replicates is a teaching visualization, not a precise confidence interval. Bootstrapping one scaffold measures sensitivity to blocks within that scaffold; it cannot compensate for limited genome coverage, systematic callability bias, or uncertainty in mutation rate and generation time.
 
