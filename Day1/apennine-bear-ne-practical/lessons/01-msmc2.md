@@ -129,11 +129,11 @@ If the program reports `invalid literal for int() with base 10: '.'`, a missing 
 **Input:** the two multihetsep files.
 
 ~~~bash
-msmc2 -t 2 -p '1*2+15*1+1*2' \
+msmc2 -t 2 -p '4+25*2+4+6' \
   -o "$OUTDIR/ABB_${ABB_ID}" \
   "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt"
 
-msmc2 -t 2 -p '1*2+15*1+1*2' \
+msmc2 -t 2 -p '4+25*2+4+6' \
   -o "$OUTDIR/SBB_${SBB_ID}" \
   "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
 ~~~
