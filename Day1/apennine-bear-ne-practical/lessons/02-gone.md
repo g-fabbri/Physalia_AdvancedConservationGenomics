@@ -1,8 +1,8 @@
-# GONE — recent demographic history from linkage disequilibrium
+# GONE — comparing recent history in two bear populations
 
 Estimated practical time: 30 minutes.
 
-GONE estimates recent effective population size from linkage disequilibrium (LD) measured at different recombination distances. It requires genotypes from several individuals sampled from the same population.
+GONE estimates recent effective population size from linkage disequilibrium (LD) measured at different recombination distances. We will estimate each population separately and then compare the trajectories.
 
 In this exercise, we use one Apennine brown bear chromosome to reduce runtime. The result is a teaching demonstration rather than a complete demographic reconstruction.
 
@@ -35,13 +35,12 @@ Create short shell variables that will be reused throughout the analysis.
 
 **Command**
 
-Replace `chrN` with the selected chromosome name.
+Use the selected scaffold and population VCF.
 
 ```bash
-CHROM=chrN
-VCF=data/teaching/population.${CHROM}.vcf.gz
+CHROM=Scaffold_34
+ALL_VCF=data/UrArMa_18i_s34.vcf.gz
 OUTDIR=results/gone
-PREFIX="$OUTDIR/population_${CHROM}"
 mkdir -p "$OUTDIR"
 ```
 
@@ -52,9 +51,9 @@ No text is printed. The command creates `results/gone/` if it does not already e
 **Check**
 
 ```bash
-printf 'Chromosome: %s\nVCF: %s\nOutput prefix: %s\n' \
-  "$CHROM" "$VCF" "$PREFIX"
-ls -lh "$VCF"
+printf 'Chromosome: %s\nComplete VCF: %s\nOutput directory: %s\n' \
+  "$CHROM" "$ALL_VCF" "$OUTDIR"
+ls -lh "$ALL_VCF"
 ```
 
 The VCF should exist and have a file size greater than zero.
@@ -67,21 +66,21 @@ Confirm that the VCF contains several individuals and quantify the starting numb
 
 **Input**
 
-`$VCF` from Step 1.
+The 18-individual VCF from Step 1.
 
 **Command**
 
 List and count individuals:
 
 ```bash
-bcftools query -l "$VCF"
-bcftools query -l "$VCF" | wc -l
+bcftools query -l "$ALL_VCF"
+bcftools query -l "$ALL_VCF" | wc -l
 ```
 
 Count biallelic SNP records:
 
 ```bash
-bcftools view -m2 -M2 -v snps "$VCF" -Ou | \
+bcftools view -m2 -M2 -v snps "$ALL_VCF" -Ou | \
   bcftools view -H | wc -l
 ```
 
@@ -93,7 +92,35 @@ bcftools view -m2 -M2 -v snps "$VCF" -Ou | \
 
 **Check**
 
-The VCF must contain more than one individual. Record the individual and SNP counts in the student answer sheet.
+The complete VCF should contain 18 individuals. Separate the populations:
+
+```bash
+bcftools query -l "$ALL_VCF" | awk '!/^U/' > data/apennine.samples
+bcftools query -l "$ALL_VCF" | awk '/^U/' > data/slovak.samples
+
+bcftools view -S data/apennine.samples "$ALL_VCF" \
+  -Oz -o data/apennine_s34.vcf.gz
+bcftools view -S data/slovak.samples "$ALL_VCF" \
+  -Oz -o data/slovak_s34.vcf.gz
+
+bcftools index -t data/apennine_s34.vcf.gz
+bcftools index -t data/slovak_s34.vcf.gz
+```
+
+Check:
+
+```bash
+bcftools query -l data/apennine_s34.vcf.gz | wc -l
+bcftools query -l data/slovak_s34.vcf.gz | wc -l
+```
+
+Expected: 10 Apennine and 8 Slovak bears. Each group now selects one population; use `slovak` instead of `apennine` when assigned:
+
+```bash
+POPULATION=apennine
+VCF=data/${POPULATION}_s34.vcf.gz
+PREFIX="$OUTDIR/${POPULATION}_${CHROM}"
+```
 
 ## Step 3 — Filter variants and create PED/MAP files
 
@@ -137,9 +164,9 @@ plink \
 **Expected output**
 
 ```text
-results/gone/population_chrN_original_label.ped
-results/gone/population_chrN_original_label.map
-results/gone/population_chrN_original_label.log
+results/gone/apennine_Scaffold_34_original_label.ped
+results/gone/apennine_Scaffold_34_original_label.map
+results/gone/apennine_Scaffold_34_original_label.log
 ```
 
 PLINK should finish with a message indicating that the PED and MAP files were written.
@@ -182,8 +209,8 @@ awk 'BEGIN {OFS="\t"} {$1=1; print $1,$2,$3,$4}' \
 **Expected output**
 
 ```text
-results/gone/population_chrN.ped
-results/gone/population_chrN.map
+results/gone/apennine_Scaffold_34.ped
+results/gone/apennine_Scaffold_34.map
 ```
 
 Every row in the new MAP should begin with `1`.
@@ -240,7 +267,7 @@ GONE_SOURCE="$COURSE_DIR/software/GONE"
 GROUP=group01
 DATA_DIR="$COURSE_DIR/results/gone/$GROUP"
 RUN_DIR="$COURSE_DIR/work/gone_${CHROM}_${GROUP}"
-FILE=population_${CHROM}
+FILE=${POPULATION}_${CHROM}
 ```
 
 Replace `group01` with the assigned group identifier. Create a private software copy:
@@ -382,9 +409,9 @@ ls -lh "$DATA_DIR"
 Principal expected files:
 
 ```text
-OUTPUT_population_chrN
-Output_Ne_population_chrN
-Output_d2_population_chrN
+OUTPUT_apennine_Scaffold_34
+Output_Ne_apennine_Scaffold_34
+Output_d2_apennine_Scaffold_34
 outfileHWD
 timefile
 seedfile
@@ -421,7 +448,7 @@ Visualize how inferred effective population size changes through recent generati
 
 **Input**
 
-`results/gone/Output_Ne_population_chrN`.
+The group-specific Apennine or Slovak `Output_Ne` file.
 
 **Command**
 
@@ -476,6 +503,8 @@ A line plot with generations before present on the horizontal axis and effective
 - Do not interpret abrupt changes until the diagnostics and replicate stability have been examined.
 
 Exit R with `q()`.
+
+After both population runs are available, place or link their final files under `results/gone/comparison/` and overlay them using the same axes. Do not compare curves plotted with different parameter settings.
 
 ## Questions for discussion
 

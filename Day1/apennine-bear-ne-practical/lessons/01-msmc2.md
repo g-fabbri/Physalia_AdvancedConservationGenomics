@@ -1,194 +1,283 @@
-# MSMC2 — historical effective population size
+# MSMC2 — comparing historical population-size trajectories
 
 Estimated practical time: 30 minutes.
 
-MSMC2 uses the spacing of heterozygous sites and the amount of callable sequence to infer coalescence rates through time.
+We begin with one representative from each population:
 
-## What input does MSMC2 require?
+| Population | Individual |
+|---|---|
+| Apennine | 4573 |
+| Slovak | U1916 |
 
-MSMC2 does **not** read BAM or VCF files directly. Its input is a text file in `multihetsep` format.
+Our question is:
 
-The complete workflow is:
+> Do these two genomes record different histories of coalescence and effective population size?
 
-```text
-BAM + reference genome
-        ↓ variant calling and callable-site assessment
+MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a format combining segregating-site information with the amount of callable sequence between sites.
+
+~~~text
+BAM + reference
+      ↓ variant calling and callability assessment
 VCF + callable mask
-        ↓ generate_multihetsep.py
-multihetsep file
-        ↓ MSMC2
-coalescence-rate and demographic trajectory
-```
+      ↓ generate_multihetsep.py
+multihetsep
+      ↓ MSMC2
+historical trajectory
+~~~
 
-For this short practical, read alignment and variant calling have already been completed. Students begin with:
+## A note about the common mask
 
-```text
-data/UrArMa_4573_s34.vcf.gz
-data/UrArMa_4573_s34.vcf.gz.tbi
-data/UrArMa_callable.bed.gz
-data/Scaffold_34.mappability.bed.gz     # when available
-```
+Both bears were aligned to the Apennine reference. We use **UrArMa_callable.bed.gz** as the common teaching mask. This is defensible only if it represents reference mappability or regions callable in both samples. Alignment to the same reference alone does not make a sample-specific depth mask transferable.
 
-The VCF contains the observed genotypes or heterozygous variants. The callable mask identifies positions where a genotype could be assessed reliably. A mappability mask excludes regions where short reads cannot be placed uniquely.
+We will additionally identify and exclude missing genotypes separately for each bear.
 
-> A variant-only VCF cannot distinguish a confidently homozygous-reference position from a position with no usable data. It must not be used by itself to construct the callable mask.
+## Step 1 — Define files and individuals
 
-Starting from BAM files would require alignment QC, genotype calling, depth and quality thresholds, and callable-region construction. Those operations are important but constitute a separate practical.
+**Purpose:** name the inputs and representatives.
 
+**Input:** the 18-individual VCF, common callable mask, and Scaffold_34.
 
-
-## Prepare the input
-
-### Step 1 — Create an output directory
-
-**Purpose:** keep derived files separate from immutable teaching inputs.
-
-```bash
+~~~bash
 CHROM=Scaffold_34
-VCF=data/UrArMa_4573_s34.vcf.gz
+ALL_VCF=data/UrArMa_18i_s34.vcf.gz
 MASK=data/UrArMa_callable.bed.gz
+APN_ID=4573
+SVK_ID=U1916
 OUTDIR=results/msmc2
 mkdir -p "$OUTDIR"
-```
+~~~
 
-**Expected:** no output. `mkdir -p` creates the directory if needed and does not complain if it already exists.
+**Expected:** no terminal output.
 
-### Step 2 — Convert VCF plus mask to multihetsep
+**Check:**
 
-**Input:** one diploid VCF and its callable-region mask. These are inputs to `generate_multihetsep.py`; the resulting multihetsep file is the input to MSMC2 itself.
+~~~bash
+bcftools query -l "$ALL_VCF" | grep -x "$APN_ID"
+bcftools query -l "$ALL_VCF" | grep -x "$SVK_ID"
+~~~
 
-```bash
+Both identifiers should be printed.
+
+## Step 2 — Extract one genome per population
+
+**Purpose:** create single-sample VCFs with identical site definitions.
+
+**Input:** the joint 18-individual VCF.
+
+~~~bash
+bcftools view -s "$APN_ID" "$ALL_VCF" \
+  -Oz -o "$OUTDIR/${APN_ID}.raw.vcf.gz"
+
+bcftools view -s "$SVK_ID" "$ALL_VCF" \
+  -Oz -o "$OUTDIR/${SVK_ID}.raw.vcf.gz"
+
+bcftools index -t "$OUTDIR/${APN_ID}.raw.vcf.gz"
+bcftools index -t "$OUTDIR/${SVK_ID}.raw.vcf.gz"
+~~~
+
+**Expected:** two compressed, indexed, single-sample VCFs.
+
+**Check:**
+
+~~~bash
+bcftools query -l "$OUTDIR/${APN_ID}.raw.vcf.gz"
+bcftools query -l "$OUTDIR/${SVK_ID}.raw.vcf.gz"
+~~~
+
+Each command should print exactly its requested individual.
+
+## Step 3 — Inspect and exclude missing genotypes
+
+**Purpose:** prevent missing genotypes such as **./.** from being parsed as alleles or treated as invariant sequence.
+
+**Input:** the two extracted VCFs.
+
+Count genotype types:
+
+~~~bash
+bcftools query -f '[%GT\n]' "$OUTDIR/${APN_ID}.raw.vcf.gz" | sort | uniq -c
+bcftools query -f '[%GT\n]' "$OUTDIR/${SVK_ID}.raw.vcf.gz" | sort | uniq -c
+~~~
+
+Create individual negative masks for missing sites:
+
+~~~bash
+bcftools query -i 'GT="mis"' -f '%CHROM\t%POS\n' \
+  "$OUTDIR/${APN_ID}.raw.vcf.gz" | \
+  awk 'BEGIN {OFS="\t"} {print $1,$2-1,$2}' | \
+  bgzip -c > "$OUTDIR/${APN_ID}.missing.bed.gz"
+
+bcftools query -i 'GT="mis"' -f '%CHROM\t%POS\n' \
+  "$OUTDIR/${SVK_ID}.raw.vcf.gz" | \
+  awk 'BEGIN {OFS="\t"} {print $1,$2-1,$2}' | \
+  bgzip -c > "$OUTDIR/${SVK_ID}.missing.bed.gz"
+~~~
+
+Create VCFs containing non-missing biallelic SNP genotypes:
+
+~~~bash
+bcftools view -g ^miss -m2 -M2 -v snps \
+  "$OUTDIR/${APN_ID}.raw.vcf.gz" \
+  -Oz -o "$OUTDIR/${APN_ID}.complete.vcf.gz"
+
+bcftools view -g ^miss -m2 -M2 -v snps \
+  "$OUTDIR/${SVK_ID}.raw.vcf.gz" \
+  -Oz -o "$OUTDIR/${SVK_ID}.complete.vcf.gz"
+
+bcftools index -t "$OUTDIR/${APN_ID}.complete.vcf.gz"
+bcftools index -t "$OUTDIR/${SVK_ID}.complete.vcf.gz"
+~~~
+
+**Expected:** two complete VCFs and two individual missing-site BED files.
+
+**Check:**
+
+~~~bash
+bcftools query -f '[%GT\n]' "$OUTDIR/${APN_ID}.complete.vcf.gz" | sort | uniq -c
+bcftools query -f '[%GT\n]' "$OUTDIR/${SVK_ID}.complete.vcf.gz" | sort | uniq -c
+~~~
+
+No **./.** or **.|.** genotype should remain. Do not replace missing genotypes with **0/0**.
+
+## Step 4 — Create the multihetsep files
+
+**Purpose:** combine allele and callability information in MSMC2 format.
+
+**Input:** one complete VCF, the common positive mask, and the individual's missing-site negative mask.
+
+~~~bash
 generate_multihetsep.py \
   --chr "$CHROM" \
   --mask "$MASK" \
-  "$VCF" \
-  > "$OUTDIR/single_bear.${CHROM}.multihetsep.txt"
-```
+  --negative_mask "$OUTDIR/${APN_ID}.missing.bed.gz" \
+  "$OUTDIR/${APN_ID}.complete.vcf.gz" \
+  > "$OUTDIR/${APN_ID}.${CHROM}.multihetsep.txt"
 
-**Expected:** the command writes a new text file and normally prints little or nothing to the terminal. A typical record has four fields:
+generate_multihetsep.py \
+  --chr "$CHROM" \
+  --mask "$MASK" \
+  --negative_mask "$OUTDIR/${SVK_ID}.missing.bed.gz" \
+  "$OUTDIR/${SVK_ID}.complete.vcf.gz" \
+  > "$OUTDIR/${SVK_ID}.${CHROM}.multihetsep.txt"
+~~~
 
-```text
-Scaffold_34     888733  523396  GC
-Scaffold_34     1576118 432519  AC
-```
+**Expected:** the program reports **2 haplotypes** for each diploid genome and creates two non-empty files.
 
-These values illustrate the format only. The fields represent chromosome, position, callable distance from the preceding segregating site, and observed alleles/haplotypes.
+Typical format:
 
-| Argument | Meaning | Decision to justify |
-|---|---|---|
-| `--chr` | Selects/labels the chromosome | Must match VCF labels exactly |
-| `--mask` | Includes callable intervals | How was callability defined? |
-| VCF path | Single diploid genotype input | Are depth and quality adequate? |
-| `>` | Redirects output to a file | Is overwriting acceptable? |
+~~~text
+Scaffold_34    68306    44     TC
+Scaffold_34    87563    259    AG
+~~~
 
-Inspect it:
+Columns represent chromosome, segregating-site position, callable sites since the previous segregating site, and observed haplotype alleles.
 
-```bash
-head "$OUTDIR/single_bear.${CHROM}.multihetsep.txt"
-wc -l "$OUTDIR/single_bear.${CHROM}.multihetsep.txt"
-```
+**Check:**
 
-**Check:** the file must be non-empty, positions should increase, chromosome labels should be consistent, and the allele field should not be missing. `wc -l` approximates the number of segregating records.
+~~~bash
+head "$OUTDIR/${APN_ID}.${CHROM}.multihetsep.txt"
+head "$OUTDIR/${SVK_ID}.${CHROM}.multihetsep.txt"
+wc -l "$OUTDIR/"*.multihetsep.txt
+~~~
 
-If the file is empty, check sample name, chromosome label, mask overlap, genotype filtering, and whether the VCF contains heterozygous variants.
+Positions should increase, chromosome labels should match, and neither file should be empty.
 
+## Step 5 — Run MSMC2 separately
 
-## Run MSMC2
+**Purpose:** estimate a historical trajectory for each diploid genome.
 
-### Step 3 — Examine available parameters
+~~~bash
+msmc2 -t 2 -p '1*2+15*1+1*2' \
+  -o "$OUTDIR/APN_4573" \
+  "$OUTDIR/${APN_ID}.${CHROM}.multihetsep.txt"
 
-```bash
-msmc2 --help | less
-```
+msmc2 -t 2 -p '1*2+15*1+1*2' \
+  -o "$OUTDIR/SVK_U1916" \
+  "$OUTDIR/${SVK_ID}.${CHROM}.multihetsep.txt"
+~~~
 
-Press `q` to exit `less`. Locate `-t`, `-p`, and `-o` in the help before continuing.
+| Flag | Meaning |
+|---|---|
+| **-t 2** | Use two compute threads |
+| **-p** | Group atomic time intervals into estimated parameters |
+| **-o** | Set the population-specific output prefix |
 
-### Step 4 — Fit a teaching model
+**Expected:** two final tables:
 
-**Input:** the multihetsep file created above.
+~~~text
+results/msmc2/APN_4573.final.txt
+results/msmc2/SVK_U1916.final.txt
+~~~
 
-```bash
-msmc2 \
-  -t 2 \
-  -p '1*2+15*1+1*2' \
-  -o "$OUTDIR/bear_chr" \
-  "$OUTDIR/single_bear.${CHROM}.multihetsep.txt"
-```
+**Check:**
 
-**Expected:** MSMC2 reports optimization progress and creates files beginning `bear_chr`, including a final table. Confirm:
+~~~bash
+head "$OUTDIR/APN_4573.final.txt"
+head "$OUTDIR/SVK_U1916.final.txt"
+~~~
 
-```bash
-ls -lh "$OUTDIR"/bear_chr*
-head "$OUTDIR/bear_chr.final.txt"
-```
+Both should contain time boundaries and a lambda column.
 
-Expected table shape:
+## Step 6 — Scale and compare the trajectories
 
-```text
-time_index  left_time_boundary  right_time_boundary  lambda_00
-0           ...                 ...                  ...
-```
+**Purpose:** apply the same mutation rate and generation time so the curves are directly comparable.
 
-**Check:** time boundaries and rate values should be numeric and the final file should contain multiple rows. A completed run is not automatically a trustworthy run.
+Start R:
 
-| Flag | Meaning | Question |
-|---|---|---|
-| `-t 2` | Two compute threads | How many cores are allocated? |
-| `-p` | Groups time segments into free parameters | Is the dataset rich enough for more parameters? |
-| `-o` | Output prefix | Can runs with different settings be distinguished? |
-
-The teaching pattern combines two intervals at each end and estimates 15 middle intervals separately. More parameters do not automatically improve inference; sparse data can make a flexible curve unstable.
-
-If necessary, stop with `Ctrl-C` and use the precomputed checkpoint:
-
-```bash
-cp results/msmc2/precomputed/msmc2.final.txt "$OUTDIR/bear_chr.final.txt"
-```
-
-## Scale and plot in R
-
-### Step 5 — Convert scaled units to biological units
-
-**Input:** the MSMC2 final table, mutation rate per site per generation, and generation time in years.
-
-```bash
+~~~bash
 R
-```
+~~~
 
-```r
-x <- read.table("results/msmc2/bear_chr.final.txt", header=TRUE)
-names(x)
+~~~r
+apn <- read.table("results/msmc2/APN_4573.final.txt", header=TRUE)
+svk <- read.table("results/msmc2/SVK_U1916.final.txt", header=TRUE)
+
 mu <- 4.5e-9
 generation_time <- 10
-midpoint <- sqrt(x$left_time_boundary * x$right_time_boundary)
-years <- midpoint / mu * generation_time
-lambda <- if ("lambda_00" %in% names(x)) x$lambda_00 else x$lambda
-Ne <- 1 / (2 * mu * lambda)
-plot(years, Ne, type="s", log="xy",
+
+scale_msmc <- function(x) {
+  lambda <- if ("lambda_00" %in% names(x)) x$lambda_00 else x$lambda
+  midpoint <- sqrt(x$left_time_boundary * x$right_time_boundary)
+  data.frame(
+    years = midpoint / mu * generation_time,
+    Ne = 1 / (2 * mu * lambda)
+  )
+}
+
+apn_scaled <- scale_msmc(apn)
+svk_scaled <- scale_msmc(svk)
+
+plot(apn_scaled$years, apn_scaled$Ne,
+     type="s", log="xy", lwd=2, col="firebrick",
      xlab="Years before present", ylab="Effective population size")
-```
+lines(svk_scaled$years, svk_scaled$Ne,
+      type="s", lwd=2, col="steelblue")
+legend("topleft",
+       legend=c("Apennine 4573", "Slovak U1916"),
+       col=c("firebrick", "steelblue"), lwd=2)
+~~~
 
-**Expected:** `names(x)` lists the time-boundary and lambda columns. The plot has logarithmic time and population-size axes and a step-like trajectory.
+**Expected:** two trajectories on identical logarithmic axes.
 
-**Check:** `years` and `Ne` should be positive and finite:
+**Check:**
 
-```r
-summary(years)
-summary(Ne)
-```
+~~~r
+summary(apn_scaled)
+summary(svk_scaled)
+~~~
 
-`NA`, `Inf`, or non-positive values indicate a parsing, column-selection, or numerical problem that must be resolved before interpretation.
+All plotted values should be positive and finite. The values of **mu** and generation time are teaching placeholders and must be justified for biological use.
 
-The values of `mu` and `generation_time` are placeholders for teaching, not recommended bear parameters.
+Exit R with **q()**.
 
-### Parameter challenge
+## Questions for discussion
 
-Repeat with alternative values and explain:
+1. Where do the two curves differ, and where do they overlap?
+2. Which parts of each curve are least reliable?
+3. Could unequal coverage or callability imitate a population difference?
+4. What does the third multihetsep column contribute that a variant-only VCF does not?
+5. How would alternative mutation rates and generation times change the figure?
+6. Why should a one-scaffold trajectory not be treated as a final demographic reconstruction?
 
-- Is `mu` measured per site per generation?
-- Is it estimated for bears or borrowed from another mammal?
-- Does generation time represent this population?
-- Which axes change with `mu`?
-- Which axis changes with generation time?
+The first piece of evidence is now complete. Continue to [recent population history with GONE](02-gone.md).
 
-Exit R using `q()`. Continue to [GONE](02-gone.md).

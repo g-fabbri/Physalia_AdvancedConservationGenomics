@@ -11,18 +11,27 @@
 
 - Mutation rate used:
 - Generation time used:
-- Most defensible portion of the curve:
+- Main difference between 4573 and U1916:
+- Most defensible portion of the curves:
 - Effect of changing generation time:
 - Interpretation in two sentences:
 
 ## GONE
 
-- Number of individuals and SNPs:
+- Apennine individuals and SNPs:
+- Slovak individuals and SNPs:
 - Recombination assumption:
-- Recent pattern inferred:
+- Main difference between recent trajectories:
 - Possible non-demographic explanation:
 
-## NeEstimator
+## NeEstimator — Apennine
+
+| Allele-frequency cutoff | Loci | Ne | Lower CI | Upper CI |
+|---:|---:|---:|---:|---:|
+| 0.02 | | | | |
+| 0.05 | | | | |
+
+## NeEstimator — Slovak
 
 | Allele-frequency cutoff | Loci | Ne | Lower CI | Upper CI |
 |---:|---:|---:|---:|---:|
@@ -34,4 +43,3 @@
 Do the results disagree? Explain with reference to genomic signal, sampling, and time window.
 
 What can you responsibly tell a conservation manager?
-

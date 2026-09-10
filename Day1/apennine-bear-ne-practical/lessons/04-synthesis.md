@@ -1,20 +1,46 @@
-# Synthesis — three views of effective size
+# Synthesis — reconstructing two population histories
 
-| Method | Signal | Samples | Time window | Key parameter | Main vulnerability | Result |
-|---|---|---:|---|---|---|---|
-| MSMC2 | Heterozygous-site spacing/coalescence | 1 diploid genome | Older/intermediate | `mu`, generation time, time pattern | Masking and limited sequence | |
-| GONE | LD by recombination distance | Multiple individuals | Recent generations | Recombination map/rate | Structure, migrants, relatives | |
-| NeEstimator | Sample LD among loci | Multiple individuals | Contemporary | Rare-allele cutoff | Sample size, rare alleles, linkage | |
+We began with one question:
+
+> Do Apennine and Slovak bear genomes record different histories of effective population size?
+
+No single result answers it completely. Assemble the evidence by time scale.
+
+## Evidence table
+
+| Method | Apennine result | Slovak result | Time window | Most important limitation |
+|---|---|---|---|---|
+| MSMC2 | | | Older/intermediate | One genome and one scaffold per population |
+| GONE | | | Recent generations | 10 versus 8 individuals; one scaffold |
+| NeEstimator | | | Contemporary | Small samples, rare alleles, linkage |
+
+## Are the comparisons equivalent?
+
+| Method | Unit being compared | Genomic signal |
+|---|---|---|
+| MSMC2 | Representative diploid individuals | Heterozygous-site spacing and coalescence |
+| GONE | Population genotype samples | LD by recombination distance |
+| NeEstimator | Population genotype samples | Contemporary sample LD |
+
+The MSMC2 curves describe the genealogical histories recorded by two selected genomes. They are not direct estimates based on all 10 and 8 population samples. GONE and NeEstimator use population samples but have limited precision because those samples are small.
 
 ## Final questions
 
-1. Do the estimates contradict one another? Explain using time scale and genomic signal.
-2. Which is most relevant to immediate management?
-3. Would adding chromosomes and adding individuals improve all methods equally?
-4. Which assumptions are most questionable in an isolated, inbred population?
-5. What evidence is needed before recommending genetic rescue or another intervention?
+1. At which time scales do the two populations appear most different?
+2. Do any results appear contradictory, or do they describe different periods?
+3. Could differences in callability, coverage, sample size, or relatedness explain part of the contrast?
+4. Which curve endpoints or confidence intervals should not be interpreted strongly?
+5. Would adding chromosomes and adding individuals improve all three methods in the same way?
+6. Which result is most relevant to immediate conservation management?
+7. What additional genomic and ecological evidence is needed before recommending an intervention?
 
-## One-minute conclusion
+## Conservation briefing
 
-Write a three-sentence briefing for a conservation manager: what the data suggest, the largest uncertainty, and what should be measured next.
+Write three sentences for a conservation manager:
+
+1. the main difference suggested between the populations;
+2. the largest uncertainty or assumption;
+3. the next analysis or measurement needed.
+
+Avoid converting a chromosome-level teaching estimate directly into a management prescription.
 

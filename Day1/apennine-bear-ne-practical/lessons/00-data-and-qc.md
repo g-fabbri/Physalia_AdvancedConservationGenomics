@@ -11,7 +11,7 @@ Estimated time: 10 minutes.
 ~~~bash
 CHROM=Scaffold_34
 SINGLE=data/UrArMa_4573_s34.vcf.gz
-POP=data/UrArMa_10i_s34.vcf.gz
+POP=data/UrArMa_18i_s34.vcf.gz
 MASK=data/UrArMa_callable.bed.gz
 ~~~
 
@@ -29,7 +29,7 @@ Expected shape:
 ~~~text
 Chromosome: Scaffold_34
 Single VCF: data/UrArMa_4573_s34.vcf.gz
-Population VCF: data/UrArMa_10i_s34.vcf.gz
+Population VCF: data/UrArMa_18i_s34.vcf.gz
 Mask: data/UrArMa_callable.bed.gz
 ~~~
 
@@ -72,7 +72,25 @@ bcftools query -l "$SINGLE" | wc -l
 bcftools query -l "$POP" | wc -l
 ~~~
 
-**Expected:** **1** for the single-individual VCF and **10** for the population VCF. Record both observed counts.
+**Expected:** **1** for the single-individual VCF and **18** for the population VCF. Record both observed counts.
+
+Create population sample lists from the naming convention:
+
+~~~bash
+bcftools query -l "$POP" | awk '/^U/' > data/slovak.samples
+bcftools query -l "$POP" | awk '!/^U/' > data/apennine.samples
+~~~
+
+Check the population assignments:
+
+~~~bash
+printf 'Apennine bears: '; wc -l < data/apennine.samples
+printf 'Slovak bears: '; wc -l < data/slovak.samples
+cat data/apennine.samples
+cat data/slovak.samples
+~~~
+
+**Expected:** 10 Apennine identifiers and 8 Slovak identifiers. `U1916` should occur in the Slovak list, while `4573` should occur in the Apennine list.
 
 ## Step 4 — Inspect chromosome labels
 
@@ -201,10 +219,9 @@ A BED mask contains genomic intervals. Counting its rows gives the number of int
 ## Stop and discuss
 
 1. What is the main difference between the single-individual VCF and the population VCF?
-2. Why must callable sequence in the BED mask be counted differently from variant records in the VCF?
-3. Does the mask represent callable sequence or only variant positions?
-4. What happens if the BED and VCF chromosome labels differ?
+2. How were individuals assigned to the two populations, and what assumption does that naming rule make?
+3. Why must callable sequence in the BED mask be counted differently from variant records in the VCF?
+4. Does the mask represent callable sequence or only variant positions?
+5. What happens if the BED and VCF chromosome labels differ?
 
 Record the sample counts, VCF record counts, BED interval count, and callable-base total in the [answer sheet](../answers/student_answers.md). Continue to the [first analysis](01-msmc2.md).
-
-

@@ -1,6 +1,6 @@
 # Data preparation and provenance
 
-No empirical genotypes are bundled in this template. The instructor should stage approved derived files under `data/teaching/`.
+No empirical genotypes are bundled in this template. The instructor should stage approved derived files under `data/`.
 
 ## Candidate source
 
@@ -26,12 +26,13 @@ Document:
 ## Files expected by the exercises
 
 ```text
-data/teaching/single_bear.chrN.vcf.gz
-data/teaching/single_bear.chrN.vcf.gz.tbi
-data/teaching/single_bear.chrN.callable.bed.gz
-data/teaching/population.chrN.vcf.gz
-data/teaching/population.chrN.vcf.gz.tbi
+data/UrArMa_4573_s34.vcf.gz
+data/UrArMa_4573_s34.vcf.gz.tbi
+data/UrArMa_callable.bed.gz
+data/UrArMa_18i_s34.vcf.gz
+data/UrArMa_18i_s34.vcf.gz.tbi
 ```
 
 The VCFs should contain both invariant callable sites or have an accompanying mask appropriate to the downstream method. A variant-only VCF is insufficient for constructing a defensible MSMC2 callable mask.
 
+For the comparative tutorial, sample `4573` represents the Apennine population and `U1916` represents the Slovak population. `UrArMa_callable.bed.gz` is treated as a common teaching mask. Document whether it is a reference/mappability mask, a cohort-wide mask, or an intersection of individual callable masks. Alignment to the same reference alone does not justify reusing a sample-specific depth mask.

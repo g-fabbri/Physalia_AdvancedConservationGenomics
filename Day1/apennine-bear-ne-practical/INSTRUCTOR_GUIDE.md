@@ -2,16 +2,17 @@
 
 ## Recommended teaching configuration
 
-Use one long autosome for speed and distribute precomputed outputs from a genome-wide analysis for comparison. Call the chromosome analysis a demonstration, not a biological reconstruction.
+Use Scaffold_34 for speed and distribute precomputed genome-wide outputs for comparison. Frame the practical around Apennine versus Slovak bears, while calling the one-scaffold analyses demonstrations rather than biological reconstructions.
 
 ### Required inputs
 
-- one high-coverage diploid Apennine bear with a sample-specific callable mask;
-- a jointly called, filtered VCF from multiple unrelated Apennine bears;
+- the 18-individual joint VCF containing 10 Apennine and 8 Slovak bears;
+- representative diploid genomes 4573 (Apennine) and U1916 (Slovak);
+- a common mask valid for both representatives, plus sample-specific exclusion of missing genotypes;
 - chromosome names consistent across VCF, BED, reference, and genetic map;
 - no sex chromosome unless sex and ploidy are handled explicitly.
 
-Do not manufacture a callable mask from variant-only positions. The mask must represent sites where a genotype could reliably have been called.
+Do not manufacture a callable mask from variant-only positions. Verify how `UrArMa_callable.bed.gz` was constructed. Sharing an alignment reference permits a shared mappability mask but does not by itself justify sharing a sample-specific depth mask.
 
 ## Before class
 

@@ -1,77 +1,117 @@
-# Effective population size from genomes
+# Two bear populations, three views of effective population size
 
-## A terminal-based practical using the Apennine brown bear
+## A conservation-genomics practical
 
-This repository replaces a slide deck. Work through it from top to bottom: read a short concept, answer a prediction question, copy a command into the terminal, inspect its output, and interpret the result.
+The Apennine brown bear is a small and isolated population in central Italy. Slovak brown bears belong to a larger and more connected European population. Their contrasting histories give us a biological question:
 
-The central lesson is that **effective population size is not one universal number**. Different methods observe different genomic signals over different time windows.
+> Do genomes from Apennine and Slovak bears record different histories of effective population size?
 
-> One diploid genome can be used for MSMC2. GONE and NeEstimator require genotypes from multiple individuals.
+We will not search for one definitive value. Instead, we will use three genomic signals:
+
+| Method | Genomic signal | Main time scale |
+|---|---|---|
+| MSMC2 | Coalescence along diploid genomes | Older and intermediate history |
+| GONE | LD at different recombination distances | Recent generations |
+| NeEstimator | LD in a population sample | Contemporary effective size |
+
+The objective is to understand why these methods may produce different—but not necessarily contradictory—answers.
+
+## The bears
+
+Our chromosome-level dataset contains 18 individuals:
+
+| Population | Identification | Sample size |
+|---|---|---:|
+| Apennine | IDs not beginning with U | 10 |
+| Slovak | IDs beginning with U | 8 |
+
+For the individual-genome comparison, we use Apennine bear **4573** and Slovak bear **U1916**.
+
+All analyses use **Scaffold_34** to keep computation short. A single scaffold is appropriate for learning the workflow, but provides less information and greater stochastic variation than a genome-wide analysis.
+
+## The investigation
+
+~~~text
+Meet and inspect the samples
+             ↓
+Ask what one genome records
+             ↓
+Compare historical trajectories with MSMC2
+             ↓
+Ask what population-level LD records
+             ↓
+Compare recent histories with GONE
+             ↓
+Estimate contemporary Ne with NeEstimator
+             ↓
+Combine evidence and identify limitations
+~~~
 
 ## Learning outcomes
 
-By the end, you should be able to connect each method to its genomic signal and time scale, justify important parameters, and recognize when a conservation interpretation is unsupported.
+By the end, you should be able to connect each estimator to its genomic signal and time scale, prepare and validate inputs, justify important parameters, and compare populations without ignoring sampling limitations.
 
-## Three-hour route
+## Schedule
 
 | Time | Activity |
 |---:|---|
-| 00:00–00:15 | Introduction: what is `Ne`? |
-| 00:15–00:25 | [Terminal orientation and data QC](lessons/00-data-and-qc.md) |
-| 00:25–00:50 | MSMC2 concepts |
-| 00:50–01:20 | [MSMC2 practical](lessons/01-msmc2.md) |
+| 00:00–00:15 | Effective population size and the bear case study |
+| 00:15–00:25 | [Meet and inspect the data](lessons/00-data-and-qc.md) |
+| 00:25–00:50 | Coalescence and historical demography |
+| 00:50–01:20 | [Compare individual histories with MSMC2](lessons/01-msmc2.md) |
 | 01:20–01:30 | Break |
 | 01:30–01:50 | LD and recent demography |
-| 01:50–02:20 | [GONE practical](lessons/02-gone.md) |
-| 02:20–02:35 | Contemporary `Ne` and sampling |
-| 02:35–02:55 | [NeEstimator practical](lessons/03-neestimator.md) |
-| 02:55–03:00 | [Synthesis](lessons/04-synthesis.md) |
+| 01:50–02:20 | [Compare population histories with GONE](lessons/02-gone.md) |
+| 02:20–02:35 | Contemporary effective size and sampling |
+| 02:35–02:55 | [Compare contemporary estimates](lessons/03-neestimator.md) |
+| 02:55–03:00 | [Combine the evidence](lessons/04-synthesis.md) |
 
-## How to use the commands
+## Input files
 
-Copy commands inside code blocks. Do not copy a shell prompt such as `$`. Replace placeholders such as `chrN` with the value supplied by the instructor. Lines beginning with `#` are comments.
+~~~text
+data/UrArMa_18i_s34.vcf.gz
+data/UrArMa_18i_s34.vcf.gz.tbi
+data/UrArMa_4573_s34.vcf.gz
+data/UrArMa_4573_s34.vcf.gz.tbi
+data/UrArMa_callable.bed.gz
+~~~
 
-Start in the repository directory:
+The 18-individual VCF supplies population data. The single-individual VCF is retained for comparison and troubleshooting.
 
-```bash
-pwd
-ls
-```
+### About the callable mask
 
-Check the principal programs:
+All individuals were aligned to the Apennine brown bear reference assembly. The course uses **UrArMa_callable.bed.gz** as a common teaching mask.
 
-```bash
+Sharing a reference assembly does not automatically make a sample-specific callable mask transferable. A shared mask is appropriate when it describes reference mappability or regions callable in all relevant samples. In a complete analysis, depth- and genotype-quality-based callability should be assessed separately for each individual and then combined explicitly.
+
+## Before starting
+
+~~~bash
 bcftools --version
 plink --version
 msmc2 --help | head
 Rscript --version
-```
+~~~
 
-If a command is missing, ask the instructor. Installation is not part of the timed practical.
+GONE and NeEstimator are supplied separately because their executables are platform-specific. Installation is not part of the timed practical.
 
-## Dataset
+## Interpretation limits
 
-```text
-data/teaching/single_bear.chrN.vcf.gz
-data/teaching/single_bear.chrN.callable.bed.gz
-data/teaching/population.chrN.vcf.gz
-```
+- Ten Apennine and eight Slovak individuals are small samples for LD-based estimation.
+- One scaffold provides much less independent information than a whole genome.
+- Coverage, callability, missingness, relatedness, and population structure can imitate demographic differences.
+- Classroom runs use fewer replicates to reduce runtime.
+- Results demonstrate methods and hypotheses; they should not be used directly for management decisions.
 
-The first two files represent one high-coverage diploid individual. The population VCF contains multiple individuals. See [data preparation and provenance](data/README.md).
+## Begin
 
-## Case-study reading
+Start with [Terminal orientation and data QC](lessons/00-data-and-qc.md).
 
-- [Genomic history of the Apennine brown bear](https://pmc.ncbi.nlm.nih.gov/articles/PMC5692547/)
+## Background and inspiration
+
+- [Benazzo et al. 2017](https://pmc.ncbi.nlm.nih.gov/articles/PMC5692547/)
 - [NCBI BioProject PRJNA395974](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395974)
+- Tutorial structure inspired by the narrative, command-first approach of the [Speciation & Population Genomics guide](https://speciationgenomics.github.io/pca/).
 
-## Take-home message
-
-> An `Ne` estimate belongs to a method, sample, genomic signal, time window, and set of assumptions—not simply to a species.
-
-## Instructor resources
-
-- [Instructor guide](INSTRUCTOR_GUIDE.md)
-- [Student answer sheet](answers/student_answers.md)
-- [Software environment](environment.yml)
-- [References](REFERENCES.md)
+Additional method references are listed in [REFERENCES.md](REFERENCES.md).
 
