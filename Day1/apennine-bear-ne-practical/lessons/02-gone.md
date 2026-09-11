@@ -208,7 +208,7 @@ The classroom parameter file contains:
 | `maxNCHROM` | `-99` | Analyze all chromosomes detected—one in this exercise |
 | `maxNSNP` | `50000` | Approximate maximum SNPs sampled per chromosome |
 | `hc` | `0.01` | Maximum recombination fraction analyzed |
-| `REPS` | `5` | Number of replicate estimates in the live exercise |
+| `REPS` | `10` | Number of replicate estimates in the live exercise |
 | `threads` | `2` | Number of parallel workers in the live exercise |
 
 The repository already contains these classroom settings. The original Apennine analysis used `REPS=40` and `threads=10`; the smaller classroom values reduce runtime. A precomputed 40-replicate run can be used for the final comparison.
