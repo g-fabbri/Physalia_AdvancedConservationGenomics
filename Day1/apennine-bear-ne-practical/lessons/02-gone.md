@@ -1,15 +1,19 @@
-# GONE — comparing recent history in two bear populations
+# Part 2 — GONE: comparing recent history in two bear populations
 
 Estimated practical time: 30 minutes.
 
-GONE estimates recent effective population size from linkage disequilibrium (LD) measured at different recombination distances. We will estimate each population separately and then compare the trajectories.
+GONE estimates recent effective population size from linkage disequilibrium (LD) measured at different recombination distances. We will estimate ABB and SBB separately and then compare the trajectories.
 
-In this exercise, we use one Apennine brown bear chromosome to reduce runtime. The result is a teaching demonstration rather than a complete demographic reconstruction.
+In this exercise, we use one chromosome to reduce runtime. The result is a teaching demonstration rather than a complete demographic reconstruction.
+
+The shared QC section has already verified the input VCF, identified 10 Apennine brown bears (ABB) and 8 Slovak brown bears (SBB), and created the two population sample lists. We therefore begin with population subsetting rather than checking the files again.
 
 ## Workflow
 
 ```text
 population VCF
+      ↓
+separate ABB and SBB samples
       ↓
 filter variants and create PED/MAP files
       ↓
@@ -22,107 +26,58 @@ run GONE
 check and plot the results
 ```
 
-## Step 1 — Define the input and output names
+## Step 1 — Prepare the population VCFs
 
 **Purpose**
 
-Create short shell variables that will be reused throughout the analysis.
+Create separate ABB and SBB VCFs from the validated sample lists, then select the population assigned to your group.
 
 **Input**
 
-- A multi-individual VCF containing one chromosome.
-- The chromosome identifier supplied by the instructor.
+- The previously checked 18-individual VCF.
+- **data/apennine.samples** and **data/slovak.samples**, created during shared QC.
 
 **Command**
 
-Use the selected scaffold and population VCF.
-
-```bash
+~~~bash
 CHROM=Scaffold_34
 ALL_VCF=data/UrArMa_18i_s34.vcf.gz
 OUTDIR=results/gone
 mkdir -p "$OUTDIR"
-```
-
-**Expected output**
-
-No text is printed. The command creates `results/gone/` if it does not already exist.
-
-**Check**
-
-```bash
-printf 'Chromosome: %s\nComplete VCF: %s\nOutput directory: %s\n' \
-  "$CHROM" "$ALL_VCF" "$OUTDIR"
-ls -lh "$ALL_VCF"
-```
-
-The VCF should exist and have a file size greater than zero.
-
-## Step 2 — Inspect the population dataset
-
-**Purpose**
-
-Confirm that the VCF contains several individuals and quantify the starting number of biallelic SNPs.
-
-**Input**
-
-The 18-individual VCF from Step 1.
-
-**Command**
-
-List and count individuals:
-
-```bash
-bcftools query -l "$ALL_VCF"
-bcftools query -l "$ALL_VCF" | wc -l
-```
-
-Count biallelic SNP records:
-
-```bash
-bcftools view -m2 -M2 -v snps "$ALL_VCF" -Ou | \
-  bcftools view -H | wc -l
-```
-
-**Expected output**
-
-- One sample identifier per line.
-- One integer giving the number of individuals.
-- One integer giving the number of biallelic SNPs.
-
-**Check**
-
-The complete VCF should contain 18 individuals. Separate the populations:
-
-```bash
-bcftools query -l "$ALL_VCF" | awk '!/^U/' > data/apennine.samples
-bcftools query -l "$ALL_VCF" | awk '/^U/' > data/slovak.samples
 
 bcftools view -S data/apennine.samples "$ALL_VCF" \
-  -Oz -o data/apennine_s34.vcf.gz
+  -Oz -o data/ABB_s34.vcf.gz
 bcftools view -S data/slovak.samples "$ALL_VCF" \
-  -Oz -o data/slovak_s34.vcf.gz
+  -Oz -o data/SBB_s34.vcf.gz
 
-bcftools index -t data/apennine_s34.vcf.gz
-bcftools index -t data/slovak_s34.vcf.gz
-```
+bcftools index -t data/ABB_s34.vcf.gz
+bcftools index -t data/SBB_s34.vcf.gz
+~~~
 
-Check:
+**Expected output**
 
-```bash
-bcftools query -l data/apennine_s34.vcf.gz | wc -l
-bcftools query -l data/slovak_s34.vcf.gz | wc -l
-```
+- **data/ABB_s34.vcf.gz**, containing the 10 ABB individuals;
+- **data/SBB_s34.vcf.gz**, containing the 8 SBB individuals;
+- one tabix index for each VCF.
 
-Expected: 10 Apennine and 8 Slovak bears. Each group now selects one population; use `slovak` instead of `apennine` when assigned:
+Select the population assigned to your group. Use **SBB** instead of **ABB** for an SBB group:
 
-```bash
-POPULATION=apennine
+~~~bash
+POPULATION=ABB
 VCF=data/${POPULATION}_s34.vcf.gz
 PREFIX="$OUTDIR/${POPULATION}_${CHROM}"
-```
+~~~
 
-## Step 3 — Filter variants and create PED/MAP files
+**Check**
+
+~~~bash
+printf 'Population: %s\nPopulation VCF: %s\nOutput prefix: %s\n' \
+  "$POPULATION" "$VCF" "$PREFIX"
+~~~
+
+The population, VCF, and output prefix should all refer to the same assigned population.
+
+## Step 2 — Filter variants and create PED/MAP files
 
 **Purpose**
 
@@ -164,12 +119,14 @@ plink \
 **Expected output**
 
 ```text
-results/gone/apennine_Scaffold_34_original_label.ped
-results/gone/apennine_Scaffold_34_original_label.map
-results/gone/apennine_Scaffold_34_original_label.log
+results/gone/ABB_Scaffold_34_original_label.ped
+results/gone/ABB_Scaffold_34_original_label.map
+results/gone/ABB_Scaffold_34_original_label.log
 ```
 
 PLINK should finish with a message indicating that the PED and MAP files were written.
+
+The example names above are for an ABB group; an SBB group should see the same names beginning with **SBB**.
 
 **Check**
 
@@ -183,7 +140,7 @@ wc -l "${PREFIX}_original_label.map"
 - MAP rows should equal the number of retained SNPs reported by PLINK.
 - The log should not contain `Error:`.
 
-## Step 4 — Prepare the MAP for one chromosome
+## Step 3 — Prepare the MAP for one chromosome
 
 **Purpose**
 
@@ -209,8 +166,8 @@ awk 'BEGIN {OFS="\t"} {$1=1; print $1,$2,$3,$4}' \
 **Expected output**
 
 ```text
-results/gone/apennine_Scaffold_34.ped
-results/gone/apennine_Scaffold_34.map
+results/gone/ABB_Scaffold_34.ped
+results/gone/ABB_Scaffold_34.map
 ```
 
 Every row in the new MAP should begin with `1`.
@@ -227,7 +184,7 @@ wc -l "${PREFIX}.ped" "${PREFIX}.map"
 - The new and original files should contain the same numbers of individuals and loci.
 - MAP column 4 should still contain the original physical positions.
 
-## Step 5 — Inspect and set GONE parameters
+## Step 4 — Inspect and set GONE parameters
 
 **Purpose**
 
@@ -340,7 +297,7 @@ ls PROGRAMMES
 
 The first command should reproduce the complete classroom parameter block. `diff` should show changes only to `REPS` and `threads` if the original supplied file has the values listed above. `diff` returning status `1` is normal when differences are found. Confirm the presence of all required GONE programs.
 
-## Step 6 — Run GONE
+## Step 5 — Run GONE
 
 **Purpose**
 
@@ -389,7 +346,7 @@ The driver internally runs:
 
 If the workflow stops, read the final terminal lines. Common causes are missing executables, incompatible compiled binaries, incorrect input basenames, and non-numeric chromosome codes.
 
-## Step 7 — Inspect the outputs
+## Step 6 — Inspect the outputs
 
 **Purpose**
 
@@ -409,9 +366,9 @@ ls -lh "$DATA_DIR"
 Principal expected files:
 
 ```text
-OUTPUT_apennine_Scaffold_34
-Output_Ne_apennine_Scaffold_34
-Output_d2_apennine_Scaffold_34
+OUTPUT_ABB_Scaffold_34
+Output_Ne_ABB_Scaffold_34
+Output_d2_ABB_Scaffold_34
 outfileHWD
 timefile
 seedfile
@@ -440,7 +397,7 @@ cat "$DATA_DIR/outfileHWD"
 - The `Ne` output should contain multiple generations.
 - `timefile` should finish with `END OF ANALYSES`.
 
-## Step 8 — Plot the GONE trajectory
+## Step 7 — Plot the GONE trajectory
 
 **Purpose**
 
@@ -448,7 +405,7 @@ Visualize how inferred effective population size changes through recent generati
 
 **Input**
 
-The group-specific Apennine or Slovak `Output_Ne` file.
+The group-specific ABB or SBB `Output_Ne` file.
 
 **Command**
 
