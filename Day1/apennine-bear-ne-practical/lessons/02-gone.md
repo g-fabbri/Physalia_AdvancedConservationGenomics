@@ -244,7 +244,7 @@ ZERO=1
 maxNCHROM=-99
 maxNSNP=50000
 hc=0.01
-REPS=5
+REPS=10
 threads=2
 ```
 
