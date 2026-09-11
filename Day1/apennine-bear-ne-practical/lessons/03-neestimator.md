@@ -1,4 +1,4 @@
-# NeEstimator — comparing contemporary effective size
+# Part 3 — NeEstimator: comparing contemporary effective size
 
 Estimated practical time: 20 minutes.
 

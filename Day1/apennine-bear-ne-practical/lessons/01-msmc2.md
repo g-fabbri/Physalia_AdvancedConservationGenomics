@@ -1,4 +1,4 @@
-# MSMC2 — comparing historical population-size trajectories
+# Part 1 — MSMC2: comparing historical population-size trajectories
 
 Estimated practical time: 30 minutes.
 
@@ -16,7 +16,7 @@ Our biological question is:
 MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a format that combines segregating sites with the amount of callable sequence between them.
 
 ~~~text
-  filtered VCF + callable mask
+already-filtered VCF + callable mask
                ↓ generate_multihetsep.py
            multihetsep
                ↓ MSMC2
@@ -178,8 +178,8 @@ Then paste:
 abb <- read.table("results/msmc2/ABB_4573.final.txt", header=TRUE)
 sbb <- read.table("results/msmc2/SBB_U1916.final.txt", header=TRUE)
 
-mu <- 1.82e-8
-generation_time <- 11
+mu <- 4.5e-9
+generation_time <- 10
 
 scale_msmc <- function(x) {
   lambda <- if ("lambda_00" %in% names(x)) x$lambda_00 else x$lambda
@@ -316,8 +316,8 @@ The count should be **20**. If classroom time is limited, run two or three repli
 Start R again. The following code writes the figure explicitly to **results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf**:
 
 ~~~r
-mu <- 1.82e-8
-generation_time <- 11
+mu <- 4.5e-9
+generation_time <- 10
 
 scale_msmc <- function(x) {
   lambda <- if ("lambda_00" %in% names(x)) x$lambda_00 else x$lambda
@@ -407,4 +407,3 @@ The spread of ten replicates is a teaching visualization, not a precise confiden
 7. In which periods are the bootstrap trajectories most variable? What does that imply about confidence in the ABB–SBB contrast?
 
 Record the main comparison and its limitations in the [answer sheet](../answers/student_answers.md). Continue to [GONE](02-gone.md).
-

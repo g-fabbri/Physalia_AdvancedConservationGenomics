@@ -12,6 +12,7 @@ No single result answers it completely. Assemble the evidence by time scale.
 |---|---|---|---|---|
 | MSMC2 | | | Older/intermediate | One genome and one scaffold per population |
 | GONE | | | Recent generations | 10 versus 8 individuals; one scaffold |
+| GONE2 (optional) | | | Recent generations | 10 versus 8 individuals; one scaffold |
 | NeEstimator | | | Contemporary | Small samples, rare alleles, linkage |
 
 ## Are the comparisons equivalent?
@@ -20,9 +21,10 @@ No single result answers it completely. Assemble the evidence by time scale.
 |---|---|---|
 | MSMC2 | Representative diploid individuals | Heterozygous-site spacing and coalescence |
 | GONE | Population genotype samples | LD by recombination distance |
+| GONE2 | Population genotype samples | LD with updated fitting and diagnostics |
 | NeEstimator | Population genotype samples | Contemporary sample LD |
 
-The MSMC2 curves describe the genealogical histories recorded by two selected genomes. They are not direct estimates based on all 10 and 8 population samples. GONE and NeEstimator use population samples but have limited precision because those samples are small.
+The MSMC2 curves describe the genealogical histories recorded by two selected genomes. They are not direct estimates based on all 10 and 8 population samples. GONE, GONE2, and NeEstimator use population samples but have limited precision because those samples are small.
 
 ## Final questions
 
@@ -43,4 +45,3 @@ Write three sentences for a conservation manager:
 3. the next analysis or measurement needed.
 
 Avoid converting a chromosome-level teaching estimate directly into a management prescription.
-

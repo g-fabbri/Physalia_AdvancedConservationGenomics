@@ -208,7 +208,7 @@ The classroom parameter file contains:
 | `maxNCHROM` | `-99` | Analyze all chromosomes detected—one in this exercise |
 | `maxNSNP` | `50000` | Approximate maximum SNPs sampled per chromosome |
 | `hc` | `0.01` | Maximum recombination fraction analyzed |
-| `REPS` | `10` | Number of replicate estimates in the live exercise |
+| `REPS` | `5` | Number of replicate estimates in the live exercise |
 | `threads` | `2` | Number of parallel workers in the live exercise |
 
 The repository already contains these classroom settings. The original Apennine analysis used `REPS=40` and `threads=10`; the smaller classroom values reduce runtime. A precomputed 40-replicate run can be used for the final comparison.
@@ -244,7 +244,7 @@ ZERO=1
 maxNCHROM=-99
 maxNSNP=50000
 hc=0.01
-REPS=10
+REPS=5
 threads=2
 ```
 
@@ -253,6 +253,18 @@ Students do not need to copy, recreate, or edit this file. The command only make
 ### Run GONE
 
 From inside **software/GONE**, calculate LD by recombination-distance bin and infer recent effective population size:
+
+The instructor must have installed the platform-specific programs before class. Confirm that the essential files are executable:
+
+~~~bash
+test -x PROGRAMMES/MANAGE_CHROMOSOMES2 &&
+test -x PROGRAMMES/LD_SNP_REAL3 &&
+test -x PROGRAMMES/SUMM_REP_CHROM3 &&
+test -x PROGRAMMES/GONEparallel.sh &&
+echo "GONE programs are ready"
+~~~
+
+**Expected:** **GONE programs are ready**. If nothing is printed, stop and ask the instructor; the GONE installation is incomplete.
 
 ```bash
 bash script_GONE.sh "$FILE" "$DATA_DIR"
@@ -417,4 +429,3 @@ After both population runs are available, place or link their final files under 
 10. Which portion of the trajectory is sufficiently stable to interpret?
 
 Continue to [NeEstimator](03-neestimator.md).
-

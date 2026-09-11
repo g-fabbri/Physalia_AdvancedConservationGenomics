@@ -12,6 +12,7 @@ We will not search for one definitive value. Instead, we will use three genomic 
 |---|---|---|
 | MSMC2 | Coalescence along diploid genomes | Older and intermediate history |
 | GONE | LD at different recombination distances | Recent generations |
+| GONE2 (optional test) | Updated LD modelling and diagnostics | Recent generations |
 | NeEstimator | LD in a population sample | Contemporary effective size |
 
 The objective is to understand why these methods may produce different—but not necessarily contradictory—answers.
@@ -42,6 +43,8 @@ Ask what population-level LD records
              ↓
 Compare recent histories with GONE
              ↓
+Optionally repeat with GONE2
+             ↓
 Estimate contemporary Ne with NeEstimator
              ↓
 Combine evidence and identify limitations
@@ -61,7 +64,7 @@ By the end, you should be able to connect each estimator to its genomic signal a
 | 00:50–01:20 | [Compare individual histories with MSMC2](lessons/01-msmc2.md) |
 | 01:20–01:30 | Break |
 | 01:30–01:50 | LD and recent demography |
-| 01:50–02:20 | [Compare population histories with GONE](lessons/02-gone.md) |
+| 01:50–02:20 | [Compare population histories with GONE](lessons/02-gone.md), or test [GONE2](lessons/02b-gone2.md) |
 | 02:20–02:35 | Contemporary effective size and sampling |
 | 02:35–02:55 | [Compare contemporary estimates](lessons/03-neestimator.md) |
 | 02:55–03:00 | [Combine the evidence](lessons/04-synthesis.md) |
@@ -95,7 +98,7 @@ msmc2 --help | head
 Rscript --version
 ~~~
 
-GONE and NeEstimator are supplied separately because their executables are platform-specific. Installation is not part of the timed practical.
+GONE, GONE2, and NeEstimator require separate software setup. Installation is not part of the timed practical. GONE2 is retained as an optional comparison while both LD workflows are being tested.
 
 ## Interpretation limits
 
