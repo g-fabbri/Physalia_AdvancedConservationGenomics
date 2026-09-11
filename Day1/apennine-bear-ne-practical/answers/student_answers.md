@@ -16,13 +16,18 @@
 - Effect of changing generation time:
 - Interpretation in two sentences:
 
-## GONE
+## GONE2
 
 - Apennine individuals and SNPs:
 - Slovak individuals and SNPs:
 - Recombination assumption:
 - Main difference between recent trajectories:
 - Possible non-demographic explanation:
+
+## Optional original GONE comparison
+
+- Does it infer the same direction of recent change as GONE2?
+- Which settings or diagnostics differ?
 
 ## NeEstimator — Apennine
 

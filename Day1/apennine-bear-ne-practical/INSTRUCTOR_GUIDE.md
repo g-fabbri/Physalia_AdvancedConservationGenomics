@@ -42,19 +42,19 @@ Emphasize that the callable mask contributes information: long distances between
 
 Expected interpretation: the middle of the curve is generally more defensible than either extreme. One chromosome increases stochastic variation and reduces independent genealogical information.
 
-### GONE
+### GONE2
 
 Ask students why the full LD pattern—not an LD-pruned panel—is needed. Recent migrants, Wahlund effects, and relatives can create LD that is not due solely to historical population size.
 
-The GONE lesson uses the supplied Apennine bear `script_GONE.sh` after students have explicitly prepared and validated the population sample, filters, one-chromosome MAP, recombination assumptions, LD parameters, replicates, and private run directory. The driver handles fragile bookkeeping through `MANAGE_CHROMOSOMES2`, `LD_SNP_REAL3`, `SUMM_REP_CHROM3`, and `GONEparallel.sh`. This balance keeps biological choices visible without spending the practical on internal control files.
+GONE2 is the primary recent-demography practical. Students create the ABB and SBB population VCFs and the shared PED/MAP inputs, then run GONE2 with identical settings. Emphasize the sample size, SNP count, Fis, inferred genome length, and structure warnings in each **GONE2_STATS** file before discussing the trajectories.
 
-The supplied script assumes chromosomes are consecutively numbered beginning at 1 and infers `NCHR` from the last MAP row. The lesson therefore creates a derived one-chromosome MAP whose chromosome code is `1`. Confirm that marker order and physical coordinates are preserved.
+The lesson uses GONE2's default upper recombination fraction of 0.05. The value 0.0101 is reserved for instructor sensitivity testing against the original GONE setting **hc=0.01**.
 
-Give every student or group both a **private copy** of the GONE directory and a private results subdirectory. The script deletes and recreates `TEMPORARY_FILES`, uses generic intermediate filenames such as `data.ped`, and returns generic results such as `timefile` and `outfileHWD`. It is unsafe for concurrent runs in one shared software or output directory.
+### Optional original GONE
 
-Prepare two parameter files or checkpoints: a short live run with approximately five replicates, and the original 40-replicate setting for interpretation. The original supplied values were `PHASE=2`, `cMMb=1`, `DIST=1`, `NGEN=2000`, `NBIN=400`, `MAF=0.0`, `ZERO=1`, `maxNCHROM=-99`, `maxNSNP=50000`, `hc=0.01`, `REPS=40`, and `threads=10`.
+The optional lesson reuses the PED/MAP files prepared by GONE2. The supplied driver assumes chromosomes are consecutively numbered beginning at 1, so Part 2 creates a derived one-chromosome MAP with chromosome code **1** while preserving marker order and physical coordinates.
 
-The workflow is platform-sensitive. Never make compilation the objective of a 30-minute exercise.
+Each student works in a private course directory, so no group-specific run copies are required. The original driver uses generic intermediate files and ABB and SBB runs must be performed sequentially. Keep compilation and installation outside the timed practical; all setup is consolidated in **software/README.md**.
 
 ### NeEstimator
 

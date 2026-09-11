@@ -11,8 +11,8 @@ No single result answers it completely. Assemble the evidence by time scale.
 | Method | Apennine result | Slovak result | Time window | Most important limitation |
 |---|---|---|---|---|
 | MSMC2 | | | Older/intermediate | One genome and one scaffold per population |
-| GONE | | | Recent generations | 10 versus 8 individuals; one scaffold |
-| GONE2 (optional) | | | Recent generations | 10 versus 8 individuals; one scaffold |
+| GONE2 | | | Recent generations | 10 versus 8 individuals; one scaffold |
+| GONE (optional) | | | Recent generations | 10 versus 8 individuals; one scaffold |
 | NeEstimator | | | Contemporary | Small samples, rare alleles, linkage |
 
 ## Are the comparisons equivalent?
@@ -20,11 +20,11 @@ No single result answers it completely. Assemble the evidence by time scale.
 | Method | Unit being compared | Genomic signal |
 |---|---|---|
 | MSMC2 | Representative diploid individuals | Heterozygous-site spacing and coalescence |
-| GONE | Population genotype samples | LD by recombination distance |
 | GONE2 | Population genotype samples | LD with updated fitting and diagnostics |
+| GONE | Population genotype samples | Original LD-by-distance workflow |
 | NeEstimator | Population genotype samples | Contemporary sample LD |
 
-The MSMC2 curves describe the genealogical histories recorded by two selected genomes. They are not direct estimates based on all 10 and 8 population samples. GONE, GONE2, and NeEstimator use population samples but have limited precision because those samples are small.
+The MSMC2 curves describe the genealogical histories recorded by two selected genomes. They are not direct estimates based on all 10 and 8 population samples. GONE2, optional original GONE, and NeEstimator use population samples but have limited precision because those samples are small.
 
 ## Final questions
 

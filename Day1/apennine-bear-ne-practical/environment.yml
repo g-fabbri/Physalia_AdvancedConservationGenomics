@@ -4,9 +4,13 @@ channels:
   - bioconda
 dependencies:
   - bcftools
+  - cxx-compiler
+  - git
+  - make
+  - msmc2
   - plink=1.90
+  - python=3.11
   - r-base
   - tabix
-  # Install MSMC2/msmc-tools, GONE, and NeEstimator using their official instructions.
-  # They are intentionally not pinned here because platform-specific binaries differ.
-
+  # msmc-tools, GONE, GONE2, and NeEstimator are installed as described
+  # in software/README.md.

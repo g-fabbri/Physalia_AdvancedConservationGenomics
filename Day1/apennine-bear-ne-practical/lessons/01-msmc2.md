@@ -406,4 +406,4 @@ The spread of ten replicates is a teaching visualization, not a precise confiden
 6. What happens to the time axis if generation time increases? What happens to both axes if the mutation rate changes?
 7. In which periods are the bootstrap trajectories most variable? What does that imply about confidence in the ABB–SBB contrast?
 
-Record the main comparison and its limitations in the [answer sheet](../answers/student_answers.md). Continue to [GONE](02-gone.md).
+Record the main comparison and its limitations in the [answer sheet](../answers/student_answers.md). Continue to [GONE2](02-gone2.md).
