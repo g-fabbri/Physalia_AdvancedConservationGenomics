@@ -30,7 +30,7 @@ check and plot the results
 
 **Purpose**
 
-Create separate ABB and SBB VCFs from the validated sample lists, then select the population assigned to your group.
+Create separate ABB and SBB VCFs from the validated sample lists, then select one population for the first run.
 
 **Input**
 
@@ -60,7 +60,7 @@ bcftools index -t data/SBB_s34.vcf.gz
 - **data/SBB_s34.vcf.gz**, containing the 8 SBB individuals;
 - one tabix index for each VCF.
 
-Select the population assigned to your group. Use **SBB** instead of **ABB** for an SBB group:
+Begin with ABB. After completing the workflow, repeat it with **POPULATION=SBB**:
 
 ~~~bash
 POPULATION=ABB
@@ -77,7 +77,7 @@ printf 'Population: %s\nPopulation VCF: %s\nOutput prefix: %s\n' \
 
 The population, VCF, and output prefix should all refer to the same assigned population.
 
-## Step 2 — Filter variants and create PED/MAP files
+## Step 2 — Create the GONE PED/MAP input
 
 **Purpose**
 
@@ -126,7 +126,7 @@ results/gone/ABB_Scaffold_34_original_label.log
 
 PLINK should finish with a message indicating that the PED and MAP files were written.
 
-The example names above are for an ABB group; an SBB group should see the same names beginning with **SBB**.
+The example names above are for the ABB run; the SBB run produces the same names beginning with **SBB**.
 
 **Check**
 
@@ -140,7 +140,7 @@ wc -l "${PREFIX}_original_label.map"
 - MAP rows should equal the number of retained SNPs reported by PLINK.
 - The log should not contain `Error:`.
 
-## Step 3 — Prepare the MAP for one chromosome
+### Relabel the selected chromosome
 
 **Purpose**
 
@@ -184,11 +184,11 @@ wc -l "${PREFIX}.ped" "${PREFIX}.map"
 - The new and original files should contain the same numbers of individuals and loci.
 - MAP column 4 should still contain the original physical positions.
 
-## Step 4 — Inspect and set GONE parameters
+## Step 3 — Set the parameters and run GONE
 
 **Purpose**
 
-Review parameters affecting phasing, recombination distance, LD bins, SNP sampling, replicates, and computation.
+Review the main parameters, then calculate LD and infer recent effective population size.
 
 **Input**
 
@@ -215,32 +215,19 @@ For the live exercise, use `REPS=5` and the number of threads allocated by the i
 
 **Command**
 
-First define the group-specific run directory:
+Define the course, GONE, and data directories:
 
 ```bash
 COURSE_DIR=$(pwd)
-SOURCE_DATA_DIR="$COURSE_DIR/results/gone"
-GONE_SOURCE="$COURSE_DIR/software/GONE"
-GROUP=group01
-DATA_DIR="$COURSE_DIR/results/gone/$GROUP"
-RUN_DIR="$COURSE_DIR/work/gone_${CHROM}_${GROUP}"
-FILE=${POPULATION}_${CHROM}
-```
-
-Replace `group01` with the assigned group identifier. Create a private software copy:
-
-```bash
-mkdir -p "$COURSE_DIR/work"
-mkdir -p "$DATA_DIR"
-cp "$SOURCE_DATA_DIR/${FILE}.ped" "$DATA_DIR/${FILE}.ped"
-cp "$SOURCE_DATA_DIR/${FILE}.map" "$DATA_DIR/${FILE}.map"
-cp -R "$GONE_SOURCE" "$RUN_DIR"
-cd "$RUN_DIR"
+GONE_DIR="$COURSE_DIR/software/GONE"
+DATA_DIR="$COURSE_DIR/results/gone"
+FILE="${POPULATION}_${CHROM}"
 ```
 
 Preserve the supplied parameter file:
 
 ```bash
+cd "$GONE_DIR"
 cp INPUT_PARAMETERS_FILE INPUT_PARAMETERS_FILE.original
 ```
 
@@ -268,13 +255,13 @@ The line containing only `EOF` finishes the file. Do not add spaces before or af
 This classroom file retains the original biological settings and changes:
 
 - `REPS` from `40` to `5` to reduce runtime;
-- `threads` from `10` to `2`, assuming two cores per group.
+- `threads` from `10` to `2`, assuming two cores per run.
 
 If the instructor allocates a different number of cores, replace `threads=2` before running. Do not set it higher than the allocated resources.
 
 **Expected output**
 
-A private directory containing:
+A GONE directory containing:
 
 ```text
 script_GONE.sh
@@ -283,8 +270,6 @@ PROGRAMMES/
 ```
 
 `INPUT_PARAMETERS_FILE.original` contains the supplied settings, while `INPUT_PARAMETERS_FILE` contains the short classroom configuration.
-
-The group also has a private data/output directory under `results/gone/group01/`, preventing simultaneous runs from overwriting generic files such as `timefile` and `outfileHWD`.
 
 **Check**
 
@@ -297,22 +282,9 @@ ls PROGRAMMES
 
 The first command should reproduce the complete classroom parameter block. `diff` should show changes only to `REPS` and `threads` if the original supplied file has the values listed above. `diff` returning status `1` is normal when differences are found. Confirm the presence of all required GONE programs.
 
-## Step 5 — Run GONE
+### Run GONE
 
-**Purpose**
-
-Calculate LD by recombination-distance bin and infer recent effective population size.
-
-**Input**
-
-- `$DATA_DIR/${FILE}.ped`
-- `$DATA_DIR/${FILE}.map`
-- `INPUT_PARAMETERS_FILE`
-- Programs under `PROGRAMMES/`
-
-**Command**
-
-Run from inside the private GONE directory:
+From inside **software/GONE**, calculate LD by recombination-distance bin and infer recent effective population size:
 
 ```bash
 bash script_GONE.sh "$FILE" "$DATA_DIR"
@@ -346,7 +318,7 @@ The driver internally runs:
 
 If the workflow stops, read the final terminal lines. Common causes are missing executables, incompatible compiled binaries, incorrect input basenames, and non-numeric chromosome codes.
 
-## Step 6 — Inspect the outputs
+## Step 4 — Inspect the outputs
 
 **Purpose**
 
@@ -397,7 +369,7 @@ cat "$DATA_DIR/outfileHWD"
 - The `Ne` output should contain multiple generations.
 - `timefile` should finish with `END OF ANALYSES`.
 
-## Step 7 — Plot the GONE trajectory
+## Step 5 — Plot the GONE trajectory
 
 **Purpose**
 
@@ -405,7 +377,7 @@ Visualize how inferred effective population size changes through recent generati
 
 **Input**
 
-The group-specific ABB or SBB `Output_Ne` file.
+The ABB or SBB `Output_Ne` file.
 
 **Command**
 
