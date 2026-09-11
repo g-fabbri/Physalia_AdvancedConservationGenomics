@@ -194,7 +194,7 @@ Review the main parameters, then calculate LD and infer recent effective populat
 
 The supplied `software/GONE/INPUT_PARAMETERS_FILE`.
 
-The original Apennine analysis used:
+The classroom parameter file contains:
 
 | Parameter | Value | Meaning |
 |---|---:|---|
@@ -208,10 +208,10 @@ The original Apennine analysis used:
 | `maxNCHROM` | `-99` | Analyze all chromosomes detected—one in this exercise |
 | `maxNSNP` | `50000` | Approximate maximum SNPs sampled per chromosome |
 | `hc` | `0.01` | Maximum recombination fraction analyzed |
-| `REPS` | `40` | Number of replicate estimates |
-| `threads` | `10` | Number of parallel workers |
+| `REPS` | `5` | Number of replicate estimates in the live exercise |
+| `threads` | `2` | Number of parallel workers in the live exercise |
 
-For the live exercise, use `REPS=5` and the number of threads allocated by the instructor. A precomputed run with `REPS=40` should be used for the final comparison.
+The repository already contains these classroom settings. The original Apennine analysis used `REPS=40` and `threads=10`; the smaller classroom values reduce runtime. A precomputed 40-replicate run can be used for the final comparison.
 
 **Command**
 
@@ -224,17 +224,16 @@ DATA_DIR="$COURSE_DIR/results/gone"
 FILE="${POPULATION}_${CHROM}"
 ```
 
-Preserve the supplied parameter file:
+Move into the GONE directory and display the supplied classroom parameter file:
 
 ```bash
 cd "$GONE_DIR"
-cp INPUT_PARAMETERS_FILE INPUT_PARAMETERS_FILE.original
+cat INPUT_PARAMETERS_FILE
 ```
 
-Create the classroom parameter file by copying and pasting this complete block:
+**Expected output**
 
-```bash
-cat > INPUT_PARAMETERS_FILE <<'EOF'
+```text
 PHASE=2
 cMMb=1
 DIST=1
@@ -247,40 +246,9 @@ maxNSNP=50000
 hc=0.01
 REPS=5
 threads=2
-EOF
 ```
 
-The line containing only `EOF` finishes the file. Do not add spaces before or after it.
-
-This classroom file retains the original biological settings and changes:
-
-- `REPS` from `40` to `5` to reduce runtime;
-- `threads` from `10` to `2`, assuming two cores per run.
-
-If the instructor allocates a different number of cores, replace `threads=2` before running. Do not set it higher than the allocated resources.
-
-**Expected output**
-
-A GONE directory containing:
-
-```text
-script_GONE.sh
-INPUT_PARAMETERS_FILE
-PROGRAMMES/
-```
-
-`INPUT_PARAMETERS_FILE.original` contains the supplied settings, while `INPUT_PARAMETERS_FILE` contains the short classroom configuration.
-
-**Check**
-
-```bash
-grep -E '^(PHASE|cMMb|DIST|NGEN|NBIN|MAF|ZERO|maxNCHROM|maxNSNP|hc|REPS|threads)=' \
-  INPUT_PARAMETERS_FILE
-diff -u INPUT_PARAMETERS_FILE.original INPUT_PARAMETERS_FILE
-ls PROGRAMMES
-```
-
-The first command should reproduce the complete classroom parameter block. `diff` should show changes only to `REPS` and `threads` if the original supplied file has the values listed above. `diff` returning status `1` is normal when differences are found. Confirm the presence of all required GONE programs.
+Students do not need to copy, recreate, or edit this file. The command only makes its settings visible before the run.
 
 ### Run GONE
 
@@ -449,3 +417,4 @@ After both population runs are available, place or link their final files under 
 10. Which portion of the trajectory is sufficiently stable to interpret?
 
 Continue to [NeEstimator](03-neestimator.md).
+
