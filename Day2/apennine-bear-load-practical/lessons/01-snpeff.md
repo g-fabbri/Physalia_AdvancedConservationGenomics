@@ -4,14 +4,16 @@ Estimated terminal time: 20 minutes.
 
 SnpEff compares each VCF allele with gene models and writes predicted consequences to the VCF `ANN` field. The same SNP can have multiple transcript annotations. `HIGH`, `MODERATE`, `LOW`, and `MODIFIER` are **predicted impact categories**, not measurements of selection coefficients or fitness.
 
+The instructor built **UrArMar_mUrsArc2** from the frozen Apennine-bear BRAKER3/TSEBRA gene annotation and a reference FASTA. The database build is pre-class preparation; see [how it was made and validated](../software/README.md). In particular, the assembly used for the database must be the same one used for the VCF—an apparent mUrsArc1.1/mUrsArc2 naming discrepancy in the original recipe must be resolved first.
+
 ## Step 1 — Annotate the teaching VCF
 
 **Purpose:** add consequences on the same reference assembly used for variant calling.
 
-**Input:** the teaching VCF and a prebuilt, instructor-verified SnpEff database. Replace `BEAR_DB` with its actual database ID.
+**Input:** the teaching VCF and the prebuilt, instructor-verified **UrArMar_mUrsArc2** SnpEff database.
 
 ~~~bash
-SNPEFF_DB=BEAR_DB
+SNPEFF_DB=UrArMar_mUrsArc2
 SNPEFF_CONFIG=software/snpEff/snpEff.config
 SNPEFF_JAR=software/snpEff/snpEff.jar
 ANNOTATED="$OUTDIR/four_species.ann.vcf"

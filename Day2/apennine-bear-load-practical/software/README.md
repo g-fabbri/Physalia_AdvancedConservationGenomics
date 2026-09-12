@@ -13,7 +13,60 @@ The environment provides BCFtools, BEDTools, Java, a C++ compiler, and Python. I
 
 ## SnpEff
 
-Place a tested SnpEff distribution under **software/snpEff/** so that **snpEff.jar** and **snpEff.config** match the commands in Part 1. Build or obtain a database for the **exact Apennine reference assembly and gene annotation** used for the VCF. Record database ID, assembly accession, annotation source, and version. Follow the [official custom-database instructions](https://pcingola.github.io/SnpEff/snpeff/build_db/). Do not use a polar-bear or another brown-bear assembly merely because its database is available.
+The existing Jarvis analysis used the custom database ID **UrArMar_mUrsArc2** with the frozen BRAKER3/TSEBRA annotation. Reproduce that preparation before class, but **first verify the reference assembly**: the supplied recipe labels the database mUrsArc2 while copying a FASTA named **mUrsArc1.1.primarysoftmask.fasta**. A filename may be stale, but an actual assembly mismatch would invalidate consequence calls. Confirm the FASTA is the assembly used to call the four-species VCF and that GFF3 scaffold names and lengths agree. Do not proceed based on the database label alone.
+
+From the SnpEff installation directory on Jarvis, prepare files using the verified reference FASTA:
+
+~~~bash
+SNPEFF_HOME=/jarvis/scratch/usr/biello/software/snpEff
+DB=UrArMar_mUrsArc2
+GFF=/jarvis/scratch/usr/biello/bear/annotation/annotation_versions/frozen/UrArMar.braker3.tsebra.gff3
+REF_FASTA=/path/to/verified/VCF_reference.fasta
+
+bcftools view -h /jarvis/scratch/usr/biello/bear/snpeff/VCF/marpolblk.sorted.merged.alignable.final.SNP.vcf.gz | grep '^##contig' | head
+grep '^>' "$REF_FASTA" | head
+awk '$0 !~ /^#/ {print $1; if (++n==5) exit}' "$GFF"
+
+mkdir -p "$SNPEFF_HOME/data/$DB"
+cp "$GFF" "$SNPEFF_HOME/data/$DB/genes.gff"
+cp "$REF_FASTA" "$SNPEFF_HOME/data/$DB/sequences.fa"
+gzip "$SNPEFF_HOME/data/$DB/genes.gff"
+gzip "$SNPEFF_HOME/data/$DB/sequences.fa"
+~~~
+
+The three inspections should show compatible scaffold IDs. Also verify that VCF contig lengths agree with the FASTA index and that the reference alleles match the FASTA at sampled variant sites; matching names alone cannot establish assembly identity. Replace **REF_FASTA** only after this verification.
+
+The previous workflow also copied **UrArMar.braker3.tsebra.gtf** to **genes.gtf.gz**. That file is optional when building with **-gff3**; SnpEff uses **genes.gff.gz** for the explicit GFF3 build. Keep GTF only if you plan to compare builds. The [official database documentation](https://pcingola.github.io/SnpEff/snpeff/build_db_gff_gtf/) describes the expected filenames and notes that GTF is generally preferred when both formats are valid.
+
+Add these entries **once** to **$SNPEFF_HOME/snpEff.config** (inspect the file first to avoid duplicate definitions):
+
+~~~text
+UrArMar_mUrsArc2.genome : Ursus arctos marsicanus
+UrArMar_mUrsArc2.codonTable : Standard
+~~~
+
+Build the database outside the timed practical:
+
+~~~bash
+java -Xmx4g -jar "$SNPEFF_HOME/snpEff.jar" build \
+  -gff3 -c "$SNPEFF_HOME/snpEff.config" \
+  -nodownload -dataDir "$SNPEFF_HOME/data" \
+  -noCheckCds -noCheckProtein -v "$DB" \
+  > "$SNPEFF_HOME/${DB}.build.log" 2>&1
+~~~
+
+The last two flags reproduce the supplied run but **skip CDS and protein validation**. Check the build log for errors and unexpected gene/transcript counts, and run independent reference/annotation checks; a successful exit alone is insufficient. If CDS and protein FASTAs are available, rebuild with checks enabled.
+
+The historical whole-dataset annotation was:
+
+~~~bash
+VCF=/jarvis/scratch/usr/biello/bear/snpeff/VCF/marpolblk.sorted.merged.alignable.final.SNP.vcf.gz
+java -Xmx4g -jar "$SNPEFF_HOME/snpEff.jar" \
+  -c "$SNPEFF_HOME/snpEff.config" "$DB" "$VCF" |
+  gzip -c > marpolblk.sorted.merged.alignable.final.SNP.snpeff.vcf.gz
+~~~
+
+For class, distribute a small indexed four-species VCF and make the prepared SnpEff installation available at **software/snpEff/** (or adjust the paths in Part 1). Record the exact DB build, source VCF, annotation rate, and software version. Installation and the database build are instructor tasks; students annotate only the small teaching VCF.
 
 ## GenoLoader
 

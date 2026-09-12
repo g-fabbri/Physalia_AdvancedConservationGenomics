@@ -26,12 +26,12 @@ This is a **draft with explicit input placeholders**, not yet a tested runnable 
 
 - a **biallelic SNP VCF** on the Apennine brown-bear reference, containing ABB, SBB, BLB, and PBB individuals, plus its index;
 - four exact sample-ID lists in `data/` and the sample counts for each;
-- a SnpEff database built for the **same reference assembly and gene model** as the VCF;
+- the custom **UrArMar_mUrsArc2** SnpEff database, after resolving the mUrsArc1.1 FASTA-name discrepancy and verifying that its reference and gene model match the VCF;
 - a small annotated teaching VCF, ideally on one well-covered autosome, so the exercise fits the time;
 - GenoLoader compiled and tested against that VCF;
 - for the optional GERP extension: the score track's **source assembly**, score definition and format, a validated source-to-Apennine chain, and a pre-lifted one-base score track with mapping QC.
 
-The commands deliberately use `data/FOUR_SPECIES_TEACHING.vcf.gz` and `BEAR_DB` until the real file and database names are confirmed. Installation belongs in [software setup](software/README.md), not in the timed lessons.
+The commands deliberately use `data/FOUR_SPECIES_TEACHING.vcf.gz` until the real classroom file name is confirmed. The SnpEff database ID now follows the supplied Jarvis recipe, subject to the assembly verification above. Installation and database building belong in [software setup](software/README.md), not in the timed lessons.
 
 ## Begin
 
