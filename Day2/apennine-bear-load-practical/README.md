@@ -2,9 +2,11 @@
 
 ## The question
 
-Day 1 asked whether Apennine (ABB) and Slovak (SBB) brown bears have different demographic histories. Today we ask whether they carry different **burdens of putatively damaging derived alleles**. Black bears (BLB) and polar bears (PBB) provide outgroup information for deciding which allele is likely ancestral. Functional effects come from SnpEff; GenoLoader polarizes genotypes and records derived-allele dosage. A GERP conservation-score comparison is an optional extension.
+Day 1 asked whether Apennine (ABB) and Slovak (SBB) brown bears have different demographic histories. Today we ask whether they carry different **burdens of putatively damaging derived alleles**. Black bears (BLB) and polar bears (POB) provide outgroup information for deciding which allele is likely ancestral. Functional effects come from SnpEff; GenoLoader polarizes genotypes and records derived-allele dosage. A GERP conservation-score comparison is an optional extension.
 
 An allele annotated `HIGH` or `MODERATE` is **not** a measured fitness effect. A larger derived-allele count is not automatically a larger realized load. Keep prediction, ancestry, genotype state, and fitness distinct throughout.
+
+The timed analysis uses **Scaffold_34 only**, from `data/Bears_4pops_s34.vcf.gz` (about 20 MB). All site counts and burdens refer to that scaffold, not to the whole genome. `POB` is the sample-list label for polar bears.
 
 ## Schedule (3 hours; about 90 minutes at the terminal)
 
@@ -24,14 +26,14 @@ An allele annotated `HIGH` or `MODERATE` is **not** a measured fitness effect. A
 
 This is a **draft with explicit input placeholders**, not yet a tested runnable lesson. Before class, supply:
 
-- a **biallelic SNP VCF** on the Apennine brown-bear reference, containing ABB, SBB, BLB, and PBB individuals, plus its index;
-- four exact sample-ID lists in `data/` and the sample counts for each;
+- `data/Bears_4pops_s34.vcf.gz` and its `.csi` index; confirm it contains only biallelic SNPs on Scaffold_34 before GenoLoader;
+- the four actual lists `data/ABB.samples`, `data/SBB.samples`, `data/BLB.samples`, and `data/POB.samples`;
 - the custom **UrArMar_mUrsArc2** SnpEff database, after resolving the mUrsArc1.1 FASTA-name discrepancy and verifying that its reference and gene model match the VCF;
-- a small annotated teaching VCF, ideally on one well-covered autosome, so the exercise fits the time;
+- a precomputed annotation checkpoint for the same Scaffold_34 VCF if live SnpEff annotation takes too long;
 - GenoLoader compiled and tested against that VCF;
 - for the optional GERP extension: the score track's **source assembly**, score definition and format, a validated source-to-Apennine chain, and a pre-lifted one-base score track with mapping QC.
 
-The commands deliberately use `data/FOUR_SPECIES_TEACHING.vcf.gz` until the real classroom file name is confirmed. The SnpEff database ID now follows the supplied Jarvis recipe, subject to the assembly verification above. Installation and database building belong in [software setup](software/README.md), not in the timed lessons.
+The input filenames now follow the supplied Jarvis `day02/data/` listing. The SnpEff database ID follows the supplied recipe, subject to the assembly verification above. Installation and database building belong in [software setup](software/README.md), not in the timed lessons.
 
 ## Begin
 

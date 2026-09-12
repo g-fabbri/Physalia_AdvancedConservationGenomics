@@ -2,7 +2,7 @@
 
 ## Dataset
 
-- ABB / SBB / BLB / PBB sample counts:
+- ABB / SBB / BLB / POB (polar bear) sample counts:
 - Teaching chromosome and VCF record count:
 - Why is the VCF reference allele not automatically ancestral?
 
@@ -19,7 +19,7 @@
 - ABB versus SBB: derived copies by category:
 - ABB versus SBB: homozygous-derived sites by category:
 - What changes when the synonymous category is used as a comparator?
-- What changes when BLB and PBB outgroups are tested separately?
+- What changes when BLB and POB outgroups are tested separately?
 
 ## GERP and synthesis
 

@@ -11,14 +11,14 @@ The VCF `REF` allele is defined by the Apennine assembly. It need not be ancestr
 **Input:** the two outgroup sample lists from Part 0.
 
 ~~~bash
-cat "$BLB_LIST" "$PBB_LIST" | sort -u > "$OUTDIR/outgroups.samples"
+cat "$BLB_LIST" "$POB_LIST" | sort -u > "$OUTDIR/outgroups.samples"
 N_ABB=$(wc -l < "$ABB_LIST")
 N_SBB=$(wc -l < "$SBB_LIST")
 N_OUT=$(wc -l < "$OUTDIR/outgroups.samples")
 printf 'ABB=%s SBB=%s outgroups=%s\n' "$N_ABB" "$N_SBB" "$N_OUT"
 ~~~
 
-**Expected:** the outgroup count equals BLB plus PBB counts if no IDs overlap. Outgroup support is a **hypothesis**, not a guarantee: shared ancestral polymorphism, sequencing error, and bear introgression can cause disagreement.
+**Expected:** the outgroup count equals BLB plus POB counts if no IDs overlap. Outgroup support is a **hypothesis**, not a guarantee: shared ancestral polymorphism, sequencing error, and bear introgression can cause disagreement.
 
 ## Step 2 — Run GenoLoader
 
@@ -37,7 +37,7 @@ GENOLOADER=software/genoloader/genoloader
 
 `--p1` and `--p2` define the focal groups; `--p0` supplies outgroup genotypes. The `--m*` values request called individuals in each group. `POP_OUT` uses outgroup information, but its output flags reveal whether a locus was truly outgroup-polarized or used a fallback. `--low_cov NO` keeps diploid dosage rather than one-read resampling.
 
-**Expected:** a table named like `results/genetic_load/four_species.ann.vcf.POP_OUT.gt`. The exact path is printed by GenoLoader; confirm it before the next command.
+**Expected:** a table named like `results/genetic_load/Bears_4pops_s34.ann.vcf.POP_OUT.gt`. The exact path is printed by GenoLoader; confirm it before the next command.
 
 **Check:**
 
@@ -63,7 +63,7 @@ column -t "$OUTDIR/derived_burden_by_sample.tsv" | head -n 16
 
 **Expected:** three rows per ABB/SBB individual: `HIGH`, `missense`, and `synonymous`. The table reports called sites, derived copies (`heterozygote=1`, derived homozygote=2), homozygous-derived sites, and copies per called site. The script retains only flags indicating a monomorphic outgroup or an `allFix` site; all other fallback and ambiguous flags are excluded.
 
-**Check:** the script prints how many annotated loci it read and retained after conservative flag filtering. If `called_sites` is zero for a category, do not compare its ratio. A transcript's impact label is not a direct estimate of deleteriousness.
+**Check:** the script prints how many annotated loci it read and retained after conservative flag filtering. If `called_sites` is zero for a category, do not compare its ratio. A transcript's impact label is not a direct estimate of deleteriousness. Every result here is a **Scaffold_34 burden proxy**, not a whole-genome load estimate.
 
 ## Step 4 — Interpret, then challenge, the comparison
 
