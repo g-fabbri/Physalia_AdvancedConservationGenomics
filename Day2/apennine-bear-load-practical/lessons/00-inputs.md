@@ -11,7 +11,7 @@ ABB and SBB are the **focal populations**. BLB and PBB are **outgroups** used to
 **Input:** indexed VCF and plain-text sample lists, one ID per line.
 
 ~~~bash
-VCF=data/FOUR_SPECIES_TEACHING.vcf.gz
+VCF=data/Bears_4pops_s34.vcf.gz
 ABB_LIST=data/ABB.samples
 SBB_LIST=data/SBB.samples
 BLB_LIST=data/BLB.samples
