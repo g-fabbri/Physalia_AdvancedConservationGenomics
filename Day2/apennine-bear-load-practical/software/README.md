@@ -13,28 +13,14 @@ The environment provides BCFtools, BEDTools, Java, a C++ compiler, and Python. I
 
 ## SnpEff
 
-The existing Jarvis analysis used the custom database ID **UrArMar_mUrsArc2** with the frozen BRAKER3/TSEBRA annotation. Reproduce that preparation before class, but **first verify the reference assembly**: the supplied recipe labels the database mUrsArc2 while copying a FASTA named **mUrsArc1.1.primarysoftmask.fasta**. A filename may be stale, but an actual assembly mismatch would invalidate consequence calls. Confirm the FASTA is the assembly used to call the four-species VCF and that GFF3 scaffold names and lengths agree. Do not proceed based on the database label alone.
+The existing Jarvis analysis used the custom database ID **UrArMar_mUrsArc2** with the frozen BRAKER3/TSEBRA annotation. The [SnpEff lesson](../lessons/01-snpeff.md) now contains the reference/GFF3 inspection and file-preparation commands. In particular, resolve the mUrsArc2 database-label versus mUrsArc1.1 FASTA-name discrepancy before building anything.
 
-From the SnpEff installation directory on Jarvis, prepare files using the verified reference FASTA:
+For the following instructor-only commands, use the prepared, writable SnpEff directory and the same database ID as the lesson:
 
 ~~~bash
-SNPEFF_HOME=/jarvis/scratch/usr/biello/software/snpEff
+SNPEFF_HOME=software/snpEff
 DB=UrArMar_mUrsArc2
-GFF=/jarvis/scratch/usr/biello/bear/annotation/annotation_versions/frozen/UrArMar.braker3.tsebra.gff3
-REF_FASTA=/path/to/verified/VCF_reference.fasta
-
-bcftools view -h /jarvis/scratch/usr/biello/bear/snpeff/VCF/marpolblk.sorted.merged.alignable.final.SNP.vcf.gz | grep '^##contig' | head
-grep '^>' "$REF_FASTA" | head
-awk '$0 !~ /^#/ {print $1; if (++n==5) exit}' "$GFF"
-
-mkdir -p "$SNPEFF_HOME/data/$DB"
-cp "$GFF" "$SNPEFF_HOME/data/$DB/genes.gff"
-cp "$REF_FASTA" "$SNPEFF_HOME/data/$DB/sequences.fa"
-gzip "$SNPEFF_HOME/data/$DB/genes.gff"
-gzip "$SNPEFF_HOME/data/$DB/sequences.fa"
 ~~~
-
-The three inspections should show compatible scaffold IDs. Also verify that VCF contig lengths agree with the FASTA index and that the reference alleles match the FASTA at sampled variant sites; matching names alone cannot establish assembly identity. Replace **REF_FASTA** only after this verification.
 
 The previous workflow also copied **UrArMar.braker3.tsebra.gtf** to **genes.gtf.gz**. That file is optional when building with **-gff3**; SnpEff uses **genes.gff.gz** for the explicit GFF3 build. Keep GTF only if you plan to compare builds. The [official database documentation](https://pcingola.github.io/SnpEff/snpeff/build_db_gff_gtf/) describes the expected filenames and notes that GTF is generally preferred when both formats are valid.
 
