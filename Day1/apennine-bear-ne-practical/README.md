@@ -91,10 +91,20 @@ Sharing a reference assembly does not automatically make a sample-specific calla
 
 ## Before starting
 
+From the course root, activate the prepared Conda environment and add **msmc-tools** to your current terminal session:
+
+~~~bash
+conda activate bear-ne-practical
+export PATH="$PWD/software/msmc-tools:$PATH"
+~~~
+
+Repeat these two commands whenever you open a new terminal. Then check the programs:
+
 ~~~bash
 bcftools --version
 plink --version
 msmc2 --help | head
+generate_multihetsep.py --help | head
 Rscript --version
 ~~~
 
@@ -116,6 +126,5 @@ Start with [Terminal orientation and data QC](lessons/00-data-and-qc.md).
 
 - [Benazzo et al. 2017](https://pmc.ncbi.nlm.nih.gov/articles/PMC5692547/)
 - [NCBI BioProject PRJNA395974](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395974)
-- Tutorial structure inspired by the narrative, command-first approach of the [Speciation & Population Genomics guide](https://speciationgenomics.github.io/pca/).
 
 Additional method references are listed in [REFERENCES.md](REFERENCES.md).
