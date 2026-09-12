@@ -9,9 +9,21 @@ conda env create -f environment.yml
 conda activate bear-load-practical
 ~~~
 
-The environment provides BCFtools, BEDTools, Java, a C++ compiler, and Python. It does not automatically provide the bear-specific SnpEff database, GenoLoader binary, or liftOver chain.
+The environment provides BCFtools, BEDTools, Java, a C++ compiler, Python, wget, and unzip. It does not automatically provide the bear-specific SnpEff database, GenoLoader binary, or liftOver chain.
 
 ## SnpEff
+
+For a **fresh installation**, download and unpack SnpEff from the course directory (do not unpack over an existing customized installation):
+
+~~~bash
+cd software
+wget https://snpeff-public.s3.amazonaws.com/versions/snpEff_latest_core.zip
+unzip snpEff_latest_core.zip
+cd ..
+ls -lh software/snpEff/snpEff.jar software/snpEff/snpEff.config
+~~~
+
+The ZIP extracts to **software/snpEff/**. Because `latest` can change, record the downloaded SnpEff version for reproducibility. The custom bear database still needs to be prepared and built as described below.
 
 The existing Jarvis analysis used the custom database ID **UrArMar_mUrsArc2** with the frozen BRAKER3/TSEBRA annotation. The [SnpEff lesson](../lessons/01-snpeff.md) now contains the reference/GFF3 inspection and file-preparation commands. In particular, resolve the mUrsArc2 database-label versus mUrsArc1.1 FASTA-name discrepancy before building anything.
 
