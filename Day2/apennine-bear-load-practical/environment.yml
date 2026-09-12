@@ -8,3 +8,5 @@ dependencies:
   - cxx-compiler
   - openjdk
   - python=3.11
+  - wget
+  - unzip
