@@ -59,8 +59,6 @@ for POPULATION in ABB SBB; do
     --allow-extra-chr \
     --snps-only just-acgt \
     --biallelic-only strict \
-    --geno 0.10 \
-    --mac 2 \
     --recode \
     --out "${PREFIX}_original_label"
 
@@ -76,8 +74,6 @@ The loop performs exactly the same commands for ABB and SBB. The derived MAP use
 |---|---|
 | **--snps-only just-acgt** | Retain canonical A/C/G/T SNPs |
 | **--biallelic-only strict** | Retain strictly biallelic sites |
-| **--geno 0.10** | Remove sites missing in more than 10% of individuals |
-| **--mac 2** | Require at least two copies of the minor allele |
 
 **Expected:**
 
