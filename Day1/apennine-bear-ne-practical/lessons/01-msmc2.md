@@ -49,6 +49,8 @@ mkdir -p "$OUTDIR"
 
 **Expected:** nothing is printed. The commands assign shell variables and create **results/msmc2** if necessary.
 
+Run these commands from the course root and keep using the same terminal: the variables are needed in Steps 2 and 3. The VCFs already contain one selected bear each; **OUTDIR** keeps intermediate files and final estimates together without changing the input VCFs.
+
 **Check:**
 
 ~~~bash
@@ -69,6 +71,8 @@ Mask: data/UrArMa_callable.bed.gz
 **Purpose:** combine genotype information and callable sequence in the format required by MSMC2.
 
 **Input:** one already-filtered single-sample VCF and the common positive mask for each run.
+
+MSMC2 needs to know both where heterozygous sites occur and how much sequence could have been observed between them. The VCF supplies genotypes at variant positions; the BED mask supplies the callable intervals. We run the conversion separately because ABB and SBB have different genotypes, even though they use the same teaching mask.
 
 ~~~bash
 generate_multihetsep.py \
@@ -120,6 +124,8 @@ wc -l \
 
 Positions should increase, chromosome labels should equal **Scaffold_34**, and both files should contain records.
 
+The number of lines is the number of multihetsep records, not the number of callable bases. The third column carries information about callable sequence between records, which would be lost if we simply handed MSMC2 a list of SNP positions.
+
 If the program reports `invalid literal for int() with base 10: '.'`, a missing genotype remains in the VCF. Return to the input-QC step rather than replacing missing genotypes with **0/0**.
 
 ## Step 3 — Run MSMC2 separately for ABB and SBB
@@ -127,6 +133,8 @@ If the program reports `invalid literal for int() with base 10: '.'`, a missing 
 **Purpose:** estimate one historical coalescence-rate trajectory from each diploid genome.
 
 **Input:** the two multihetsep files.
+
+Each run treats the two haplotypes of one bear as the genetic sample. The `-p` pattern constrains adjacent time intervals to share rates, reducing the number of independently fitted values for this one-scaffold demonstration. Use the **same** pattern and thread count for ABB and SBB so the comparison does not also change the model settings.
 
 ~~~bash
 msmc2 -t 2 -p '1*2+15*1+1*2' \
@@ -162,58 +170,31 @@ head "$OUTDIR/SBB_${SBB_ID}.final.txt"
 
 Both tables should contain time boundaries and a coalescence-rate column named **lambda** or **lambda_00**.
 
+The time boundaries and rates are in MSMC2's scaled units. They are not yet calendar years or directly readable values of effective population size.
+
 ## Step 4 — Scale and compare the trajectories
 
-**Purpose:** apply the same mutation rate and generation time to both results so their scales are directly comparable.
+**Purpose:** convert the fitted time boundaries to years and the coalescence rate to effective population size, then save an ABB–SBB comparison figure.
 
-Start R:
+**Input:** the two **.final.txt** files from Step 3 and the provided [plotting script](../scripts/plot_msmc2.R).
+
+The script uses a mutation rate of **1.82 × 10⁻⁸ per site per generation** and a generation time of **11 years** for both bears. It uses the geometric midpoint of each fitted time interval, calculates `Ne = 1 / (2 × mu × lambda)`, and plots only positive, finite values on logarithmic axes. These are explicit scaling assumptions, not values estimated by MSMC2; justify or revise them for a formal analysis.
+
+From the course root, run:
 
 ~~~bash
-R
+Rscript scripts/plot_msmc2.R
 ~~~
 
-Then paste:
+**Expected:** the script prints the path **results/msmc2/MSMC2_ABB_4573_SBB_U1916.pdf**. The PDF contains two stepwise trajectories on the same axes. No interactive R session or `q(save="no")` command is needed.
 
-~~~r
-abb <- read.table("results/msmc2/ABB_4573.final.txt", header=TRUE)
-sbb <- read.table("results/msmc2/SBB_U1916.final.txt", header=TRUE)
+**Check:**
 
-mu <- 4.5e-9
-generation_time <- 10
-
-scale_msmc <- function(x) {
-  lambda <- if ("lambda_00" %in% names(x)) x$lambda_00 else x$lambda
-  midpoint <- sqrt(x$left_time_boundary * x$right_time_boundary)
-  data.frame(
-    years = midpoint / mu * generation_time,
-    Ne = 1 / (2 * mu * lambda)
-  )
-}
-
-abb_scaled <- scale_msmc(abb)
-sbb_scaled <- scale_msmc(sbb)
-
-plot(abb_scaled$years, abb_scaled$Ne,
-     type="s", log="xy", lwd=2, col="firebrick",
-     xlab="Years before present", ylab="Effective population size")
-lines(sbb_scaled$years, sbb_scaled$Ne,
-      type="s", lwd=2, col="steelblue")
-legend("topleft",
-       legend=c("ABB: 4573", "SBB: U1916"),
-       col=c("firebrick", "steelblue"), lwd=2)
+~~~bash
+ls -lh results/msmc2/MSMC2_ABB_4573_SBB_U1916.pdf
 ~~~
 
-**Expected:** two stepwise trajectories on identical logarithmic axes.
-
-**Check:** both curves should appear and both axes should contain positive values. If R warns about non-positive values, inspect the corresponding **final.txt** file before interpreting the graph.
-
-The numerical dates and population sizes depend directly on **mu** and **generation_time**. These teaching values must be replaced or justified for a formal analysis.
-
-Exit R without saving the workspace:
-
-~~~r
-q(save="no")
-~~~
+The file should have a nonzero size. Inspect the figure: both curves should appear, and the time and Ne axes should contain positive values. The youngest and oldest intervals are often less reliable than the central part of a one-scaffold trajectory.
 
 ## Optional extension — block bootstrap
 
@@ -221,11 +202,15 @@ q(save="no")
 
 The official [multihetsep bootstrap utility](https://github.com/stschiff/msmc-tools/blob/master/multihetsep_bootstrap.py) resamples genomic blocks with replacement and constructs pseudo-scaffolds. MSMC2 is then run independently on each bootstrap replicate. This extension is computationally longer than the main practical; ten replicates are useful for demonstration, whereas a formal analysis should use substantially more.
 
+The bootstrap begins from the **multihetsep files**, not from the original VCFs. Each resampled file represents a different selection of blocks from the same scaffold; comparing the fitted curves reveals sensitivity to that selection.
+
 ### Step A — Choose the block layout
 
 **Input:** the callable mask and the multihetsep files produced above.
 
 Use 5 Mb blocks, the default used by **multihetsep_bootstrap.py**, and calculate how many blocks are needed to approximate the length of Scaffold_34:
+
+The BED intervals can have gaps, so summing callable bases would not give the scaffold coordinate span. Here we take the largest BED end coordinate on **Scaffold_34**, then round up to the number of 5 Mb blocks needed to cover that span.
 
 ~~~bash
 CHUNK_SIZE=5000000
@@ -244,7 +229,11 @@ printf 'Scaffold length: %s bp\nBootstrap blocks per replicate: %s\n' \
 
 **Expected:** a positive scaffold length and a positive number of blocks. The final block may be shorter than 5 Mb, so the reconstructed length is approximate.
 
+**Check:** if either value is zero, confirm that the mask contains **Scaffold_34** and that **CHROM** and **MASK** still have the values from Step 1.
+
 ### Step B — Generate bootstrap multihetsep files
+
+**Purpose:** make ten pseudo-scaffolds for each bear by drawing 5 Mb blocks with replacement. The fixed seed makes the block selections reproducible. ABB and SBB are resampled separately because their heterozygous sites differ.
 
 ~~~bash
 multihetsep_bootstrap.py \
@@ -287,6 +276,8 @@ The count should be **20**: ten ABB replicates and ten SBB replicates.
 
 ### Step C — Run MSMC2 on every replicate
 
+**Purpose:** fit the same MSMC2 time model to each resampled input. A bootstrap replicate is not a new animal; it is another block sample from the original scaffold. The loops may take substantially longer than the two main runs.
+
 ~~~bash
 for REP in $(seq 1 "$N_BOOT"); do
   msmc2 -t 2 -p '1*2+15*1+1*2' \
@@ -313,86 +304,27 @@ The count should be **20**. If classroom time is limited, run two or three repli
 
 ### Step D — Display bootstrap variation
 
-Start R again. The following code writes the figure explicitly to **results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf**:
+**Purpose:** draw the original ABB and SBB estimates as thick lines and the bootstrap estimates as faint lines. The [bootstrap plotting script](../scripts/plot_msmc2_bootstrap.R) uses the same mutation rate and generation time as the main plot. It checks that bootstrap results exist **before** opening a PDF device, avoiding an empty PDF if Step C was skipped.
 
-~~~r
-mu <- 4.5e-9
-generation_time <- 10
+From the course root, run:
 
-scale_msmc <- function(x) {
-  lambda <- if ("lambda_00" %in% names(x)) x$lambda_00 else x$lambda
-  midpoint <- sqrt(x$left_time_boundary * x$right_time_boundary)
-  y <- data.frame(
-    years = midpoint / mu * generation_time,
-    Ne = 1 / (2 * mu * lambda)
-  )
-  y[is.finite(y$years) & is.finite(y$Ne) &
-      y$years > 0 & y$Ne > 0, ]
-}
-
-read_scaled <- function(filename) {
-  scale_msmc(read.table(filename, header=TRUE))
-}
-
-abb <- read_scaled("results/msmc2/ABB_4573.final.txt")
-sbb <- read_scaled("results/msmc2/SBB_U1916.final.txt")
-
-abb_files <- Sys.glob(
-  "results/msmc2/bootstrap/ABB_*/*.final.txt")
-sbb_files <- Sys.glob(
-  "results/msmc2/bootstrap/SBB_*/*.final.txt")
-
-if (length(abb_files) == 0 || length(sbb_files) == 0) {
-  stop("No bootstrap final.txt files found; check BOOTDIR and Step C")
-}
-
-abb_boot <- lapply(abb_files, read_scaled)
-sbb_boot <- lapply(sbb_files, read_scaled)
-all_curves <- c(list(abb, sbb), abb_boot, sbb_boot)
-
-x_limits <- range(unlist(lapply(all_curves, function(x) x$years)))
-y_limits <- range(unlist(lapply(all_curves, function(x) x$Ne)))
-
-pdf("results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf",
-    width=7, height=5)
-plot(abb$years, abb$Ne, type="n", log="xy",
-     xlab="Years before present", ylab="Effective population size",
-     xlim=x_limits, ylim=y_limits)
-
-for (x in abb_boot) {
-  lines(x$years, x$Ne, type="s",
-        col=adjustcolor("firebrick", alpha.f=0.20))
-}
-
-for (x in sbb_boot) {
-  lines(x$years, x$Ne, type="s",
-        col=adjustcolor("steelblue", alpha.f=0.20))
-}
-
-lines(abb$years, abb$Ne, type="s", lwd=3, col="firebrick")
-lines(sbb$years, sbb$Ne, type="s", lwd=3, col="steelblue")
-legend("topleft", legend=c("ABB: 4573", "SBB: U1916"),
-       col=c("firebrick", "steelblue"), lwd=3)
-
-dev.off()
-file.info("results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf")$size
+~~~bash
+Rscript scripts/plot_msmc2_bootstrap.R
 ~~~
 
-**Expected:** **dev.off()** prints the name of the closed graphics device, followed by a positive PDF file size. The PDF contains the original ABB and SBB estimates as thick lines surrounded by faint bootstrap trajectories.
+**Expected:** the script reports how many ABB and SBB replicates it read and prints the path **results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf**.
 
-Return to the terminal and check the result:
+**Check:**
 
 ~~~bash
 ls -lh results/msmc2/MSMC2_ABB_SBB_bootstrap.pdf
 ~~~
 
-If R stops with **No bootstrap final.txt files found**, run this in the terminal and compare the paths with Step C:
+If R stops with **Bootstrap results not found**, compare the actual paths with Step C:
 
 ~~~bash
 find results/msmc2/bootstrap -name '*.final.txt'
 ~~~
-
-Do not call **pdf()** after the plotting commands: that would create a new, empty PDF device.
 
 The spread of ten replicates is a teaching visualization, not a precise confidence interval. Bootstrapping one scaffold measures sensitivity to blocks within that scaffold; it cannot compensate for limited genome coverage, systematic callability bias, or uncertainty in mutation rate and generation time.
 
