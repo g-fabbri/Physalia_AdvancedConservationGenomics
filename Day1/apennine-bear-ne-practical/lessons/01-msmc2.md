@@ -137,11 +137,11 @@ If the program reports `invalid literal for int() with base 10: '.'`, a missing 
 Each run treats the two haplotypes of one bear as the genetic sample. The `-p` pattern constrains adjacent time intervals to share rates, reducing the number of independently fitted values for this one-scaffold demonstration. Use the **same** pattern and thread count for ABB and SBB so the comparison does not also change the model settings.
 
 ~~~bash
-msmc2 -t 2 -p '1*2+15*1+1*2' \
+msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
   -o "$OUTDIR/ABB_${ABB_ID}" \
   "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt"
 
-msmc2 -t 2 -p '1*2+15*1+1*2' \
+msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
   -o "$OUTDIR/SBB_${SBB_ID}" \
   "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
 ~~~
@@ -280,13 +280,13 @@ The count should be **20**: ten ABB replicates and ten SBB replicates.
 
 ~~~bash
 for REP in $(seq 1 "$N_BOOT"); do
-  msmc2 -t 2 -p '1*2+15*1+1*2' \
+  msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
     -o "$BOOTDIR/ABB_${REP}/ABB_${REP}" \
     "$BOOTDIR/ABB_${REP}/bootstrap_multihetsep.chr1.txt"
 done
 
 for REP in $(seq 1 "$N_BOOT"); do
-  msmc2 -t 2 -p '1*2+15*1+1*2' \
+  msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
     -o "$BOOTDIR/SBB_${REP}/SBB_${REP}" \
     "$BOOTDIR/SBB_${REP}/bootstrap_multihetsep.chr1.txt"
 done
