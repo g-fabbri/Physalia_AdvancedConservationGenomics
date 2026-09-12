@@ -1,0 +1,10 @@
+name: bear-load-practical
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - bcftools
+  - bedtools
+  - cxx-compiler
+  - openjdk
+  - python=3.11
