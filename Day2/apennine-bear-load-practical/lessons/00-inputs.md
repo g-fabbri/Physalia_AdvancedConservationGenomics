@@ -2,7 +2,7 @@
 
 Estimated terminal time: 10 minutes.
 
-ABB and SBB are the **focal populations**. BLB and PBB are **outgroups** used to infer ancestral states; they are not added to either focal population. All four groups were called against the Apennine reference assembly, so REF is the assembly allele, not necessarily the ancestral allele.
+ABB and SBB are the **focal populations**. BLB and POB are **outgroups** used to infer ancestral states; they are not added to either focal population. All four groups were called against the Apennine reference assembly, so REF is the assembly allele, not necessarily the ancestral allele.
 
 ## Step 1 — Name the inputs
 
@@ -15,7 +15,7 @@ VCF=data/Bears_4pops_s34.vcf.gz
 ABB_LIST=data/ABB.samples
 SBB_LIST=data/SBB.samples
 BLB_LIST=data/BLB.samples
-PBB_LIST=data/PBB.samples
+POB_LIST=data/POB.samples
 OUTDIR=results/genetic_load
 mkdir -p "$OUTDIR"
 ~~~
@@ -25,9 +25,9 @@ mkdir -p "$OUTDIR"
 **Check:**
 
 ~~~bash
-ls -lh "$VCF" "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$PBB_LIST"
+ls -lh "$VCF" "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
 bcftools query -l "$VCF" | wc -l
-for LIST in "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$PBB_LIST"; do
+for LIST in "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"; do
   printf '%s: ' "$LIST"
   wc -l < "$LIST"
 done
