@@ -37,7 +37,18 @@ make -C software/GONE2 gone
 
 ## 4 — Optional SMC++ installation
 
-The [SMC++ project](https://github.com/popgenmethods/smcpp) currently recommends a versioned container; its latest release is **not** supplied by this Conda environment. On Jarvis, ask the cluster administrator whether Apptainer/Singularity can run that container, or follow the project's source-build instructions in a separate tested environment. Do not assume `conda install smcpp` provides the current release. Before offering the [optional lesson](../lessons/03-smcpp-optional.md), confirm that `smc++ vcf2smc -h`, `smc++ estimate -h`, and `smc++ plot -h` work on the teaching compute node, and record the exact version and runtime.
+Install the [Bioconda SMC++ package](https://anaconda.org/bioconda/smcpp) in the existing course environment before offering the [optional lesson](../lessons/03-smcpp-optional.md):
+
+~~~bash
+conda activate bear-ne-practical
+conda install bioconda::smcpp
+conda list smcpp
+smc++ vcf2smc -h | head
+smc++ estimate -h | head
+smc++ plot -h | head
+~~~
+
+This is an optional install, so it is not included in `environment.yml`. Record the installed version and test all lesson commands on the teaching compute node. The [upstream project](https://github.com/popgenmethods/smcpp) recommends a container for its own latest release; the Conda package may not be that exact build.
 
 ## 5 — Optional currentNe2 installation
 
