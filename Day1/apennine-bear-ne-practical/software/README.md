@@ -35,27 +35,12 @@ git clone --depth 1 https://github.com/esrud/GONE2.git software/GONE2
 make -C software/GONE2 gone
 ~~~
 
-## 4 — Install original GONE on Linux
 
-The original GONE programs are platform-specific. Download the official repository and copy its Linux programs into the course driver directory:
-
-~~~bash
-git clone --depth 1 https://github.com/esrud/GONE.git \
-  software/GONE_official
-
-cp -a software/GONE_official/Linux/PROGRAMMES/. \
-  software/GONE/PROGRAMMES/
-
-chmod u+x software/GONE/PROGRAMMES/*
-~~~
-
-The optional original GONE lesson uses the supplied **script_GONE.sh** and **INPUT_PARAMETERS_FILE**, not the copies in **GONE_official/Linux**.
-
-## 5 — Install NeEstimator
+## 4 — Install NeEstimator
 
 NeEstimator is not installed through this Conda environment. Download the appropriate release from the [official NeEstimator page](https://www.molecularfisherieslaboratory.com/neestimator-software/) and follow its platform-specific instructions. If it is unavailable on the teaching cluster, provide precomputed output for the interpretation exercise.
 
-## 6 — Verify everything
+## 5 — Verify everything
 
 ~~~bash
 conda activate bear-ne-practical
@@ -71,11 +56,6 @@ multihetsep_bootstrap.py --help | head
 test -x software/GONE2/gone2 &&
   echo "GONE2 ready"
 
-test -x software/GONE/PROGRAMMES/MANAGE_CHROMOSOMES2 &&
-test -x software/GONE/PROGRAMMES/LD_SNP_REAL3 &&
-test -x software/GONE/PROGRAMMES/SUMM_REP_CHROM3 &&
-test -x software/GONE/PROGRAMMES/GONEparallel.sh &&
-  echo "Original GONE ready"
 ~~~
 
-Run these checks on the same operating system and compute nodes used for teaching. The Conda environment manages shared dependencies, while the two GONE implementations remain local under **software/**.
+Run these checks on the same operating system and compute nodes used for teaching. The Conda environment manages shared dependencies, while the GONE2 implementation remain local under **software/**.
