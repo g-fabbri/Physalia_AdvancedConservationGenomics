@@ -1,0 +1,17 @@
+name: bear-ne-practical
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - bcftools
+  - bedtools
+  - cxx-compiler
+  - git
+  - make
+  - msmc2
+  - plink=1.90
+  - python=3.11
+  - r-base
+  - tabix
+  # msmc-tools, GONE2, optional SMC++, and optional currentNe2 are installed as described
+  # in software/README.md.
