@@ -12,7 +12,6 @@ We will not search for one definitive value. Instead, we will use three genomic 
 |---|---|---|
 | MSMC2 | Coalescence along diploid genomes | Older and intermediate history |
 | GONE2 | Updated LD modelling and diagnostics | Recent generations |
-| GONE (optional comparison) | Original LD workflow | Recent generations |
 | NeEstimator | LD in a population sample | Contemporary effective size |
 
 The objective is to understand why these methods may produce different—but not necessarily contradictory—answers.
@@ -42,8 +41,6 @@ Compare historical trajectories with MSMC2
 Ask what population-level LD records
              ↓
 Compare recent histories with GONE2
-             ↓
-Optionally repeat with original GONE
              ↓
 Estimate contemporary Ne with NeEstimator
              ↓
@@ -108,7 +105,7 @@ generate_multihetsep.py --help | head
 Rscript --version
 ~~~
 
-Installation is not part of the timed practical. Create the shared environment and install the remaining programs using the consolidated [software setup](software/README.md). Original GONE is retained as an [optional comparison](lessons/02b-gone.md) while both LD workflows are being tested.
+Installation is not part of the timed practical. Create the shared environment and install the remaining programs using the consolidated [software setup](software/README.md).
 
 ## Interpretation limits
 
@@ -122,7 +119,7 @@ Installation is not part of the timed practical. Create the shared environment a
 
 Start with [Terminal orientation and data QC](lessons/00-data-and-qc.md).
 
-## Background and inspiration
+## Background
 
 - [Benazzo et al. 2017](https://pmc.ncbi.nlm.nih.gov/articles/PMC5692547/)
 - [NCBI BioProject PRJNA395974](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395974)
