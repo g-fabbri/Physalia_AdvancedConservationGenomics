@@ -25,9 +25,6 @@ MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a forma
 
 The preliminary QC has already confirmed the files, sample IDs, chromosome labels, indexes, and genotype filtering. We therefore begin by preparing the MSMC2 input rather than repeating those checks.
 
-## A note about the common mask
-
-Both bears were aligned to the Apennine reference, and this exercise uses **UrArMa_callable.bed.gz** as a common teaching mask. This is appropriate if the file describes reference mappability or regions callable in both genomes. In a full analysis, sample-specific callability masks—or their intersection for a comparison—are preferable when callability was estimated from read depth and genotype quality.
 
 ## Step 1 — Define the analysis variables
 
