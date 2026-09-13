@@ -16,7 +16,7 @@ Our biological question is:
 MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a format that combines segregating sites with the amount of callable sequence between them.
 
 ~~~text
-  filtered VCF + callable mask
+already-filtered VCF + callable mask
                ↓ generate_multihetsep.py
            multihetsep
                ↓ MSMC2
@@ -25,6 +25,9 @@ MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a forma
 
 The preliminary QC has already confirmed the files, sample IDs, chromosome labels, indexes, and genotype filtering. We therefore begin by preparing the MSMC2 input rather than repeating those checks.
 
+## A note about the common mask
+
+Both bears were aligned to the Apennine reference, and this exercise uses **UrArMa_callable.bed.gz** as a common teaching mask. This is appropriate if the file describes reference mappability or regions callable in both genomes. In a full analysis, sample-specific callability masks—or their intersection for a comparison—are preferable when callability was estimated from read depth and genotype quality.
 
 ## Step 1 — Define the analysis variables
 
@@ -134,11 +137,11 @@ If the program reports `invalid literal for int() with base 10: '.'`, a missing 
 Each run treats the two haplotypes of one bear as the genetic sample. The `-p` pattern constrains adjacent time intervals to share rates, reducing the number of independently fitted values for this one-scaffold demonstration. Use the **same** pattern and thread count for ABB and SBB so the comparison does not also change the model settings.
 
 ~~~bash
-msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
+msmc2 -t 2 -p '1*2+15*1+1*2' \
   -o "$OUTDIR/ABB_${ABB_ID}" \
   "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt"
 
-msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
+msmc2 -t 2 -p '1*2+15*1+1*2' \
   -o "$OUTDIR/SBB_${SBB_ID}" \
   "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
 ~~~
@@ -277,13 +280,13 @@ The count should be **20**: ten ABB replicates and ten SBB replicates.
 
 ~~~bash
 for REP in $(seq 1 "$N_BOOT"); do
-  msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
+  msmc2 -t 2 -p '1*2+15*1+1*2' \
     -o "$BOOTDIR/ABB_${REP}/ABB_${REP}" \
     "$BOOTDIR/ABB_${REP}/bootstrap_multihetsep.chr1.txt"
 done
 
 for REP in $(seq 1 "$N_BOOT"); do
-  msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
+  msmc2 -t 2 -p '1*2+15*1+1*2' \
     -o "$BOOTDIR/SBB_${REP}/SBB_${REP}" \
     "$BOOTDIR/SBB_${REP}/bootstrap_multihetsep.chr1.txt"
 done

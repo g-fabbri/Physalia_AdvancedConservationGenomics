@@ -12,8 +12,8 @@ No single result answers it completely. Assemble the evidence by time scale.
 |---|---|---|---|---|
 | MSMC2 | | | Older/intermediate | One genome and one scaffold per population |
 | GONE2 | | | Recent generations | 10 versus 8 individuals; one scaffold |
-| GONE (optional) | | | Recent generations | 10 versus 8 individuals; one scaffold |
-| NeEstimator | | | Contemporary | Small samples, rare alleles, linkage |
+| SMC++ (optional) | | | Historical trajectory | One scaffold; shared mask; selected distinguished bear |
+| currentNe2 (optional) | | | Contemporary | One scaffold is not a genome-wide LD panel |
 
 ## Are the comparisons equivalent?
 
@@ -21,10 +21,10 @@ No single result answers it completely. Assemble the evidence by time scale.
 |---|---|---|
 | MSMC2 | Representative diploid individuals | Heterozygous-site spacing and coalescence |
 | GONE2 | Population genotype samples | LD with updated fitting and diagnostics |
-| GONE | Population genotype samples | Original LD-by-distance workflow |
-| NeEstimator | Population genotype samples | Contemporary sample LD |
+| SMC++ (optional) | All population individuals, with one distinguished bear | Coalescent information plus allele counts |
+| currentNe2 (optional) | Population genotype samples | LD-based contemporary estimate |
 
-The MSMC2 curves describe the genealogical histories recorded by two selected genomes. They are not direct estimates based on all 10 and 8 population samples. GONE2, optional original GONE, and NeEstimator use population samples but have limited precision because those samples are small.
+The MSMC2 curves describe the genealogical histories recorded by two selected genomes. They are not direct estimates based on all 10 and 8 population samples. Optional SMC++ includes all 10 and 8 samples; GONE2 and optional currentNe2 use population-level LD, but target different time scales. None of these one-scaffold runs should be treated as a genome-wide estimate.
 
 ## Final questions
 
@@ -32,7 +32,7 @@ The MSMC2 curves describe the genealogical histories recorded by two selected ge
 2. Do any results appear contradictory, or do they describe different periods?
 3. Could differences in callability, coverage, sample size, or relatedness explain part of the contrast?
 4. Which curve endpoints or confidence intervals should not be interpreted strongly?
-5. Would adding chromosomes and adding individuals improve all three methods in the same way?
+5. Would adding chromosomes and adding individuals improve all of these methods in the same way?
 6. Which result is most relevant to immediate conservation management?
 7. What additional genomic and ecological evidence is needed before recommending an intervention?
 

@@ -4,6 +4,7 @@ channels:
   - bioconda
 dependencies:
   - bcftools
+  - bedtools
   - cxx-compiler
   - git
   - make
@@ -12,5 +13,5 @@ dependencies:
   - python=3.11
   - r-base
   - tabix
-  # msmc-tools, GONE, GONE2, and NeEstimator are installed as described
+  # msmc-tools, GONE2, optional SMC++, and optional currentNe2 are installed as described
   # in software/README.md.

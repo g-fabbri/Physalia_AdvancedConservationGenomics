@@ -28,8 +28,9 @@ Do not manufacture a callable mask from variant-only positions. Verify how `UrAr
 
 ```text
 results/msmc2/precomputed/msmc2.final.txt
-results/gone/precomputed/Output_Ne_<name>
-results/neestimator/precomputed/result.txt
+results/gone2/precomputed/GONE2_ABB_SBB.pdf
+results/smcpp/precomputed/SMCPP_ABB_SBB_Scaffold_34.pdf
+results/currentne2/precomputed/comparison.txt
 ```
 
 Keep a provenance record containing source accession, sample identifiers, filtering commands, software versions, and checksums. If public redistribution is not allowed, provide a download/preparation script or use a simulated dataset.
@@ -48,17 +49,15 @@ Ask students why the full LD pattern—not an LD-pruned panel—is needed. Recen
 
 GONE2 is the primary recent-demography practical. Students create the ABB and SBB population VCFs and the shared PED/MAP inputs, then run GONE2 with identical settings. Emphasize the sample size, SNP count, Fis, inferred genome length, and structure warnings in each **GONE2_STATS** file before discussing the trajectories.
 
-The lesson uses GONE2's default upper recombination fraction of 0.05. The value 0.0101 is reserved for instructor sensitivity testing against the original GONE setting **hc=0.01**.
+The lesson uses GONE2's default upper recombination fraction of 0.05. Testing alternative `-u` values can be an instructor sensitivity analysis.
 
-### Optional original GONE
+### Optional SMC++
 
-The optional lesson reuses the PED/MAP files prepared by GONE2. The supplied driver assumes chromosomes are consecutively numbered beginning at 1, so Part 2 creates a derived one-chromosome MAP with chromosome code **1** while preserving marker order and physical coordinates.
+This is an extension, not part of the timed practical. It uses the same one-scaffold 18-individual VCF but fits ABB and SBB separately. Verify that the VCF contains all expected sample IDs, that the reference chromosome length is available, and that the shared callable BED is appropriate for both populations. SMC++ needs an **uncallable** BED mask, so the lesson complements the provided callable BED. Test both fits and the plot on the classroom platform; distribute a precomputed plot if fitting takes too long.
 
-Each student works in a private course directory, so no group-specific run copies are required. The original driver uses generic intermediate files and ABB and SBB runs must be performed sequentially. Keep compilation and installation outside the timed practical; all setup is consolidated in **software/README.md**.
+### Optional currentNe2
 
-### NeEstimator
-
-Ask why GONE and NeEstimator should not receive identical SNP treatment automatically. Prepare a valid GENEPOP file and test it with the exact NeEstimator V2.1 package distributed to students.
+This extension reuses the GONE2 PED/MAP inputs to estimate one contemporary value per population. It is LD-based like GONE2, but targets a different time scale. Treat its one-scaffold numbers as exploratory; prepare a multi-chromosome dataset for a substantive comparison, especially if using currentNe2's between-chromosome estimate.
 
 ## Suggested assessment
 

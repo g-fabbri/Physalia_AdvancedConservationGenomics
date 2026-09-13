@@ -24,24 +24,18 @@
 - Main difference between recent trajectories:
 - Possible non-demographic explanation:
 
-## Optional original GONE comparison
+## Optional SMC++ comparison
 
-- Does it infer the same direction of recent change as GONE2?
-- Which settings or diagnostics differ?
+- Number of ABB and SBB individuals used:
+- Distinguished individual in each population:
+- Why was the callable BED complemented before `--mask`?
+- Which differences from MSMC2 might be due to sample size rather than biology?
 
-## NeEstimator — Apennine
+## Optional currentNe2 comparison
 
-| Allele-frequency cutoff | Loci | Ne | Lower CI | Upper CI |
-|---:|---:|---:|---:|---:|
-| 0.02 | | | | |
-| 0.05 | | | | |
-
-## NeEstimator — Slovak
-
-| Allele-frequency cutoff | Loci | Ne | Lower CI | Upper CI |
-|---:|---:|---:|---:|---:|
-| 0.02 | | | | |
-| 0.05 | | | | |
+- ABB and SBB contemporary estimates:
+- Why is a one-scaffold estimate not equivalent to a genome-wide contemporary estimate?
+- Does it agree with the recent end of GONE2's trajectory? Why might it differ?
 
 ## Synthesis
 

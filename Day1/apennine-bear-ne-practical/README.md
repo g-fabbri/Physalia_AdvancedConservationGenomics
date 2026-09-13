@@ -1,4 +1,4 @@
-# Two bear populations, three views of effective population size
+# Two bear populations, two complementary views of effective population size
 
 ## A conservation-genomics practical
 
@@ -6,13 +6,14 @@ The Apennine brown bear is a small and isolated population in central Italy. Slo
 
 > Do genomes from Apennine brown bears (ABB) and Slovak brown bears (SBB) record different histories of effective population size?
 
-We will not search for one definitive value. Instead, we will use three genomic signals:
+We will not search for one definitive value. Instead, we will use two complementary approaches, with optional method comparisons:
 
 | Method | Genomic signal | Main time scale |
 |---|---|---|
 | MSMC2 | Coalescence along diploid genomes | Older and intermediate history |
 | GONE2 | Updated LD modelling and diagnostics | Recent generations |
-| NeEstimator | LD in a population sample | Contemporary effective size |
+| SMC++ (optional extension) | Coalescent and frequency information from multiple unphased individuals | Historical trajectory |
+| currentNe2 (optional extension) | Genome-wide LD in a population sample | Contemporary effective size |
 
 The objective is to understand why these methods may produce different—but not necessarily contradictory—answers.
 
@@ -42,7 +43,7 @@ Ask what population-level LD records
              ↓
 Compare recent histories with GONE2
              ↓
-Estimate contemporary Ne with NeEstimator
+Optional extensions: SMC++ or currentNe2
              ↓
 Combine evidence and identify limitations
 ~~~
@@ -62,9 +63,10 @@ By the end, you should be able to connect each estimator to its genomic signal a
 | 01:20–01:30 | Break |
 | 01:30–01:50 | LD and recent demography |
 | 01:50–02:20 | [Compare population histories with GONE2](lessons/02-gone2.md) |
-| 02:20–02:35 | Contemporary effective size and sampling |
-| 02:35–02:55 | [Compare contemporary estimates](lessons/03-neestimator.md) |
-| 02:55–03:00 | [Combine the evidence](lessons/04-synthesis.md) |
+| 02:20–02:35 | Sampling, uncertainty, and method assumptions |
+| 02:35–03:00 | [Combine the evidence](lessons/04-synthesis.md) |
+
+The [SMC++ extension](lessons/03-smcpp-optional.md) uses all 10 ABB and 8 SBB individuals on Scaffold_34. The [currentNe2 extension](lessons/03b-currentne2-optional.md) reuses the GONE2 inputs to illustrate a contemporary LD estimate. Both are outside the timed practical and should be tested by the instructor first.
 
 ## Input files
 
@@ -119,9 +121,10 @@ Installation is not part of the timed practical. Create the shared environment a
 
 Start with [Terminal orientation and data QC](lessons/00-data-and-qc.md).
 
-## Background
+## Background and inspiration
 
 - [Benazzo et al. 2017](https://pmc.ncbi.nlm.nih.gov/articles/PMC5692547/)
 - [NCBI BioProject PRJNA395974](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395974)
+- Tutorial structure inspired by the narrative, command-first approach of the [Speciation & Population Genomics guide](https://speciationgenomics.github.io/pca/).
 
 Additional method references are listed in [REFERENCES.md](REFERENCES.md).

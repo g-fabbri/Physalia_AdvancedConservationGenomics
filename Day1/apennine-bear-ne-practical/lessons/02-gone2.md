@@ -59,6 +59,8 @@ for POPULATION in ABB SBB; do
     --allow-extra-chr \
     --snps-only just-acgt \
     --biallelic-only strict \
+    --geno 0.10 \
+    --mac 2 \
     --recode \
     --out "${PREFIX}_original_label"
 
@@ -68,12 +70,14 @@ for POPULATION in ABB SBB; do
 done
 ~~~
 
-The loop performs exactly the same commands for ABB and SBB. The derived MAP uses chromosome code **1**, which is accepted by both GONE2 and the optional original GONE workflow. Marker IDs and physical positions are unchanged.
+The loop performs exactly the same commands for ABB and SBB. The derived MAP uses chromosome code **1**, which GONE2 accepts. Marker IDs and physical positions are unchanged.
 
 | PLINK option | Meaning |
 |---|---|
 | **--snps-only just-acgt** | Retain canonical A/C/G/T SNPs |
 | **--biallelic-only strict** | Retain strictly biallelic sites |
+| **--geno 0.10** | Remove sites missing in more than 10% of individuals |
+| **--mac 2** | Require at least two copies of the minor allele |
 
 **Expected:**
 
@@ -131,7 +135,7 @@ OUTDIR="$COURSE_DIR/results/gone2"
 | **-E** | Request variation among genetic-algorithm rounds |
 | **-o** | Set the output prefix |
 
-The upper recombination fraction is not specified, so GONE2 uses its default **-u 0.05**. Testing **-u 0.0101** to approximate GONE's **hc=0.01** is an instructor sensitivity analysis, not part of the student lesson.
+The upper recombination fraction is not specified, so GONE2 uses its default **-u 0.05**. Changing `-u` can be explored separately as an instructor sensitivity analysis, not part of the student lesson.
 
 Do not use **-x** in the main run. It fits a structured metapopulation model, while this exercise initially treats ABB and SBB as separate populations.
 
@@ -196,4 +200,4 @@ dev.off()
 5. Why are 10 ABB and 8 SBB individuals insufficient for strong biological conclusions?
 6. Which additional chromosomes, individuals, or maps would most improve the analysis?
 
-Optionally compare the results with [Part 2B — original GONE](02b-gone.md), or continue to [Part 3 — NeEstimator](03-neestimator.md).
+Continue to the [synthesis](04-synthesis.md). For further work, try the optional [SMC++](03-smcpp-optional.md) or [currentNe2](03b-currentne2-optional.md) extensions.

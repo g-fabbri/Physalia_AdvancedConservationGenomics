@@ -11,7 +11,7 @@ conda env create -f environment.yml
 conda activate bear-ne-practical
 ~~~
 
-This environment supplies BCFtools, tabix/bgzip, PLINK 1.9, MSMC2, R, Python, Git, Make, and a C++ compiler. GONE, GONE2, msmc-tools, and NeEstimator require the additional installation steps below.
+This environment supplies BCFtools, BEDTools, tabix/bgzip, PLINK 1.9, MSMC2, R, Python, Git, Make, and a C++ compiler. GONE2 and msmc-tools require the additional installation steps below. SMC++ and currentNe2 are optional instructor-tested extensions.
 
 ## 2 — Install msmc-tools
 
@@ -35,12 +35,23 @@ git clone --depth 1 https://github.com/esrud/GONE2.git software/GONE2
 make -C software/GONE2 gone
 ~~~
 
+## 4 — Optional SMC++ installation
 
-## 4 — Install NeEstimator
+The [SMC++ project](https://github.com/popgenmethods/smcpp) currently recommends a versioned container; its latest release is **not** supplied by this Conda environment. On Jarvis, ask the cluster administrator whether Apptainer/Singularity can run that container, or follow the project's source-build instructions in a separate tested environment. Do not assume `conda install smcpp` provides the current release. Before offering the [optional lesson](../lessons/03-smcpp-optional.md), confirm that `smc++ vcf2smc -h`, `smc++ estimate -h`, and `smc++ plot -h` work on the teaching compute node, and record the exact version and runtime.
 
-NeEstimator is not installed through this Conda environment. Download the appropriate release from the [official NeEstimator page](https://www.molecularfisherieslaboratory.com/neestimator-software/) and follow its platform-specific instructions. If it is unavailable on the teaching cluster, provide precomputed output for the interpretation exercise.
+## 5 — Optional currentNe2 installation
 
-## 5 — Verify everything
+Compile the [official currentNe2 repository](https://github.com/esrud/currentNe2) on the teaching Linux node:
+
+~~~bash
+git clone --depth 1 https://github.com/esrud/currentNe2.git software/currentNe2
+make -C software/currentNe2
+test -x software/currentNe2/currentne2 && echo 'currentNe2 ready'
+~~~
+
+Check the compiler output and `software/currentNe2/currentne2 -h` before using the [optional lesson](../lessons/03b-currentne2-optional.md). The one-scaffold teaching input is useful to compare software output, not to establish a reliable contemporary population size.
+
+## 6 — Verify everything
 
 ~~~bash
 conda activate bear-ne-practical
@@ -58,4 +69,4 @@ test -x software/GONE2/gone2 &&
 
 ~~~
 
-Run these checks on the same operating system and compute nodes used for teaching. The Conda environment manages shared dependencies, while the GONE2 implementation remain local under **software/**.
+Run these checks on the same operating system and compute nodes used for teaching. The Conda environment manages shared dependencies, while GONE2 and optional currentNe2 remain local under **software/**.
