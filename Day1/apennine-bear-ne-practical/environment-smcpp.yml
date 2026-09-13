@@ -1,0 +1,9 @@
+name: bear-ne-smcpp
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - bioconda::smcpp=1.15.4
+  - bcftools
+  - bedtools

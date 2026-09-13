@@ -2,7 +2,7 @@
 
 This extension is **outside the 90-minute practical**. MSMC2 uses one diploid individual per population; SMC++ can incorporate the other individuals without phasing. Both use sequence patterns to infer a size trajectory, so this is a comparison within the coalescent-method family, not an independent LD validation of GONE2. We still use only **Scaffold_34**, and the resulting curves are demonstrations rather than genome-wide estimates.
 
-Run from the Day 1 course directory with a tested `smc++`, `bcftools`, and `bedtools` available. Installation belongs in the [software setup](../software/README.md).
+Run from the Day 1 course directory after `conda activate bear-ne-smcpp`; this optional environment provides `smc++`, `bcftools`, and `bedtools`. Installation belongs in the [software setup](../software/README.md).
 
 ## Step 1 — Identify samples and sequence length
 

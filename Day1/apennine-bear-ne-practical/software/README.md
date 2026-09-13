@@ -37,18 +37,18 @@ make -C software/GONE2 gone
 
 ## 4 — Optional SMC++ installation
 
-Install the [Bioconda SMC++ package](https://anaconda.org/bioconda/smcpp) in the existing course environment before offering the [optional lesson](../lessons/03-smcpp-optional.md):
+Install the [Bioconda SMC++ package](https://anaconda.org/bioconda/smcpp) in a **separate optional environment** before offering the [optional lesson](../lessons/03-smcpp-optional.md). The main `bear-ne-practical` environment pins Python 3.11, but Bioconda currently lists SMC++ builds for Python 3.10 and 3.9; adding it to the main environment would require changing that pin or solving a different package set.
 
 ~~~bash
-conda activate bear-ne-practical
-conda install bioconda::smcpp
+conda env create -f environment-smcpp.yml
+conda activate bear-ne-smcpp
 conda list smcpp
 smc++ vcf2smc -h | head
 smc++ estimate -h | head
 smc++ plot -h | head
 ~~~
 
-This is an optional install, so it is not included in `environment.yml`. Record the installed version and test all lesson commands on the teaching compute node. The [upstream project](https://github.com/popgenmethods/smcpp) recommends a container for its own latest release; the Conda package may not be that exact build.
+The optional `environment-smcpp.yml` uses the same Bioconda package as `conda install bioconda::smcpp`, pinned to the available 1.15.4 build. Activate `bear-ne-practical` for the two main lessons and `bear-ne-smcpp` only for SMC++. Record the installed version and test all lesson commands on the teaching compute node. The [upstream project](https://github.com/popgenmethods/smcpp) recommends a container for its own latest release; the Conda package may not be that exact build.
 
 ## 5 — Optional currentNe2 installation
 
