@@ -1,4 +1,4 @@
-# Optional Part 3 — Add GERP constraint scores to Scaffold_25
+# Optional Part 3 — GERP constraint scores
 
 Estimated terminal time: 15 minutes **if the instructor supplies the chain and score files**. Building the assembly alignment is instructor preparation; the full process is shown so the liftOver is transparent and can be repeated outside class.
 
