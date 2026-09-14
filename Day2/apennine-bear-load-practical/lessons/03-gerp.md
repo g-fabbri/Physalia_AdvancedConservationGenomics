@@ -16,7 +16,7 @@ Conda supplies the shared tools. The instructor places the standalone `minimap2`
 
 SnpEff predicts consequences from gene models; GERP measures evolutionary constraint at an alignment column. Neither identifies a bear allele's fitness effect. We will score the **Scaffold_25 SNPs** used in Parts 1–2.
 
-The GERP bigWig's **coordinate assembly must be verified first**. Polar bear being among the 92 aligned mammals does *not* prove the bigWig uses polar coordinates. The commands below assume the score track uses the exact polar assembly in `POLAR_FA`. If it does not, stop and identify the correct assembly. We lift Apennine SNPs to the score assembly and carry the score back using a stable site ID; there is no need to lift a whole bigWig or make separate files for each SnpEff category.
+The score track for this exercise is Ensembl release 114's [91-mammal GERP bigWig for polar bear](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw), named `gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw`. Its filename identifies the intended **UrsMar_1.0 polar-bear coordinates**; still verify its contig names and lengths against `POLAR_FA` before liftOver. The polar FASTA must be this same assembly, not merely any polar-bear reference. We lift Apennine SNPs to the score assembly and carry the score back using a stable site ID; there is no need to lift a whole bigWig or make separate files for each SnpEff category.
 
 ## Step 1 — Build the one-scaffold chain (instructor preparation)
 
@@ -47,7 +47,7 @@ bcftools query -l data/Bears_4pops_s25.vcf.gz
 ```bash
 CHROM=Scaffold_25
 APP_FA=/jarvis/data/refgenomes/Uarcmar/mUrsArc1.1.primarysoftmask.fasta
-POLAR_FA=/path/to/verified/polar_score_assembly.fasta
+POLAR_FA=/path/to/verified/UrsMar_1.0.fasta
 TRANSANNO="$COURSE_DIR/software/bin/transanno"
 PREP=results/gerp/preparation
 mkdir -p "$PREP"
@@ -174,10 +174,11 @@ head "$PREP/polar_sites_unique.bed"
 
 ### 4.1 — Find the polar regions to query
 
-**Purpose:** define one score-extraction span per polar contig reached by the SNPs, avoiding whole-genome conversion.
+**Purpose:** define one score-extraction span per polar contig reached by the SNPs, avoiding whole-genome conversion. The instructor downloads the Ensembl bigWig into `data/` before class; students use that prepared local copy.
 
 ```bash
-GERP_BW=/path/to/verified/polar_coordinate_GERP.bigWig
+GERP_BW=data/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw
+ls -lh "$GERP_BW"
 awk 'BEGIN{OFS="\t"}
      {if(!($1 in min) || $2<min[$1]) min[$1]=$2;
       if(!($1 in max) || $3>max[$1]) max[$1]=$3}
