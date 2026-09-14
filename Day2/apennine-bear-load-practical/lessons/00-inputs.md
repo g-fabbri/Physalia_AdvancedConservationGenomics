@@ -22,6 +22,10 @@ ABB and SBB are the **focal populations**. BLB and POB (polar bears) are **outgr
 
 **Input:** indexed VCF and plain-text sample lists, one ID per line.
 
+### 1.1 — Set the input paths
+
+**Purpose:** give the prepared VCF, sample lists, and results directory names that later commands can reuse.
+
 ~~~bash
 VCF=data/Bears_4pops_s25.vcf.gz
 ABB_LIST=data/ABB.samples
@@ -34,7 +38,9 @@ mkdir -p "$OUTDIR"
 
 **Expected:** no output. These variables exist only in the current terminal.
 
-**Check:**
+### 1.2 — Confirm the files and sample counts
+
+**Purpose:** catch missing inputs or incomplete sample lists before analysis.
 
 ~~~bash
 ls -lh "$VCF" "$VCF.csi" "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
@@ -50,6 +56,10 @@ Every file must exist; the four list counts should sum to the expected number of
 ## Step 2 — Inspect variant representation
 
 **Purpose:** verify the scaffold and variant representation before interpreting per-individual counts. The filename suggests Scaffold_25, but we check its contents rather than assume.
+
+### 2.1 — Inspect records and scaffold names
+
+**Purpose:** confirm that the indexed VCF contains the intended scaffold and count its variant records.
 
 ~~~bash
 bcftools view -H "$VCF" | head -n 3

@@ -24,6 +24,10 @@ The **UrArMar_mUrsArc2** database uses the frozen Apennine-bear BRAKER3/TSEBRA g
 
 **Input:** the frozen GFF3 and the **verified reference FASTA used to call the teaching VCF**. The original recipe called the database mUrsArc2 but copied a FASTA named mUrsArc1.1; those names must be reconciled before entering a real path below. A matching scaffold name alone does not prove that two assemblies are identical.
 
+### 1.1 — Identify and compare the reference inputs
+
+**Purpose:** verify that the VCF, gene annotation, and FASTA use the same assembly before building the custom database.
+
 From your **private course directory**, set:
 
 ~~~bash
@@ -39,7 +43,9 @@ awk '$0 !~ /^#/ {print $1; if (++n==5) exit}' "$GFF"
 
 **Expected:** scaffold IDs from the VCF, FASTA, and GFF3 that can be matched to the same assembly. The instructor must also check contig lengths and sampled VCF REF alleles against the FASTA; this short inspection is only an orientation check.
 
-After the reference has been verified, place files where SnpEff expects them:
+### 1.2 — Place the verified database inputs
+
+**Purpose:** give SnpEff the GFF3 and FASTA filenames expected by its GFF3 database build. Do this only after the reference has been verified.
 
 ~~~bash
 mkdir -p "$SNPEFF_HOME/data/$DB"
@@ -51,7 +57,9 @@ gzip "$SNPEFF_HOME/data/$DB/sequences.fa"
 
 **Expected:** **genes.gff.gz** and **sequences.fa.gz** under **software/snpEff/data/UrArMar_mUrsArc2/**. The previous Jarvis preparation also kept a GTF, but the supplied build used **-gff3**, so that build reads the GFF3. These files prepare the database inputs; the instructor's [database-build instructions](../software/README.md) explain the config entry and build command. Do not rebuild a shared installation from every student account.
 
-**Check:**
+### 1.3 — Check the prepared database files
+
+**Purpose:** ensure both compressed inputs exist before the instructor builds or supplies the database.
 
 ~~~bash
 ls -lh "$SNPEFF_HOME/data/$DB/genes.gff.gz" \
@@ -63,6 +71,10 @@ ls -lh "$SNPEFF_HOME/data/$DB/genes.gff.gz" \
 **Purpose:** add consequences on the same reference assembly used for variant calling.
 
 **Input:** the teaching VCF and the prebuilt, instructor-verified **UrArMar_mUrsArc2** SnpEff database.
+
+### 2.1 — Add consequence annotations
+
+**Purpose:** write an ANN-annotated, uncompressed VCF that GenoLoader can read.
 
 ~~~bash
 SNPEFF_DB="$DB"
@@ -79,7 +91,9 @@ java -Xmx4g -jar "$SNPEFF_JAR" \
 
 **Expected:** an uncompressed annotated VCF. GenoLoader's documented C++ command accepts a `.vcf` input; the uncompressed output avoids assuming gzip support.
 
-**Check:**
+### 2.2 — Inspect the ANN field
+
+**Purpose:** confirm that the annotated VCF has both the ANN definition and per-site consequences.
 
 ~~~bash
 bcftools view -h "$ANNOTATED" | grep 'ID=ANN'
@@ -91,6 +105,10 @@ The first command should find an `ANN` header. The second should show consequenc
 ## Step 3 — Compare consequence classes
 
 **Purpose:** see what the annotations actually contain before treating any class as putatively deleterious.
+
+### 3.1 — Count first-transcript impact labels
+
+**Purpose:** get a quick orientation to the predicted-impact categories; this is not a transcript-aware final summary.
 
 ~~~bash
 bcftools query -f '%INFO/ANN\n' "$ANNOTATED" | \

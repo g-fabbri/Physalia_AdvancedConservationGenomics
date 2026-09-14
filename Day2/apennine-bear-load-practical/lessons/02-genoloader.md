@@ -22,6 +22,10 @@ The VCF `REF` allele is defined by the Apennine assembly. It need not be ancestr
 
 **Input:** the two outgroup sample lists from Part 0.
 
+### 1.1 — Combine and count outgroups
+
+**Purpose:** create one nonredundant list and set the group sizes required by GenoLoader.
+
 ~~~bash
 cat "$BLB_LIST" "$POB_LIST" | sort -u > "$OUTDIR/outgroups.samples"
 N_ABB=$(wc -l < "$ABB_LIST")
@@ -38,6 +42,10 @@ printf 'ABB=%s SBB=%s outgroups=%s\n' "$N_ABB" "$N_SBB" "$N_OUT"
 
 **Input:** `ANN`-annotated uncompressed VCF, ABB/SBB sample lists, and the combined outgroup list.
 
+### 2.1 — Polarize annotated SNPs
+
+**Purpose:** run GenoLoader with ABB and SBB as focal groups and the combined outgroup list as ancestral-state evidence.
+
 ~~~bash
 GENOLOADER="$COURSE_DIR/software/genoloader/genoloader"
 "$GENOLOADER" "$ANNOTATED" \
@@ -51,7 +59,9 @@ GENOLOADER="$COURSE_DIR/software/genoloader/genoloader"
 
 **Expected:** a table named like `results/genetic_load/Bears_4pops_s25.ann.vcf.POP_OUT.gt`. The exact path is printed by GenoLoader; confirm it before the next command.
 
-**Check:**
+### 2.2 — Inspect dosages and polarization flags
+
+**Purpose:** verify the table structure and count reliable versus fallback or ambiguous polarization states.
 
 ~~~bash
 GT="$ANNOTATED.POP_OUT.gt"
@@ -64,6 +74,10 @@ The header should contain `scaffold`, `position`, `effect`, `vartype`, `flag`, `
 ## Step 3 — Summarize putative burden proxies
 
 **Purpose:** compare a predicted damaging class with a synonymous comparator while respecting genotype state.
+
+### 3.1 — Count derived alleles by individual and class
+
+**Purpose:** summarize called sites, derived copies, and homozygous-derived sites for ABB and SBB.
 
 ~~~bash
 python scripts/summarize_genoloader.py \
@@ -78,6 +92,10 @@ column -t "$OUTDIR/derived_burden_by_sample.tsv" | head -n 16
 **Check:** the script prints how many annotated loci it read and retained after conservative flag filtering. If `called_sites` is zero for a category, do not compare its ratio. A transcript's impact label is not a direct estimate of deleteriousness. Every result here is a **Scaffold_25 burden proxy**, not a whole-genome load estimate.
 
 ## Step 4 — Interpret, then challenge, the comparison
+
+### 4.1 — Compare the populations cautiously
+
+**Purpose:** separate observed Scaffold_25 patterns from claims about genome-wide genetic load.
 
 1. Does ABB have more homozygous-derived `HIGH` sites per individual than SBB? Is the same true for total derived copies?
 2. Are any differences also present at synonymous sites? What would that imply about ancestry, sampling, or technical bias?
