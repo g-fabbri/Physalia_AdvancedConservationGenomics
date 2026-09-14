@@ -56,7 +56,7 @@ ls -lh "$SNPEFF_HOME/data/$DB/genes.gff.gz" \
 SNPEFF_DB="$DB"
 SNPEFF_CONFIG="$SNPEFF_HOME/snpEff.config"
 SNPEFF_JAR="$SNPEFF_HOME/snpEff.jar"
-ANNOTATED="$OUTDIR/Bears_4pops_s34.ann.vcf"
+ANNOTATED="$OUTDIR/Bears_4pops_s25.ann.vcf"
 
 java -Xmx4g -jar "$SNPEFF_JAR" \
   -c "$SNPEFF_CONFIG" \

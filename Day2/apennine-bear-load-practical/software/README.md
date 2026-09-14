@@ -9,7 +9,7 @@ conda env create -f environment.yml
 conda activate bear-load-practical
 ~~~
 
-The environment provides BCFtools, BEDTools, Java, a C++ compiler, Python, wget, and unzip. It does not automatically provide the bear-specific SnpEff database, GenoLoader binary, or liftOver chain.
+The environment provides BCFtools, BEDTools, SAMtools, Java, a C++ compiler, Python, wget, and unzip. It does not automatically provide the bear-specific SnpEff database, GenoLoader binary, or liftOver chain.
 
 ## SnpEff
 
@@ -83,4 +83,4 @@ Test the executable on a small, uncompressed, SnpEff-annotated **biallelic SNP**
 
 First confirm the **source assembly of the published GERP score track**, its score sign, and whether it is a one-base bedGraph, bigWig, or another format. The fact that polar bear is one of the aligned species is not sufficient to identify the score coordinate reference.
 
-For one-base source BED records, a validated source-to-Apennine chain permits liftOver of coordinates. Keep a unique site identifier and score through transfer; reject unmapped, multi-mapped, length-changing, and non-1:1 sites. Check chromosome names and a sample of mapped positions against both assemblies, and document the fraction retained. Do not reuse the score track as if liftOver regenerated a 92-mammal alignment; it transfers existing scores to new coordinates. The student extension expects a verified four-column file **data/GERP_on_Apennine_unique.bed.gz**. UCSC documents [chain orientation](https://genome.ucsc.edu/goldenpath/help/chain.html) and [zero-based, half-open bedGraph coordinates](https://genome.ucsc.edu/goldenpath/help/bedgraph).
+The [GERP lesson](../lessons/03-gerp.md) gives the full **Scaffold_25-only** workflow: align the assemblies once, build and validate an Apennine-to-score-assembly chain, lift SNP positions, extract scores, and restore Apennine coordinates by stable site ID. It avoids converting or lifting the full-genome score track. The instructor prepares the chain and may provide scored checkpoints before the timed practical. This requires minimap2, Transanno, UCSC `liftOver`, and `bigWigToBedGraph` in addition to the Conda tools; check versions and chain direction on a few loci. Reject unmapped, multi-mapped, length-changing, and multiply scored sites, and document the fraction retained. UCSC documents [chain orientation](https://genome.ucsc.edu/goldenpath/help/chain.html) and [zero-based, half-open bedGraph coordinates](https://genome.ucsc.edu/goldenpath/help/bedgraph).

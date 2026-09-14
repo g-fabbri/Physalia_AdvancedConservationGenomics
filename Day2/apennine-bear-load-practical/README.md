@@ -6,7 +6,7 @@ Day 1 asked whether Apennine (ABB) and Slovak (SBB) brown bears have different d
 
 An allele annotated `HIGH` or `MODERATE` is **not** a measured fitness effect. A larger derived-allele count is not automatically a larger realized load. Keep prediction, ancestry, genotype state, and fitness distinct throughout.
 
-The timed analysis uses **Scaffold_34 only**, from `data/Bears_4pops_s34.vcf.gz` (about 20 MB). All site counts and burdens refer to that scaffold, not to the whole genome. `POB` is the sample-list label for polar bears.
+The timed analysis uses **Scaffold_25 only**, from `data/Bears_4pops_s25.vcf.gz`. All site counts and burdens refer to that scaffold, not to the whole genome. `POB` is the sample-list label for polar bears.
 
 ## Schedule (3 hours; about 90 minutes at the terminal)
 
@@ -26,14 +26,14 @@ The timed analysis uses **Scaffold_34 only**, from `data/Bears_4pops_s34.vcf.gz`
 
 This is a **draft with explicit input placeholders**, not yet a tested runnable lesson. Before class, supply:
 
-- `data/Bears_4pops_s34.vcf.gz` and its `.csi` index; confirm it contains only biallelic SNPs on Scaffold_34 before GenoLoader;
+- `data/Bears_4pops_s25.vcf.gz` and its `.csi` index; confirm it contains only biallelic SNPs on Scaffold_25 before GenoLoader;
 - the four actual lists `data/ABB.samples`, `data/SBB.samples`, `data/BLB.samples`, and `data/POB.samples`;
 - the custom **UrArMar_mUrsArc2** SnpEff database, after resolving the mUrsArc1.1 FASTA-name discrepancy and verifying that its reference and gene model match the VCF;
-- a precomputed annotation checkpoint for the same Scaffold_34 VCF if live SnpEff annotation takes too long;
+- a precomputed annotation checkpoint for the same Scaffold_25 VCF if live SnpEff annotation takes too long;
 - GenoLoader compiled and tested against that VCF;
-- for the optional GERP extension: the score track's **source assembly**, score definition and format, a validated source-to-Apennine chain, and a pre-lifted one-base score track with mapping QC.
+- for the optional GERP extension: the score track's **source assembly**, score definition and format, a validated Scaffold_25-to-score-assembly chain, and a precomputed site-score checkpoint with mapping QC.
 
-The input filenames now follow the supplied Jarvis `day02/data/` listing. The SnpEff database ID follows the supplied recipe, subject to the assembly verification above. Installation and database building belong in [software setup](software/README.md), not in the timed lessons.
+The four sample-list filenames follow the supplied Jarvis `day02/data/` listing. The new Scaffold_25 VCF and all downstream checkpoints must be prepared from the same verified four-population source; the earlier directory listing supplied only a different scaffold. The SnpEff database ID follows the supplied recipe, subject to the assembly verification above. Installation and database building belong in [software setup](software/README.md), not in the timed lessons.
 
 ## Begin
 
