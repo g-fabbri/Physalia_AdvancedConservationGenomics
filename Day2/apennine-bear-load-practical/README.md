@@ -19,8 +19,10 @@ The timed analysis uses **Scaffold_25 only**, from `data/Bears_4pops_s25.vcf.gz`
 | 01:20–01:30 | Break |
 | 01:30–01:55 | Ancestral-state polarization, outgroup disagreement, and introgression |
 | 01:55–02:30 | [Polarize and compare burdens with GenoLoader](lessons/02-genoloader.md) |
-| 02:30–02:45 | Conservation scores versus coding consequences |
-| 02:45–03:00 | [GERP extension and synthesis](lessons/03-gerp.md) |
+| 02:30–02:45 | Interpret ABB–SBB differences and discuss limitations |
+| 02:45–03:00 | Core synthesis and questions; **if time allows**, start the [optional GERP extension](lessons/03-gerp.md) |
+
+The core practical ends after GenoLoader and the synthesis discussion. GERP is **not required** for completing Day 2; its preparation and commands can also be used later as a follow-up exercise.
 
 ## Instructor preparation and missing local details
 

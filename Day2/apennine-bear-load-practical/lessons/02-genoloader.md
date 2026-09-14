@@ -103,4 +103,4 @@ column -t "$OUTDIR/derived_burden_by_sample.tsv" | head -n 16
 4. How many loci were excluded because the outgroups disagreed or were not confidently callable?
 5. What changes if black bears and polar bears are used **separately** as outgroups? Treat that as a sensitivity analysis, not a way to choose the preferred answer.
 
-Write a cautious conclusion in the [answer sheet](../answers/student_answers.md), then continue to [GERP](03-gerp.md).
+Write a cautious conclusion in the [answer sheet](../answers/student_answers.md). This completes the **core Day 2 practical**. If the instructor decides there is time, continue to the [optional GERP lesson](03-gerp.md).

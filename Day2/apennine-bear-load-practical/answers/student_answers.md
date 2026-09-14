@@ -21,9 +21,12 @@
 - What changes when the synonymous category is used as a comparator?
 - What changes when BLB and POB outgroups are tested separately?
 
-## GERP and synthesis
+## Optional GERP extension
 
 - Source assembly and coordinate system of the GERP track:
 - Number and fraction of scored sites after liftOver and overlap:
 - Where do SnpEff and GERP agree or disagree?
+
+## Core synthesis
+
 - One supported conclusion, one uncertainty, and one additional analysis needed:
