@@ -16,7 +16,11 @@ Conda supplies the shared tools. The instructor places the standalone `minimap2`
 
 SnpEff predicts consequences from gene models; GERP measures evolutionary constraint at an alignment column. Neither identifies a bear allele's fitness effect. We will score the **Scaffold_25 SNPs** used in Parts 1–2.
 
-The score track for this exercise is Ensembl release 114's [91-mammal GERP bigWig for polar bear](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/), named `gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw`. Its filename identifies the intended **UrsMar_1.0 polar-bear coordinates**; still verify its contig names and lengths against `POLAR_FA` before liftOver. The polar FASTA must be this same assembly, not merely any polar-bear reference. We lift Apennine SNPs to the score assembly and carry the score back using a stable site ID; there is no need to lift a whole bigWig or make separate files for each SnpEff category.
+### What is a bigWig?
+
+A **bigWig** (`.bw`) is an indexed, compressed binary track of numerical values along a genome—for example, one GERP conservation score at a genomic position. Unlike a text BED or bedGraph file, it is not meant to be read with `head`. Its index lets `bigWigToBedGraph` retrieve a selected chromosome interval without converting the entire track. The extracted **bedGraph** is a small, readable table with `chrom start end score` columns. [UCSC bigWig guide](https://genome.ucsc.edu/goldenPath/help/bigWig).
+
+The score track for this exercise is Ensembl release 114's [91-mammal GERP bigWig for polar bear](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw), named `gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw`. Its filename identifies the intended **UrsMar_1.0 polar-bear coordinates**; still verify its contig names and lengths against `POLAR_FA` before liftOver. The polar FASTA must be this same assembly, not merely any polar-bear reference. **Scaffold_25 is an Apennine scaffold, not a name to search for in the polar bigWig.** We first lift its SNPs to the corresponding polar region(s), which may span more than one polar contig, and then extract only scores in those regions. Finally, we carry scores back to Apennine coordinates using stable site IDs.
 
 ## Step 1 — Build the one-scaffold chain (instructor preparation)
 
@@ -170,11 +174,11 @@ head "$PREP/polar_sites_unique.bed"
 
 **Purpose:** extract bigWig scores only from polar regions reached by the sites, then overlap them with the one-base polar BED. bedGraph intervals already carry scores; `bedtools makewindows -w 1` is unnecessary.
 
-**Input:** verified polar-coordinate GERP bigWig and unique polar sites. The instructor may provide the resulting bedGraph checkpoint if this extraction is too slow in class.
+**Input:** verified polar-coordinate GERP bigWig and unique polar sites. **The full approximately 7 GB bigWig is needed only once, for instructor preparation.** Students need not download or copy it: the instructor can run Steps 4–5 once and distribute the much smaller `GERP_on_Apennine_unique.bed.gz` (with its index), then students start at Step 6. The commands remain here to show exactly how that teaching file was made.
 
 ### 4.1 — Find the polar regions to query
 
-**Purpose:** define one score-extraction span per polar contig reached by the SNPs, avoiding whole-genome conversion. The instructor downloads the Ensembl bigWig into `data/` before class; students use that prepared local copy.
+**Purpose:** define one score-extraction span per polar contig reached by the SNPs, avoiding whole-genome conversion. If running this substep, point `GERP_BW` to the instructor's local copy; do not download a copy for every student.
 
 ```bash
 GERP_BW=data/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw
