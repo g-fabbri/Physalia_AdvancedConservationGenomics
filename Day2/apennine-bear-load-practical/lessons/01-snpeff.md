@@ -2,6 +2,18 @@
 
 Estimated terminal time: 20 minutes with a prebuilt database; allow extra time if students prepare database files themselves.
 
+## Start your terminal
+
+From the Day 2 directory containing `data/`, `software/`, and `results/`, run this in each new terminal:
+
+```bash
+conda activate bear-load-practical
+COURSE_DIR=$(pwd)
+export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+```
+
+Conda supplies the shared tools; standalone programs are kept under Day 2 `software/`. SnpEff is called through its JAR at `software/snpEff/snpEff.jar`, so it does not need a PATH entry. The variables from Part 0 must also be set if you opened a new terminal.
+
 SnpEff compares each VCF allele with gene models and writes predicted consequences to the VCF `ANN` field. The same SNP can have multiple transcript annotations. `HIGH`, `MODERATE`, `LOW`, and `MODIFIER` are **predicted impact categories**, not measurements of selection coefficients or fitness.
 
 The **UrArMar_mUrsArc2** database uses the frozen Apennine-bear BRAKER3/TSEBRA gene annotation and a reference FASTA. We first show how those biological inputs are assembled. The software itself should already be available; its installation is described separately in [software setup](../software/README.md).
@@ -15,7 +27,7 @@ The **UrArMar_mUrsArc2** database uses the frozen Apennine-bear BRAKER3/TSEBRA g
 From your **private course directory**, set:
 
 ~~~bash
-SNPEFF_HOME="$PWD/software/snpEff"
+SNPEFF_HOME="$COURSE_DIR/software/snpEff"
 DB=UrArMar_mUrsArc2
 GFF=/jarvis/scratch/usr/biello/bear/annotation/annotation_versions/frozen/UrArMar.braker3.tsebra.gff3
 REF_FASTA=/path/to/verified/VCF_reference.fasta

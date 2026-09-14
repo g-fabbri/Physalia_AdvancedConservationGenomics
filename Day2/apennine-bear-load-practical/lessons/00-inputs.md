@@ -2,6 +2,18 @@
 
 Estimated terminal time: 10 minutes.
 
+## Start your terminal
+
+From the Day 2 directory containing `data/`, `software/`, and `results/`, run this in each new terminal:
+
+```bash
+conda activate bear-load-practical
+COURSE_DIR=$(pwd)
+export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+```
+
+Conda supplies the shared tools; standalone programs are kept under Day 2 `software/`. The instructor places command-line executables needed for GERP in `software/bin/`. Check your location with `pwd` before continuing.
+
 ABB and SBB are the **focal populations**. BLB and POB (polar bears) are **outgroups** used to infer ancestral states; they are not added to either focal population. All four groups were called against the Apennine reference assembly, so REF is the assembly allele, not necessarily the ancestral allele. This practical examines **Scaffold_25 only**.
 
 ## Step 1 — Name the inputs

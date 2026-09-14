@@ -2,6 +2,18 @@
 
 Estimated terminal time: 15 minutes **if the instructor supplies the chain and score files**. Building the assembly alignment is instructor preparation; the full process is shown so the liftOver is transparent and can be repeated outside class.
 
+## Start your terminal
+
+From the Day 2 directory containing `data/`, `software/`, and `results/`, run this in each new terminal:
+
+```bash
+conda activate bear-load-practical
+COURSE_DIR=$(pwd)
+export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+```
+
+Conda supplies the shared tools. The instructor places the standalone `minimap2`, `transanno`, `liftOver`, and `bigWigToBedGraph` executables in Day 2 `software/bin/`. Check them with `command -v minimap2 transanno liftOver bigWigToBedGraph` before the chain-building steps.
+
 SnpEff predicts consequences from gene models; GERP measures evolutionary constraint at an alignment column. Neither identifies a bear allele's fitness effect. We will score the **Scaffold_25 SNPs** used in Parts 1–2.
 
 The GERP bigWig's **coordinate assembly must be verified first**. Polar bear being among the 92 aligned mammals does *not* prove the bigWig uses polar coordinates. The commands below assume the score track uses the exact polar assembly in `POLAR_FA`. If it does not, stop and identify the correct assembly. We lift Apennine SNPs to the score assembly and carry the score back using a stable site ID; there is no need to lift a whole bigWig or make separate files for each SnpEff category.
@@ -30,7 +42,7 @@ First name the inputs and output directory. Replace `POLAR_FA` only after verify
 CHROM=Scaffold_25
 APP_FA=/jarvis/data/refgenomes/Uarcmar/mUrsArc1.1.primarysoftmask.fasta
 POLAR_FA=/path/to/verified/polar_score_assembly.fasta
-TRANSANNO=/jarvis/scratch/usr/benazzo/endemixit/ursusarctos/liftover/transanno-0.2.4/transanno
+TRANSANNO="$COURSE_DIR/software/bin/transanno"
 PREP=results/gerp/preparation
 mkdir -p "$PREP"
 ```

@@ -7,9 +7,13 @@ Complete this outside the timed practical. Test every command on the teaching co
 ~~~bash
 conda env create -f environment.yml
 conda activate bear-load-practical
+COURSE_DIR=$(pwd)
+export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
 ~~~
 
 The environment provides BCFtools, BEDTools, SAMtools, Java, a C++ compiler, Python, wget, and unzip. It does not automatically provide the bear-specific SnpEff database, GenoLoader binary, or liftOver chain.
+
+Keep software not installed through Conda in this Day 2 `software/` directory: `software/snpEff/` for the SnpEff JAR and database, `software/genoloader/` for GenoLoader, and `software/bin/` for executable `minimap2`, `transanno`, `liftOver`, and `bigWigToBedGraph` files (or links to tested copies). Prepare `software/bin/` before class and confirm each command resolves there with `command -v`. Each lesson repeats the activation and PATH block for students opening a fresh terminal.
 
 ## SnpEff
 

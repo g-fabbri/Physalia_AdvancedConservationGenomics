@@ -2,6 +2,18 @@
 
 Estimated terminal time: 35 minutes.
 
+## Start your terminal
+
+From the Day 2 directory containing `data/`, `software/`, and `results/`, run this in each new terminal:
+
+```bash
+conda activate bear-load-practical
+COURSE_DIR=$(pwd)
+export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+```
+
+Conda supplies the shared tools; GenoLoader lives in Day 2 `software/genoloader/`. If this is a new terminal, also restore the input variables from Part 0 and the annotated-VCF variable from Part 1.
+
 The VCF `REF` allele is defined by the Apennine assembly. It need not be ancestral. GenoLoader uses genotypes in an outgroup to polarize each annotated biallelic SNP, recoding every individual as `0`, `1`, or `2` derived copies. We use black and polar bears together as a **strict-consensus outgroup**: disagreement or missing calls should be excluded from the conservative summary, not silently converted into ancestry.
 
 ## Step 1 — Build the combined outgroup list
@@ -27,7 +39,7 @@ printf 'ABB=%s SBB=%s outgroups=%s\n' "$N_ABB" "$N_SBB" "$N_OUT"
 **Input:** `ANN`-annotated uncompressed VCF, ABB/SBB sample lists, and the combined outgroup list.
 
 ~~~bash
-GENOLOADER=software/genoloader/genoloader
+GENOLOADER="$COURSE_DIR/software/genoloader/genoloader"
 "$GENOLOADER" "$ANNOTATED" \
   --p1 "$ABB_LIST" --p2 "$SBB_LIST" \
   --p0 "$OUTDIR/outgroups.samples" \
