@@ -1,3 +1,9 @@
-# Standalone command-line programs
+# Day 2 command links
 
-Before Day 2, the instructor places tested executable copies or symbolic links here for `minimap2`, `transanno`, `liftOver`, and `bigWigToBedGraph`. These are the non-Conda commands used by the GERP lesson. Keep their version details in the course setup notes.
+The Conda environment installs `minimap2`, `transanno`, `liftOver`, and `bigWigToBedGraph`. After activating it, run:
+
+```bash
+bash software/link_conda_tools.sh
+```
+
+The script creates local symbolic links in this directory. Consequently, the lessons can consistently use `software/bin/` while the package versions remain managed by Conda. Do not commit machine-specific generated links.

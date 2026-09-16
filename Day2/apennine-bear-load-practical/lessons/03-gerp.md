@@ -1,4 +1,4 @@
-# Optional Part 3 — GERP constraint scores
+# Optional Part 3 — Add GERP constraint scores to Scaffold_25
 
 Estimated terminal time: 15 minutes **if the instructor supplies the chain and score files**. Building the assembly alignment is instructor preparation; the full process is shown so the liftOver is transparent and can be repeated outside class.
 
@@ -14,7 +14,7 @@ COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
 ```
 
-Conda supplies the shared tools. The instructor places the standalone `minimap2`, `transanno`, `liftOver`, and `bigWigToBedGraph` executables in Day 2 `software/bin/`. Check them with `command -v minimap2 transanno liftOver bigWigToBedGraph` before the chain-building steps.
+Conda supplies the shared tools, including `minimap2`, `transanno`, `liftOver`, and `bigWigToBedGraph`. During setup, `bash software/link_conda_tools.sh` creates their course-local links in Day 2 `software/bin/`. Check them with `command -v minimap2 transanno liftOver bigWigToBedGraph` before the chain-building steps.
 
 SnpEff predicts consequences from gene models; GERP measures evolutionary constraint at an alignment column. Neither identifies a bear allele's fitness effect. We will score the **Scaffold_25 SNPs** used in Parts 1–2.
 
@@ -89,12 +89,12 @@ head -n 2 "$PREP/Apennine_to_polar.paf"
 **Purpose:** create the coordinate-mapping file that liftOver will use.
 
 ```bash
-"$TRANSANNO" minimap2chain "$PREP/Apennine_to_polar.paf" \
+"$TRANSANNO" minimap2-to-chain "$PREP/Apennine_to_polar.paf" \
   --output "$PREP/Apennine_to_polar.chain"
 head -n 1 "$PREP/Apennine_to_polar.chain"
 ```
 
-**Expected:** a non-empty chain beginning with `chain`. The installed Transanno 0.2.4 command may be `minimap2chain`; current documentation calls it `minimap2-to-chain`, so inspect `"$TRANSANNO" --help` if necessary. **Check:** compare the chain header with both FASTAs and test a few known loci: the chain must accept **Apennine** positions and emit **polar** positions. Do not swap file labels simply to make the command finish. [Transanno documentation](https://github.com/informationsea/transanno).
+**Expected:** a non-empty chain beginning with `chain`. **Check:** compare the chain header with both FASTAs and test a few known loci: the chain must accept **Apennine** positions and emit **polar** positions. Do not swap file labels simply to make the command finish. Confirm the installed syntax with `"$TRANSANNO" minimap2-to-chain --help`. [Transanno documentation](https://github.com/informationsea/transanno).
 
 ## Step 2 — Make a named BED file of VCF SNPs
 

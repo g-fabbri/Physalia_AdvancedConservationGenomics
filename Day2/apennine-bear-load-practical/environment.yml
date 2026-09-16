@@ -6,8 +6,13 @@ dependencies:
   - bcftools
   - bedtools
   - cxx-compiler
+  - git
   - openjdk
+  - minimap2
   - samtools
+  - transanno
+  - ucsc-bigwigtobedgraph
+  - ucsc-liftover
   - python=3.11
   - wget
   - unzip

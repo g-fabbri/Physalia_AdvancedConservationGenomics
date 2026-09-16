@@ -11,9 +11,37 @@ COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
 ~~~
 
-The environment provides BCFtools, BEDTools, SAMtools, Java, a C++ compiler, Python, wget, and unzip. It does not automatically provide the bear-specific SnpEff database, GenoLoader binary, or liftOver chain.
+The environment provides BCFtools, BEDTools, SAMtools, Java, a C++ compiler, Python, Git, wget, unzip, Minimap2, Transanno, UCSC `liftOver`, and UCSC `bigWigToBedGraph`. It does not automatically provide the bear-specific SnpEff database, GenoLoader binary, reference data, GERP track, or liftOver chain.
 
-Keep software not installed through Conda in this Day 2 `software/` directory: `software/snpEff/` for the SnpEff JAR and database, `software/genoloader/` for GenoLoader, and `software/bin/` for executable `minimap2`, `transanno`, `liftOver`, and `bigWigToBedGraph` files (or links to tested copies). Prepare `software/bin/` before class and confirm each command resolves there with `command -v`. Each lesson repeats the activation and PATH block for students opening a fresh terminal.
+Create the course-local command links after activating the environment:
+
+~~~bash
+bash software/link_conda_tools.sh
+export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+
+command -v minimap2 transanno liftOver bigWigToBedGraph
+ls -l software/bin/minimap2 software/bin/transanno \
+      software/bin/liftOver software/bin/bigWigToBedGraph
+~~~
+
+The links give every student the paths used in the lessons:
+
+~~~text
+software/bin/minimap2
+software/bin/transanno
+software/bin/liftOver
+software/bin/bigWigToBedGraph
+~~~
+
+Keep software not managed through Conda in this Day 2 `software/` directory: `software/snpEff/` for the SnpEff JAR and database and `software/genoloader/` for GenoLoader. Each lesson repeats the environment activation and PATH block for students opening a fresh terminal.
+
+If the environment already exists, update it rather than recreating it:
+
+~~~bash
+conda env update -n bear-load-practical -f environment.yml --prune
+conda activate bear-load-practical
+bash software/link_conda_tools.sh
+~~~
 
 ## SnpEff
 
@@ -83,10 +111,10 @@ g++ -O2 -std=c++17 \
 
 Test the executable on a small, uncompressed, SnpEff-annotated **biallelic SNP** VCF with GT and ANN. Confirm its output filename and flag meanings against the installed version; GenoLoader's documented CLI and outputs may evolve. The Python notebook provides additional counting and plotting functions, but the supplied Day 2 summary script uses only Python's standard library.
 
-## GERP liftOver — optional instructor preparation
+## GERP liftOver — optional lesson, required student commands
 
 First confirm the **source assembly of the published GERP score track**, its score sign, and whether it is a one-base bedGraph, bigWig, or another format. The fact that polar bear is one of the aligned species is not sufficient to identify the score coordinate reference.
 
 For this exercise, obtain Ensembl release 114's [91-mammal polar-bear GERP bigWig](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw) **before class** and place it at `data/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw`. Use an `UrsMar_1.0` polar FASTA for the chain, and compare the FASTA and bigWig contig names and lengths. Do not download the large track separately for every student.
 
-The [GERP lesson](../lessons/03-gerp.md) gives the full **Scaffold_25-only** workflow: align the assemblies once, build and validate an Apennine-to-score-assembly chain, lift SNP positions, extract scores, and restore Apennine coordinates by stable site ID. It avoids converting or lifting the full-genome score track. The instructor prepares the chain and may provide scored checkpoints before the timed practical. This requires minimap2, Transanno, UCSC `liftOver`, and `bigWigToBedGraph` in addition to the Conda tools; check versions and chain direction on a few loci. Reject unmapped, multi-mapped, length-changing, and multiply scored sites, and document the fraction retained. UCSC documents [chain orientation](https://genome.ucsc.edu/goldenpath/help/chain.html) and [zero-based, half-open bedGraph coordinates](https://genome.ucsc.edu/goldenpath/help/bedgraph).
+The [GERP lesson](../lessons/03-gerp.md) gives the full **Scaffold_25-only** workflow: align the assemblies once, build and validate an Apennine-to-score-assembly chain, lift SNP positions, extract scores, and restore Apennine coordinates by stable site ID. It avoids converting or lifting the full-genome score track. Minimap2, Transanno, UCSC `liftOver`, and `bigWigToBedGraph` are installed for every student through `environment.yml`; the instructor still prepares the large reference files and may provide scored checkpoints before the timed practical. Check versions and chain direction on a few loci. Reject unmapped, multi-mapped, length-changing, and multiply scored sites, and document the fraction retained. UCSC documents [chain orientation](https://genome.ucsc.edu/goldenpath/help/chain.html) and [zero-based, half-open bedGraph coordinates](https://genome.ucsc.edu/goldenpath/help/bedgraph).

@@ -39,4 +39,4 @@ The four sample-list filenames follow the supplied Jarvis `day02/data/` listing.
 
 ## Begin
 
-Start with [the input and sample check](lessons/00-inputs.md). Record outputs in the [answer sheet](answers/student_answers.md).
+Before class, follow the [software installation and verification guide](software/README.md). It installs the core tools and the four commands used by the optional GERP lesson for every student. Then start with [the input and sample check](lessons/00-inputs.md) and record outputs in the [answer sheet](answers/student_answers.md).
