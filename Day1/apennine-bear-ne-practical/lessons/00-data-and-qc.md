@@ -9,11 +9,11 @@ Estimated time: 10 minutes.
 **Input:** the selected chromosome and the three teaching files.
 
 ~~~bash
-CHROM=Scaffold_34
-APN_SINGLE=data/UrArMa_4573_s34.vcf.gz
-SVK_SINGLE=data/UrArMa_U1916_s34.vcf.gz
-POP=data/UrArMa_18i_s34.vcf.gz
-MASK=data/UrArMa_callable.bed.gz
+CHROM=Scaffold_25
+APN_SINGLE=data/UrArMa_4573_s25.vcf.gz
+SVK_SINGLE=data/UrArMa_U1916_s25.vcf.gz
+POP=data/UrArMa_18i_s25.vcf.gz
+MASK=data/UrArMa_callable_s25.bed.gz
 ~~~
 
 **Expected:** nothing is printed because these commands assign shell variables.
@@ -28,11 +28,11 @@ printf 'Chromosome: %s\nApennine VCF: %s\nSlovak VCF: %s\nPopulation VCF: %s\nMa
 Expected shape:
 
 ~~~text
-Chromosome: Scaffold_34
-Apennine VCF: data/UrArMa_4573_s34.vcf.gz
-Slovak VCF: data/UrArMa_U1916_s34.vcf.gz
-Population VCF: data/UrArMa_18i_s34.vcf.gz
-Mask: data/UrArMa_callable.bed.gz
+Chromosome: Scaffold_25
+Apennine VCF: data/UrArMa_4573_s25.vcf.gz
+Slovak VCF: data/UrArMa_U1916_s25.vcf.gz
+Population VCF: data/UrArMa_18i_s25.vcf.gz
+Mask: data/UrArMa_callable_s25.bed.gz
 ~~~
 
 ## Step 2 — Verify that the files exist
@@ -109,7 +109,7 @@ bcftools query -f '%CHROM\n' "$POP" | sort -u
 gzip -cd "$MASK" | cut -f1 | sort -u | head
 ~~~
 
-**Expected:** both VCF commands include **Scaffold_34**. The mask command displays chromosome or scaffold labels present in the BED file.
+**Expected:** both VCF commands include **Scaffold_25**. The mask command displays chromosome or scaffold labels present in the BED file.
 
 **Check:** verify specifically that the mask contains the selected scaffold:
 
@@ -120,7 +120,7 @@ gzip -cd "$MASK" | awk -v chrom="$CHROM" '$1==chrom {found=1; exit} END {if (fou
 Expected:
 
 ~~~text
-Scaffold_34 found
+Scaffold_25 found
 ~~~
 
 Do not continue if the result is **NOT FOUND**.
@@ -172,16 +172,8 @@ gzip -cd "$MASK" | \
 **Expected:** records in BED format:
 
 ~~~text
-Scaffold_34     0       740
-Scaffold_34     769     1567
-Scaffold_34     1914    2013
-Scaffold_34     2102    3531
-Scaffold_34     3575    4060
-Scaffold_34     4171    6326
-Scaffold_34     6403    6506
-Scaffold_34     6890    7221
-Scaffold_34     7874    8952
-Scaffold_34     8989    9807
+Scaffold_25     0       740
+Scaffold_25     769     1567
 ~~~
 
 Each row describes one callable interval:
@@ -190,13 +182,13 @@ Each row describes one callable interval:
 chromosome    start    end
 ~~~
 
-**Check:** all displayed rows should begin with **Scaffold_34**, and each end coordinate should be larger than its start coordinate.
+**Check:** all displayed rows should begin with **Scaffold_25**, and each end coordinate should be larger than its start coordinate.
 
 ## Step 7 — Count BED intervals and callable base pairs
 
 **Purpose:** distinguish the number of BED intervals from the amount of callable sequence.
 
-**Input:** callable intervals belonging to **Scaffold_34**.
+**Input:** callable intervals belonging to **Scaffold_25**.
 
 Count the intervals:
 
@@ -214,10 +206,10 @@ gzip -cd "$MASK" | \
 
 **Expected:**
 
-- the first command prints the number of callable intervals on **Scaffold_34**;
+- the first command prints the number of callable intervals on **Scaffold_25**;
 - the second prints **Callable bp:** followed by a positive integer.
 
-**Check:** BED intervals are zero-based and half-open. Their lengths are therefore calculated as column 3 minus column 2. The callable-base total should be positive and should not exceed the length of **Scaffold_34**.
+**Check:** BED intervals are zero-based and half-open. Their lengths are therefore calculated as column 3 minus column 2. The callable-base total should be positive and should not exceed the length of **Scaffold_25**.
 
 ## Why are VCF and BED files counted differently?
 
