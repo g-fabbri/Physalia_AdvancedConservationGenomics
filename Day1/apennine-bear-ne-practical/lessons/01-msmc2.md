@@ -27,7 +27,7 @@ The preliminary QC has already confirmed the files, sample IDs, chromosome label
 
 ## A note about the common mask
 
-Both bears were aligned to the Apennine reference, and this exercise uses **UrArMa_callable.bed.gz** as a common teaching mask. This is appropriate if the file describes reference mappability or regions callable in both genomes. In a full analysis, sample-specific callability masks—or their intersection for a comparison—are preferable when callability was estimated from read depth and genotype quality.
+Both bears were aligned to the Apennine reference, and this exercise uses **UrArMa_callable_s25.bed.gz** as a common teaching mask. This is appropriate if the file describes reference mappability or regions callable in both genomes. In a full analysis, sample-specific callability masks—or their intersection for a comparison—are preferable when callability was estimated from read depth and genotype quality.
 
 ## Step 1 — Define the analysis variables
 
@@ -36,12 +36,12 @@ Both bears were aligned to the Apennine reference, and this exercise uses **UrAr
 **Input:** the two already-filtered single-sample VCFs, the common callable mask, and Scaffold_34.
 
 ~~~bash
-CHROM=Scaffold_34
-ABB_VCF=data/UrArMa_4573_s34.vcf.gz
-SBB_VCF=data/UrArMa_U1916_s34.vcf.gz
+CHROM=Scaffold_25
+ABB_VCF=data/UrArMa_4573_s25.vcf.gz
+SBB_VCF=data/UrArMa_U1916_s25.vcf.gz
 ABB_ID=4573
 SBB_ID=U1916
-MASK=data/UrArMa_callable.bed.gz
+MASK=data/UrArMa_callable_s25.bed.gz
 OUTDIR=results/msmc2
 
 mkdir -p "$OUTDIR"
@@ -61,9 +61,9 @@ printf 'ABB: %s (%s)\nSBB: %s (%s)\nMask: %s\n' \
 Expected shape:
 
 ~~~text
-ABB: 4573 (data/UrArMa_4573_s34.vcf.gz)
-SBB: U1916 (data/UrArMa_U1916_s34.vcf.gz)
-Mask: data/UrArMa_callable.bed.gz
+ABB: 4573 (data/UrArMa_4573_s25.vcf.gz)
+SBB: U1916 (data/UrArMa_U1916_s25.vcf.gz)
+Mask: data/UrArMa_callable_s25.bed.gz
 ~~~
 
 ## Step 2 — Create the multihetsep files
@@ -90,7 +90,7 @@ generate_multihetsep.py \
 
 | Argument | Meaning |
 |---|---|
-| **--chr "$CHROM"** | Process only Scaffold_34 |
+| **--chr "$CHROM"** | Process only Scaffold_25 |
 | **--mask "$MASK"** | Count only positions included in the callable mask |
 | **"$ABB_VCF" / "$SBB_VCF"** | Read the prepared diploid genome for that population |
 | **> output file** | Save the generated multihetsep text |
@@ -100,8 +100,8 @@ generate_multihetsep.py \
 Typical format:
 
 ~~~text
-Scaffold_34    68306    44     TC
-Scaffold_34    87563    259    AG
+Scaffold_25    68306    44     TC
+Scaffold_25    87563    259    AG
 ~~~
 
 The four columns contain:
@@ -122,7 +122,7 @@ wc -l \
   "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
 ~~~
 
-Positions should increase, chromosome labels should equal **Scaffold_34**, and both files should contain records.
+Positions should increase, chromosome labels should equal **Scaffold_25**, and both files should contain records.
 
 The number of lines is the number of multihetsep records, not the number of callable bases. The third column carries information about callable sequence between records, which would be lost if we simply handed MSMC2 a list of SNP positions.
 
@@ -208,9 +208,9 @@ The bootstrap begins from the **multihetsep files**, not from the original VCFs.
 
 **Input:** the callable mask and the multihetsep files produced above.
 
-Use 5 Mb blocks, the default used by **multihetsep_bootstrap.py**, and calculate how many blocks are needed to approximate the length of Scaffold_34:
+Use 5 Mb blocks, the default used by **multihetsep_bootstrap.py**, and calculate how many blocks are needed to approximate the length of Scaffold_25:
 
-The BED intervals can have gaps, so summing callable bases would not give the scaffold coordinate span. Here we take the largest BED end coordinate on **Scaffold_34**, then round up to the number of 5 Mb blocks needed to cover that span.
+The BED intervals can have gaps, so summing callable bases would not give the scaffold coordinate span. Here we take the largest BED end coordinate on **Scaffold_25**, then round up to the number of 5 Mb blocks needed to cover that span.
 
 ~~~bash
 CHUNK_SIZE=5000000
@@ -229,7 +229,7 @@ printf 'Scaffold length: %s bp\nBootstrap blocks per replicate: %s\n' \
 
 **Expected:** a positive scaffold length and a positive number of blocks. The final block may be shorter than 5 Mb, so the reconstructed length is approximate.
 
-**Check:** if either value is zero, confirm that the mask contains **Scaffold_34** and that **CHROM** and **MASK** still have the values from Step 1.
+**Check:** if either value is zero, confirm that the mask contains **Scaffold_25** and that **CHROM** and **MASK** still have the values from Step 1.
 
 ### Step B — Generate bootstrap multihetsep files
 
@@ -333,7 +333,7 @@ The spread of ten replicates is a teaching visualization, not a precise confiden
 1. Where do the ABB and SBB trajectories begin to differ, and where do they overlap?
 2. What aspects of isolation, connectivity, or bottleneck history might explain the contrast?
 3. Why should the recent ends of single-genome MSMC2 trajectories be interpreted cautiously?
-4. How might using only Scaffold_34 affect the smoothness and uncertainty of the curves?
+4. How might using only Scaffold_25 affect the smoothness and uncertainty of the curves?
 5. Which assumptions are shared by both curves, and which sources of bias could differ between ABB and SBB?
 6. What happens to the time axis if generation time increases? What happens to both axes if the mutation rate changes?
 7. In which periods are the bootstrap trajectories most variable? What does that imply about confidence in the ABB–SBB contrast?
