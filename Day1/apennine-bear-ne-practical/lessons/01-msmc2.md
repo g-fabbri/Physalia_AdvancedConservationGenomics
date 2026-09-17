@@ -146,7 +146,7 @@ msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
 | Flag | Meaning |
 |---|---|
 | **-t 2** | Use two compute threads |
-| **-p '1*2+15*1+1*2'** | Group adjacent atomic time intervals that share an estimated rate |
+| **-p '1x2+15x1+1x2'** | Group adjacent atomic time intervals that share an estimated rate |
 | **-o** | Set the output prefix for the population |
 
 The time-pattern string estimates 17 free rate parameters: the first and last parameters each cover two atomic intervals, while the 15 middle parameters each cover one. With only one scaffold, a simpler pattern can be more stable than a highly parameterized model.
