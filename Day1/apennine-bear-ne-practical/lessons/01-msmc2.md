@@ -30,7 +30,7 @@ The preliminary QC has already confirmed the files, sample IDs, chromosome label
 
 **Purpose:** assign short, meaningful names to the prepared inputs and create an output directory.
 
-**Input:** the two already-filtered single-sample VCFs, the common callable mask, and Scaffold_34.
+**Input:** the two already-filtered single-sample VCFs, the common callable mask, and Scaffold_25.
 
 ~~~bash
 CHROM=Scaffold_25
