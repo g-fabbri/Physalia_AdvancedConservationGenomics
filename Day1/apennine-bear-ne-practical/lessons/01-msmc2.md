@@ -165,7 +165,7 @@ head "$OUTDIR/ABB_${ABB_ID}.final.txt"
 head "$OUTDIR/SBB_${SBB_ID}.final.txt"
 ~~~
 
-Both tables should contain time boundaries and a coalescence-rate column named **lambda** or **lambda_00**.
+Both tables should contain time boundaries and a coalescence-rate column named **lambda**.
 
 The time boundaries and rates are in MSMC2's scaled units. They are not yet calendar years or directly readable values of effective population size.
 
