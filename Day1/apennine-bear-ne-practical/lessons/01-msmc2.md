@@ -277,13 +277,13 @@ The count should be **20**: ten ABB replicates and ten SBB replicates.
 
 ~~~bash
 for REP in $(seq 1 "$N_BOOT"); do
-  msmc2 -t 2 -p '1*2+15*1+1*2' \
+  msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
     -o "$BOOTDIR/ABB_${REP}/ABB_${REP}" \
     "$BOOTDIR/ABB_${REP}/bootstrap_multihetsep.chr1.txt"
 done
 
 for REP in $(seq 1 "$N_BOOT"); do
-  msmc2 -t 2 -p '1*2+15*1+1*2' \
+  msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
     -o "$BOOTDIR/SBB_${REP}/SBB_${REP}" \
     "$BOOTDIR/SBB_${REP}/bootstrap_multihetsep.chr1.txt"
 done
