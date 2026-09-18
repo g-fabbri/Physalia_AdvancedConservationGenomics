@@ -217,7 +217,7 @@ gzip -cd "$MASK" | \
 - the first command prints the number of callable intervals on **Scaffold_25**;
 - the second prints **Callable bp:** followed by a positive integer.
 
-**Check:** BED intervals are zero-based and half-open. Their lengths are therefore calculated as column 3 minus column 2. The callable-base total should be positive and should not exceed the length of **Scaffold_25**.
+**Check:** BED intervals are zero-based and half-open. Their lengths are therefore calculated as column 3 minus column 2. The callable-base total should be positive and should not exceed the length of **Scaffold_25** (45511629 bp).
 
 ## Why are VCF and BED files counted differently?
 
