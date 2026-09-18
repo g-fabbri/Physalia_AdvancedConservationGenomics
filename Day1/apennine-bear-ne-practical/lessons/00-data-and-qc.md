@@ -172,8 +172,16 @@ gzip -cd "$MASK" | \
 **Expected:** records in BED format:
 
 ~~~text
-Scaffold_25     0       740
-Scaffold_25     769     1567
+Scaffold_25     0       2
+Scaffold_25     519     588
+Scaffold_25     1130    1270
+Scaffold_25     2005    2006
+Scaffold_25     8267    8269
+Scaffold_25     8509    8565
+Scaffold_25     8611    8616
+Scaffold_25     8885    9006
+Scaffold_25     11667   11781
+Scaffold_25     11793   11802
 ~~~
 
 Each row describes one callable interval:
