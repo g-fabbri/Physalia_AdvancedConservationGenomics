@@ -97,8 +97,8 @@ generate_multihetsep.py \
 Typical format:
 
 ~~~text
-Scaffold_25    68306    44     TC
-Scaffold_25    87563    259    AG
+Scaffold_25     38123   5558    GT
+Scaffold_25     38340   217     TC
 ~~~
 
 The four columns contain:
