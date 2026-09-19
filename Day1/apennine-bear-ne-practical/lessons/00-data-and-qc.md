@@ -2,6 +2,25 @@
 
 Estimated time: 10 minutes.
 
+## Start your terminal
+
+From the Day 1 course directory, activate the course environment:
+
+~~~bash
+conda activate bear-ne-practical
+~~~
+
+Run this command whenever you open a new terminal. It makes the command-line programs used in this lesson, including BCFtools, available.
+
+**Check:**
+
+~~~bash
+command -v bcftools
+~~~
+
+The command should print the path to `bcftools` inside the `bear-ne-practical` environment.
+
+
 ## Step 1 — Name the input files
 
 **Purpose:** use short, consistent names and avoid repeatedly typing paths.
