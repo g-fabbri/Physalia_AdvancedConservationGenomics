@@ -135,6 +135,7 @@ OUTDIR="$COURSE_DIR/results/gone2"
 "$GONE2_BIN" \
   -g 0 \
   -r 1 \
+  -u 0.02 \
   -t 2 \
   -S 1 \
   -E \
@@ -144,6 +145,7 @@ OUTDIR="$COURSE_DIR/results/gone2"
 "$GONE2_BIN" \
   -g 0 \
   -r 1 \
+  -u 0.02 \
   -t 2 \
   -S 1 \
   -E \
@@ -155,12 +157,17 @@ OUTDIR="$COURSE_DIR/results/gone2"
 |---|---|
 | **-g 0** | Treat genotypes as unphased diploids |
 | **-r 1** | Assume a constant recombination rate of 1 cM/Mb |
+| **-u 0.02** | Use LD bins only up to a recombination fraction of 0.02 |
 | **-t 2** | Use two threads |
 | **-S 1** | Fix the random seed for reproducibility |
 | **-E** | Request variation among genetic-algorithm rounds |
 | **-o** | Set the output prefix |
 
-The upper recombination fraction is not specified, so GONE2 uses its default **-u 0.05**. Changing `-u` can be explored separately as an instructor sensitivity analysis, not part of the student lesson.
+### Why use `-u 0.02`?
+
+GONE2 relates LD between marker pairs to the time in the past that generated that LD. As a useful approximation, LD at recombination fraction `c` is most informative about approximately `1/(2c)` generations ago. The default upper bound is `0.05`, corresponding roughly to information from about 10 generations ago. Here we set the upper bound to `0.02`, corresponding roughly to **25 generations ago**.
+
+This choice excludes the most weakly linked marker pairs and focuses the fit on more tightly linked pairs. For this one-scaffold exercise, it reduces sensitivity to noisy LD at larger distances and to error from assuming a uniform recombination rate of 1 cM/Mb instead of using a detailed genetic map. The trade-off is important: `-u 0.02` provides **less information about the most recent generations** than the default `0.05`; it is not universally a better value. It should be reported explicitly, and a formal analysis should compare plausible `-u` settings and, where possible, use an empirical recombination map.
 
 Do not use **-x** in the main run. It fits a structured metapopulation model, while this exercise initially treats ABB and SBB as separate populations.
 
