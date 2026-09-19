@@ -95,6 +95,13 @@ Mask: data/UrArMa_callable_s25.bed.gz
 
 MSMC2 needs to know both where heterozygous sites occur and how much sequence could have been observed between them. The VCF supplies genotypes at variant positions; the BED mask supplies the callable intervals. We run the conversion separately because ABB and SBB have different genotypes, even though they use the same teaching mask.
 
+| Argument | Meaning |
+|---|---|
+| **--chr "$CHROM"** | Process only Scaffold_25 |
+| **--mask "$MASK"** | Count only positions included in the callable mask |
+| **"$ABB_VCF" / "$SBB_VCF"** | Read the prepared diploid genome for that population |
+| **> output file** | Save the generated multihetsep text |
+
 ~~~bash
 generate_multihetsep.py \
   --chr "$CHROM" \
@@ -109,20 +116,14 @@ generate_multihetsep.py \
   > "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
 ~~~
 
-| Argument | Meaning |
-|---|---|
-| **--chr "$CHROM"** | Process only Scaffold_25 |
-| **--mask "$MASK"** | Count only positions included in the callable mask |
-| **"$ABB_VCF" / "$SBB_VCF"** | Read the prepared diploid genome for that population |
-| **> output file** | Save the generated multihetsep text |
 
 **Expected:** each run reports that it is generating input for **2 haplotypes**, because each VCF contains one diploid individual. Two non-empty multihetsep files are created.
 
 Typical format:
 
 ~~~text
-Scaffold_25    68306    44     TC
-Scaffold_25    87563    259    AG
+Scaffold_25     38123   5558    GT
+Scaffold_25     38340   217     TC
 ~~~
 
 The four columns contain:
