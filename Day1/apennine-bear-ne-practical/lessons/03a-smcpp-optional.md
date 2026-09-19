@@ -95,16 +95,40 @@ ls -lh "$OUTDIR"/*.smc.gz
 
 ## Step 4 — Estimate trajectories
 
-**Purpose:** fit each population separately using the same mutation rate as the MSMC2 lesson.
+**Purpose:** fit each population separately using the same mutation rate as the MSMC2 lesson. Because this teaching dataset contains only one scaffold, we use a deliberately simple model over an explicit time interval rather than relying on SMC++ to infer very broad model limits automatically.
 
 ```bash
 MU=1.82e-8
-smc++ estimate -o "$OUTDIR/ABB" "$MU" "$OUTDIR/ABB_${CHROM}.smc.gz"
-smc++ estimate -o "$OUTDIR/SBB" "$MU" "$OUTDIR/SBB_${CHROM}.smc.gz"
-ls -lh "$OUTDIR"/{ABB,SBB}/model.final.json
+
+smc++ estimate \
+  --timepoints 10 100000 \
+  --knots 6 \
+  --cores 2 \
+  -o "$OUTDIR/ABB_bounded" \
+  "$MU" "$OUTDIR/ABB_${CHROM}.smc.gz"
+
+smc++ estimate \
+  --timepoints 10 100000 \
+  --knots 6 \
+  --cores 2 \
+  -o "$OUTDIR/SBB_bounded" \
+  "$MU" "$OUTDIR/SBB_${CHROM}.smc.gz"
+
+ls -lh "$OUTDIR"/{ABB_bounded,SBB_bounded}/model.final.json
 ```
 
-**Expected:** one `model.final.json` per population. Fitting may take much longer than the classroom slot. SMC++ folds the frequency-spectrum information by default; do not use `--unfold` unless ancestral alleles have been independently established.
+| Option | Meaning |
+|---|---|
+| **--timepoints 10 100000** | Fit the model from 10 to 100,000 generations before present instead of using automatically selected limits. These are model-fitting bounds, not proof that the complete interval is well resolved. |
+| **--knots 6** | Use a relatively small number of change points, reducing flexibility and numerical instability in a one-scaffold exercise. |
+| **--cores 2** | Use two processor cores. |
+| **-o** | Write each population to a separate, newly named output directory. |
+
+**Expected:** one `model.final.json` per population. Messages about EM iterations, log likelihood, and the current model are normal. The repeated `pkg_resources is deprecated` message is a packaging warning and does not itself indicate failure.
+
+If the command ends with `RuntimeError: erroneous average coalescence time`, no final model has been produced. This means the fitted model became numerically invalid, often because the automatic or highly flexible trajectory is poorly supported by the limited data. Confirm that the mask and scaffold length are correct, then try the bounded commands above. Failure even with the bounded model is itself an informative result: this one scaffold is insufficient for a stable SMC++ fit, and more independent scaffolds should be supplied rather than repeatedly tuning parameters until a curve appears.
+
+Fitting may take much longer than the classroom slot. SMC++ folds the frequency-spectrum information by default; do not use `--unfold` unless ancestral alleles have been independently established.
 
 ## Step 5 — Plot and discuss
 
