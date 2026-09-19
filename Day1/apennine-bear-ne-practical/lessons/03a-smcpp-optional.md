@@ -1,4 +1,4 @@
-Optional Part 3 — SMC++ with all ABB and SBB individuals
+# Optional Part 3 — SMC++ with all ABB and SBB individuals
 
 This extension is **outside the 90-minute practical**. MSMC2 uses one diploid individual per population; SMC++ can incorporate the other individuals without phasing. Both use sequence patterns to infer a size trajectory, so this is a comparison within the coalescent-method family, not an independent LD validation of GONE2. We still use only **Scaffold_25**, and the resulting curves are demonstrations rather than genome-wide estimates.
 
