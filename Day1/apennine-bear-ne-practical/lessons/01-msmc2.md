@@ -16,7 +16,7 @@ These are two separate shell commands. `conda activate` loads MSMC2 and the shar
 **Check:**
 
 ~~~bash
-command -v msmc2
+command -v msmc2_Linux
 command -v generate_multihetsep.py
 command -v multihetsep_bootstrap.py
 ~~~
