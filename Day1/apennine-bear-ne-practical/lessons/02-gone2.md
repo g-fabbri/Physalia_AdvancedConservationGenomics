@@ -175,12 +175,71 @@ Do not use **-x** in the main run. It fits a structured metapopulation model, wh
 
 ## Step 4 — Inspect the results
 
+**Purpose:** understand the structure of the output before drawing or interpreting the demographic trajectories.
+
+GONE2 writes several files for each population. The two most important for this practical are **GONE2_STATS**, which documents the run and its diagnostics, and **GONE2_Ne**, which contains the estimated trajectory.
+
+### Step 4.1 — Read the run summary and diagnostics
+
+**Input:** the two `GONE2_STATS` files.
+
 ~~~bash
-head "$OUTDIR/ABB_GONE2_Ne"
-head "$OUTDIR/SBB_GONE2_Ne"
 cat "$OUTDIR/ABB_GONE2_STATS"
 cat "$OUTDIR/SBB_GONE2_STATS"
 ~~~
+
+The exact layout can vary slightly among GONE2 versions, but the file records information such as:
+
+| Item | Meaning and interpretation |
+|---|---|
+| **Individuals and loci** | Number of samples and markers actually read. Unexpected values may indicate a problem in the PED/MAP preparation. |
+| **Genome or chromosome length** | Genetic length inferred from the MAP positions and the recombination-rate assumption. An unrealistic value changes how LD distance is translated into time. |
+| **Fis** | Departure from Hardy–Weinberg genotype proportions. A high positive value can reflect inbreeding, population structure, related individuals, or genotype/missing-data problems. |
+| **LD-fit information** | Describes how well the fitted model reproduces the observed decay of LD. A poor fit suggests that the inferred trajectory does not adequately explain the data. |
+| **Selected model/combination** | The optimisation solution retained by GONE2. Different retained solutions across sensitivity runs can indicate instability. |
+| **Warnings** | Messages about structure, excessive Fis, chromosome length, marker limits, or model failure. These must be investigated before biological interpretation. |
+
+**Expected:** both files should report a completed analysis rather than an error. Confirm that ABB has 10 individuals, SBB has 8, and that each run contains a plausible nonzero number of loci.
+
+**Check:** if GONE2 produces only a `GONE2_STATS` file and no `GONE2_Ne` file, inspect the end of the summary for the reason:
+
+~~~bash
+tail -n 20 "$OUTDIR/ABB_GONE2_STATS"
+tail -n 20 "$OUTDIR/SBB_GONE2_STATS"
+~~~
+
+### Step 4.2 — Inspect the Ne trajectories
+
+**Input:** the two `GONE2_Ne` tables.
+
+~~~bash
+head "$OUTDIR/ABB_GONE2_Ne"
+head "$OUTDIR/SBB_GONE2_Ne"
+~~~
+
+Each row represents one point in the reconstructed demographic trajectory:
+
+| Column | Meaning |
+|---|---|
+| **Generation** | Time before the sampled generation. Small values are more recent; larger values are further in the past. |
+| **Ne** or a column beginning with **Ne** | Estimated effective population size at that generation. Ne is the size of an idealised population experiencing the observed genetic drift, not a direct census count. |
+
+Depending on the GONE2 version and options, the table may contain additional Ne-related columns. Display the column names with:
+
+~~~bash
+head -n 1 "$OUTDIR/ABB_GONE2_Ne"
+head -n 1 "$OUTDIR/SBB_GONE2_Ne"
+~~~
+
+**Expected:** generation values should increase into the past, while Ne should be positive. Large jumps between adjacent generations—especially near the youngest or oldest boundary—should be treated cautiously because resolution is not uniform through time.
+
+**Check:** confirm that both trajectory files exist, are nonempty, and contain more than a header:
+
+~~~bash
+wc -l "$OUTDIR/ABB_GONE2_Ne" "$OUTDIR/SBB_GONE2_Ne"
+~~~
+
+### Step 4.3 — Recognise the supporting LD file
 
 Principal outputs:
 
@@ -190,7 +249,9 @@ Principal outputs:
 | **GONE2_d2** | Observed and predicted LD by recombination bin |
 | **GONE2_STATS** | Inputs, parameters, Hardy–Weinberg diagnostics, runtime, and warnings |
 
-If only a **GONE2_STATS** file is produced, read its failure explanation. Before interpreting a curve, examine the number of individuals and SNPs, estimated Fis, inferred genome length, and any population-structure warning.
+The `GONE2_d2` file contains the observed LD statistic and the values predicted by the fitted demographic model across recombination-distance bins. Students do not need to plot it during this short exercise, but it is useful for checking whether a visually attractive Ne trajectory is actually supported by a reasonable fit to the LD data.
+
+Before interpreting either population, examine the number of individuals and loci, Fis, inferred genetic length, fit information, and every warning in `GONE2_STATS`. The `GONE2_Ne` file is the model result; the `GONE2_STATS` and `GONE2_d2` files help determine whether that result is trustworthy.
 
 ## Step 5 — Plot ABB and SBB
 
