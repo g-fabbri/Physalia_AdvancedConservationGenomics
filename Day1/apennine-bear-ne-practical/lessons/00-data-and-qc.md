@@ -13,7 +13,7 @@ CHROM=Scaffold_25
 APN_SINGLE=data/UrArMa_4573_s25.vcf.gz
 SVK_SINGLE=data/UrArMa_U1916_s25.vcf.gz
 POP=data/UrArMa_18i_s25.vcf.gz
-MASK=data/UrArMa_callable.bed.gz
+MASK=data/UrArMa_callable_s25.bed.gz
 ~~~
 
 **Expected:** nothing is printed because these commands assign shell variables.
@@ -32,7 +32,7 @@ Chromosome: Scaffold_25
 Apennine VCF: data/UrArMa_4573_s25.vcf.gz
 Slovak VCF: data/UrArMa_U1916_s25.vcf.gz
 Population VCF: data/UrArMa_18i_s25.vcf.gz
-Mask: data/UrArMa_callable.bed.gz
+Mask: data/UrArMa_callable_s25.bed.gz
 ~~~
 
 ## Step 2 — Verify that the files exist
