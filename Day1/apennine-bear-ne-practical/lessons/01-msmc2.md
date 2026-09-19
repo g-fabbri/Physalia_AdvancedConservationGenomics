@@ -62,7 +62,7 @@ ABB_VCF=data/UrArMa_4573_s25.vcf.gz
 SBB_VCF=data/UrArMa_U1916_s25.vcf.gz
 ABB_ID=4573
 SBB_ID=U1916
-MASK=data/UrArMa_callable.bed.gz
+MASK=data/UrArMa_callable_s25.bed.gz
 OUTDIR=results/msmc2
 
 mkdir -p "$OUTDIR"
