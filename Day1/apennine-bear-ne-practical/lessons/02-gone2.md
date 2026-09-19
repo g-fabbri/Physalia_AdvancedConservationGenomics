@@ -67,6 +67,13 @@ bcftools index -t "$SBB_VCF"
 
 **Purpose:** apply the same variant filters to each population and create the PLINK files read by GONE2.
 
+PLINK's text format uses two matching files with the same prefix:
+
+- the **PED file** contains one row per individual. Its first six columns describe the sample and family, followed by two allele entries for every marker;
+- the **MAP file** contains one row per marker, giving its chromosome, marker ID, genetic-map position, and physical base-pair position.
+
+The marker order in the MAP file must exactly match the genotype order in every PED row. Together, the files tell GONE2 which alleles each bear carries and where those markers occur along the scaffold.
+
 ~~~bash
 INPUTDIR=results/gone2/input
 mkdir -p "$INPUTDIR"
