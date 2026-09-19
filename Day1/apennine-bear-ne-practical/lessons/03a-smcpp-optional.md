@@ -31,7 +31,7 @@ This lesson uses **Scaffold_25** throughout, matching the MSMC2 and GONE2 classr
 ```bash
 CHROM=Scaffold_25
 VCF=data/UrArMa_18i_s25.vcf.gz
-CALLABLE=data/UrArMa_callable.bed.gz
+CALLABLE=data/UrArMa_callable_s25.bed.gz
 OUTDIR=results/smcpp
 mkdir -p "$OUTDIR"
 
