@@ -170,7 +170,7 @@ msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
 | Flag | Meaning |
 |---|---|
 | **-t 2** | Use two compute threads |
-| **-p '1*2+15*1+1*2'** | Group adjacent atomic time intervals that share an estimated rate |
+| **-p '1x2+15x1+1x2'** | Group adjacent atomic time intervals that share an estimated rate |
 | **-o** | Set the output prefix for the population |
 
 The `-p` argument controls how MSMC2 groups its internal **atomic time intervals** into intervals that share one coalescence-rate estimate. In `1*2+15*1+1*2`:
