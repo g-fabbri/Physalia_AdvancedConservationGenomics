@@ -194,34 +194,27 @@ If only a **GONE2_STATS** file is produced, read its failure explanation. Before
 
 ## Step 5 — Plot ABB and SBB
 
-Start R from the course root:
+**Purpose:** compare ABB and SBB over a chosen number of generations and save the figure directly as a PDF.
+
+The provided [R script](../scripts/plot_gone2.R) reads both `GONE2_Ne` tables, finds the Ne column, removes non-positive or non-finite values, restricts the trajectories to the requested generations, and draws them with a logarithmic Ne axis. The first command-line number is the youngest generation to display and the second is the oldest.
+
+For example, plot generations 1–100 from the course root:
 
 ~~~bash
-R
+Rscript scripts/plot_gone2.R 1 100
 ~~~
 
-~~~r
-abb <- read.table("results/gone2/ABB_GONE2_Ne", header=TRUE)
-sbb <- read.table("results/gone2/SBB_GONE2_Ne", header=TRUE)
+To choose another interval, replace `1 100`; for example, `10 75` plots generations 10–75. With no numbers, the script defaults to generations 1–100.
 
-abb_ne <- abb[[grep("^Ne", names(abb), value=TRUE)[1]]]
-sbb_ne <- sbb[[grep("^Ne", names(sbb), value=TRUE)[1]]]
+**Expected:** the script prints the selected interval and creates **results/gone2/GONE2_ABB_SBB_generations_1_100.pdf**. The present is toward the left and older generations are toward the right.
 
-pdf("results/gone2/GONE2_ABB_SBB.pdf", width=7, height=5)
-plot(abb$Generation, abb_ne,
-     type="l", log="y", lwd=2, col="firebrick",
-     xlim=rev(range(c(abb$Generation, sbb$Generation))),
-     ylim=range(c(abb_ne, sbb_ne), finite=TRUE),
-     xlab="Generations before present",
-     ylab="Effective population size")
-lines(sbb$Generation, sbb_ne,
-      lwd=2, col="steelblue")
-legend("topright", legend=c("ABB", "SBB"),
-       col=c("firebrick", "steelblue"), lwd=2)
-dev.off()
+**Check:**
+
+~~~bash
+ls -lh results/gone2/GONE2_ABB_SBB_generations_1_100.pdf
 ~~~
 
-**Expected:** **results/gone2/GONE2_ABB_SBB.pdf**. The present is on the left and older generations are on the right.
+The PDF should have a nonzero size and contain both coloured trajectories. Do not request generations outside those available in the two result tables.
 
 ## Questions for discussion
 
