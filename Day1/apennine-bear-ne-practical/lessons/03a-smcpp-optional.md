@@ -18,9 +18,11 @@ This environment is separate from `bear-ne-practical` because the Bioconda SMC++
 command -v smc++
 command -v bcftools
 command -v bedtools
+command -v bgzip
+command -v tabix
 ```
 
-Each command should print an executable path inside the `bear-ne-smcpp` environment. If `smc++` is missing, follow the [software setup](../software/README.md) before continuing.
+Each command should print an executable path inside the `bear-ne-smcpp` environment. `bgzip` and `tabix` are needed because SMC++ requires an indexed mask. If `smc++` is missing, follow the [software setup](../software/README.md) before continuing.
 
 This lesson uses **Scaffold_25** throughout, matching the MSMC2 and GONE2 classroom analyses.
 
@@ -31,7 +33,7 @@ This lesson uses **Scaffold_25** throughout, matching the MSMC2 and GONE2 classr
 ```bash
 CHROM=Scaffold_25
 VCF=data/UrArMa_18i_s25.vcf.gz
-CALLABLE=data/UrArMa_callable_s25.bed.gz
+CALLABLE=data/UrArMa_callable.bed.gz
 OUTDIR=results/smcpp
 mkdir -p "$OUTDIR"
 
@@ -58,12 +60,18 @@ zcat "$CALLABLE" |
 bedtools complement \
   -i "$OUTDIR/${CHROM}.callable.bed" \
   -g "$OUTDIR/${CHROM}.genome" \
-  > "$OUTDIR/${CHROM}.uncallable.bed"
+  | bgzip -c > "$OUTDIR/${CHROM}.uncallable.bed.gz"
 
-head "$OUTDIR/${CHROM}.uncallable.bed"
+tabix -f -p bed "$OUTDIR/${CHROM}.uncallable.bed.gz"
+
+zcat "$OUTDIR/${CHROM}.uncallable.bed.gz" | head
+ls -lh "$OUTDIR/${CHROM}.uncallable.bed.gz" \
+  "$OUTDIR/${CHROM}.uncallable.bed.gz.tbi"
 ```
 
-**Expected:** BED intervals on Scaffold_25 that were **not** in the callable file. Do not give `UrArMa_callable.bed.gz` directly to `smc++ --mask`: that would hide the sequence we want to analyse. Confirm that this shared callable mask is appropriate for all 18 bears; common alignment to one reference alone does not establish equal callability.
+`bedtools complement` creates intervals that are outside the callable regions. `bgzip` compresses the BED in a block-addressable format, and `tabix -p bed` creates the `.tbi` index required by SMC++. Ordinary `gzip` compression is not sufficient.
+
+**Expected:** the first command displays BED intervals on Scaffold_25 that were **not** in the callable file. The second check lists both the compressed mask and its Tabix index. Do not give `UrArMa_callable.bed.gz` directly to `smc++ --mask`: that would hide the sequence we want to analyse. Confirm that this shared callable mask is appropriate for all 18 bears; common alignment to one reference alone does not establish equal callability.
 
 ## Step 3 — Convert each population
 
@@ -72,18 +80,18 @@ head "$OUTDIR/${CHROM}.uncallable.bed"
 ```bash
 smc++ vcf2smc \
   -d 4573 4573 \
-  --mask "$OUTDIR/${CHROM}.uncallable.bed" \
+  --mask "$OUTDIR/${CHROM}.uncallable.bed.gz" \
   "$VCF" "$OUTDIR/ABB_${CHROM}.smc.gz" "$CHROM" "ABB:$ABB_SAMPLES"
 
 smc++ vcf2smc \
   -d U1916 U1916 \
-  --mask "$OUTDIR/${CHROM}.uncallable.bed" \
+  --mask "$OUTDIR/${CHROM}.uncallable.bed.gz" \
   "$VCF" "$OUTDIR/SBB_${CHROM}.smc.gz" "$CHROM" "SBB:$SBB_SAMPLES"
 
 ls -lh "$OUTDIR"/*.smc.gz
 ```
 
-**Expected:** two non-empty `.smc.gz` files. With unphased genotypes, SMC++ recommends specifying the **same individual twice** for `-d`. The joint VCF can supply both conversions; the population sample lists select which genotypes contribute to each result.
+**Expected:** two non-empty `.smc.gz` files. With unphased genotypes, SMC++ recommends specifying the **same individual twice** for `-d`. The joint VCF can supply both conversions; the population sample lists select which genotypes contribute to each result. The `pkg_resources is deprecated` message comes from the packaged SMC++ version and is a warning, not the cause of a failed conversion.
 
 ## Step 4 — Estimate trajectories
 
