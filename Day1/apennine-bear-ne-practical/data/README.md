@@ -26,13 +26,13 @@ Document:
 ## Files expected by the exercises
 
 ```text
-data/UrArMa_4573_s34.vcf.gz
-data/UrArMa_4573_s34.vcf.gz.csi
-data/UrArMa_U1916_s34.vcf.gz
-data/UrArMa_U1916_s34.vcf.gz.csi
+data/UrArMa_4573_s25.vcf.gz
+data/UrArMa_4573_s25.vcf.gz.csi
+data/UrArMa_U1916_s25.vcf.gz
+data/UrArMa_U1916_s25.vcf.gz.csi
 data/UrArMa_callable.bed.gz
-data/UrArMa_18i_s34.vcf.gz
-data/UrArMa_18i_s34.vcf.gz.csi
+data/UrArMa_18i_s25.vcf.gz
+data/UrArMa_18i_s25.vcf.gz.csi
 ```
 
 The VCFs should contain both invariant callable sites or have an accompanying mask appropriate to the downstream method. A variant-only VCF is insufficient for constructing a defensible MSMC2 callable mask.

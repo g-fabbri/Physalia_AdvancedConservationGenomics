@@ -25,10 +25,10 @@ Software is prepared before class. Installation instructions are in the [softwar
 **Input:** the checked 18-individual VCF and the ABB/SBB sample lists.
 
 ~~~bash
-CHROM=Scaffold_34
-ALL_VCF=data/UrArMa_18i_s34.vcf.gz
-ABB_VCF=data/ABB_s34.vcf.gz
-SBB_VCF=data/SBB_s34.vcf.gz
+CHROM=Scaffold_25
+ALL_VCF=data/UrArMa_18i_s25.vcf.gz
+ABB_VCF=data/ABB_s25.vcf.gz
+SBB_VCF=data/SBB_s25.vcf.gz
 
 bcftools view -S data/apennine.samples "$ALL_VCF" \
   -Oz -o "$ABB_VCF"
@@ -39,7 +39,7 @@ bcftools index -t "$ABB_VCF"
 bcftools index -t "$SBB_VCF"
 ~~~
 
-**Expected:** **ABB_s34.vcf.gz** contains the 10 ABB individuals and **SBB_s34.vcf.gz** contains the 8 SBB individuals.
+**Expected:** **ABB_s25.vcf.gz** contains the 10 ABB individuals and **SBB_s25.vcf.gz** contains the 8 SBB individuals.
 
 ## Step 2 — Create the PED/MAP files
 
@@ -50,7 +50,7 @@ INPUTDIR=results/gone2/input
 mkdir -p "$INPUTDIR"
 
 for POPULATION in ABB SBB; do
-  VCF="data/${POPULATION}_s34.vcf.gz"
+  VCF="data/${POPULATION}_s25.vcf.gz"
   PREFIX="$INPUTDIR/${POPULATION}_${CHROM}"
 
   plink \
@@ -82,10 +82,10 @@ The loop performs exactly the same commands for ABB and SBB. The derived MAP use
 **Expected:**
 
 ~~~text
-results/gone2/input/ABB_Scaffold_34.ped
-results/gone2/input/ABB_Scaffold_34.map
-results/gone2/input/SBB_Scaffold_34.ped
-results/gone2/input/SBB_Scaffold_34.map
+results/gone2/input/ABB_Scaffold_25.ped
+results/gone2/input/ABB_Scaffold_25.map
+results/gone2/input/SBB_Scaffold_25.ped
+results/gone2/input/SBB_Scaffold_25.map
 ~~~
 
 **Check:**

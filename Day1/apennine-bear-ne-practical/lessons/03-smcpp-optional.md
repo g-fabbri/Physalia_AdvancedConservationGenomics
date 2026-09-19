@@ -1,16 +1,16 @@
 # Optional Part 3 — SMC++ with all ABB and SBB individuals
 
-This extension is **outside the 90-minute practical**. MSMC2 uses one diploid individual per population; SMC++ can incorporate the other individuals without phasing. Both use sequence patterns to infer a size trajectory, so this is a comparison within the coalescent-method family, not an independent LD validation of GONE2. We still use only **Scaffold_34**, and the resulting curves are demonstrations rather than genome-wide estimates.
+This extension is **outside the 90-minute practical**. MSMC2 uses one diploid individual per population; SMC++ can incorporate the other individuals without phasing. Both use sequence patterns to infer a size trajectory, so this is a comparison within the coalescent-method family, not an independent LD validation of GONE2. We still use only **Scaffold_25**, and the resulting curves are demonstrations rather than genome-wide estimates.
 
 Run from the Day 1 course directory after `conda activate bear-ne-smcpp`; this optional environment provides `smc++`, `bcftools`, and `bedtools`. Installation belongs in the [software setup](../software/README.md).
 
 ## Step 1 — Identify samples and sequence length
 
-**Purpose:** confirm that the 18-individual VCF contains the 10 ABB and 8 SBB samples and obtain the reference length of Scaffold_34.
+**Purpose:** confirm that the 18-individual VCF contains the 10 ABB and 8 SBB samples and obtain the reference length of Scaffold_25.
 
 ```bash
-CHROM=Scaffold_34
-VCF=data/UrArMa_18i_s34.vcf.gz
+CHROM=Scaffold_25
+VCF=data/UrArMa_18i_s25.vcf.gz
 CALLABLE=data/UrArMa_callable.bed.gz
 OUTDIR=results/smcpp
 mkdir -p "$OUTDIR"
@@ -23,7 +23,7 @@ bcftools index -s "$VCF" | awk -v c="$CHROM" '$1==c && $2~/^[0-9]+$/ {print $1"\
 cat "$OUTDIR/${CHROM}.genome"
 ```
 
-**Expected:** 18 sample IDs and one `Scaffold_34` line with its reference length. If the genome file is empty, obtain the verified Scaffold_34 length from the reference FASTA index (`.fai`) before continuing; do **not** substitute the position of the last variant for chromosome length.
+**Expected:** 18 sample IDs and one `Scaffold_25` line with its reference length. If the genome file is empty, obtain the verified Scaffold_25 length from the reference FASTA index (`.fai`) before continuing; do **not** substitute the position of the last variant for chromosome length.
 
 ## Step 2 — Convert callable intervals into an exclusion mask
 
@@ -43,7 +43,7 @@ bedtools complement \
 head "$OUTDIR/${CHROM}.uncallable.bed"
 ```
 
-**Expected:** BED intervals on Scaffold_34 that were **not** in the callable file. Do not give `UrArMa_callable.bed.gz` directly to `smc++ --mask`: that would hide the sequence we want to analyse. Confirm that this shared callable mask is appropriate for all 18 bears; common alignment to one reference alone does not establish equal callability.
+**Expected:** BED intervals on Scaffold_25 that were **not** in the callable file. Do not give `UrArMa_callable.bed.gz` directly to `smc++ --mask`: that would hide the sequence we want to analyse. Confirm that this shared callable mask is appropriate for all 18 bears; common alignment to one reference alone does not establish equal callability.
 
 ## Step 3 — Convert each population
 

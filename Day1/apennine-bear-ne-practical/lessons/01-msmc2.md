@@ -2,6 +2,27 @@
 
 Estimated practical time: 30 minutes.
 
+## Start your terminal
+
+From the Day 1 course directory, activate the course environment and add the MSMC helper scripts to `PATH`:
+
+~~~bash
+conda activate bear-ne-practical
+export PATH="$PWD/software/msmc-tools:$PATH"
+~~~
+
+These are two separate shell commands. `conda activate` loads MSMC2 and the shared dependencies, while `export PATH=...` makes helper programs such as `generate_multihetsep.py` and `multihetsep_bootstrap.py` available by name. Run them again whenever you open a new terminal.
+
+**Check:**
+
+~~~bash
+command -v msmc2
+command -v generate_multihetsep.py
+command -v multihetsep_bootstrap.py
+~~~
+
+Each command should print an executable path. If a helper is missing, check that you are in the course root and that `software/msmc-tools/` exists.
+
 We compare one representative genome from each population:
 
 | Population | Meaning | Individual |
@@ -16,7 +37,7 @@ Our biological question is:
 MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a format that combines segregating sites with the amount of callable sequence between them.
 
 ~~~text
-  filtered VCF + callable mask
+already-filtered VCF + callable mask
                ↓ generate_multihetsep.py
            multihetsep
                ↓ MSMC2
@@ -25,6 +46,9 @@ MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a forma
 
 The preliminary QC has already confirmed the files, sample IDs, chromosome labels, indexes, and genotype filtering. We therefore begin by preparing the MSMC2 input rather than repeating those checks.
 
+## A note about the common mask
+
+Both bears were aligned to the Apennine reference, and this exercise uses **UrArMa_callable.bed.gz** as a common teaching mask. This is appropriate if the file describes reference mappability or regions callable in both genomes. In a full analysis, sample-specific callability masks—or their intersection for a comparison—are preferable when callability was estimated from read depth and genotype quality.
 
 ## Step 1 — Define the analysis variables
 
@@ -38,7 +62,7 @@ ABB_VCF=data/UrArMa_4573_s25.vcf.gz
 SBB_VCF=data/UrArMa_U1916_s25.vcf.gz
 ABB_ID=4573
 SBB_ID=U1916
-MASK=data/UrArMa_callable_s25.bed.gz
+MASK=data/UrArMa_callable.bed.gz
 OUTDIR=results/msmc2
 
 mkdir -p "$OUTDIR"
@@ -60,7 +84,7 @@ Expected shape:
 ~~~text
 ABB: 4573 (data/UrArMa_4573_s25.vcf.gz)
 SBB: U1916 (data/UrArMa_U1916_s25.vcf.gz)
-Mask: data/UrArMa_callable_s25.bed.gz
+Mask: data/UrArMa_callable.bed.gz
 ~~~
 
 ## Step 2 — Create the multihetsep files
@@ -97,8 +121,8 @@ generate_multihetsep.py \
 Typical format:
 
 ~~~text
-Scaffold_25     38123   5558    GT
-Scaffold_25     38340   217     TC
+Scaffold_25    68306    44     TC
+Scaffold_25    87563    259    AG
 ~~~
 
 The four columns contain:
@@ -134,11 +158,11 @@ If the program reports `invalid literal for int() with base 10: '.'`, a missing 
 Each run treats the two haplotypes of one bear as the genetic sample. The `-p` pattern constrains adjacent time intervals to share rates, reducing the number of independently fitted values for this one-scaffold demonstration. Use the **same** pattern and thread count for ABB and SBB so the comparison does not also change the model settings.
 
 ~~~bash
-msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
+msmc2 -t 2 -p '1*2+15*1+1*2' \
   -o "$OUTDIR/ABB_${ABB_ID}" \
   "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt"
 
-msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
+msmc2 -t 2 -p '1*2+15*1+1*2' \
   -o "$OUTDIR/SBB_${SBB_ID}" \
   "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
 ~~~
@@ -146,10 +170,16 @@ msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
 | Flag | Meaning |
 |---|---|
 | **-t 2** | Use two compute threads |
-| **-p '1x2+15x1+1x2'** | Group adjacent atomic time intervals that share an estimated rate |
+| **-p '1*2+15*1+1*2'** | Group adjacent atomic time intervals that share an estimated rate |
 | **-o** | Set the output prefix for the population |
 
-The time-pattern string estimates 17 free rate parameters: the first and last parameters each cover two atomic intervals, while the 15 middle parameters each cover one. With only one scaffold, a simpler pattern can be more stable than a highly parameterized model.
+The `-p` argument controls how MSMC2 groups its internal **atomic time intervals** into intervals that share one coalescence-rate estimate. In `1*2+15*1+1*2`:
+
+- `1*2` means one fitted parameter is shared by the first two atomic intervals;
+- `15*1` means 15 fitted parameters each describe one atomic interval;
+- the final `1*2` means one fitted parameter is shared by the last two atomic intervals.
+
+The model therefore contains **17 independently estimated rates across 19 atomic intervals**. Pooling intervals at the temporal ends reduces the number of poorly informed tail parameters, while retaining finer resolution through the middle. A more complex pattern does not automatically provide more biological detail: with one scaffold, it can instead produce unstable estimates. The same pattern must be used for ABB and SBB. MSMC2 uses an asterisk (`*`) in this syntax, not the letter `x`.
 
 **Expected:** MSMC2 writes several files for each prefix. The principal result tables are:
 
@@ -158,6 +188,15 @@ results/msmc2/ABB_4573.final.txt
 results/msmc2/SBB_U1916.final.txt
 ~~~
 
+Each `.final.txt` file is a tab-delimited description of the fitted piecewise trajectory for one individual:
+
+- `left_time_boundary` and `right_time_boundary` define one fitted interval in MSMC2's mutation-scaled time units;
+- `lambda` or `lambda_00` is the estimated coalescence rate for the two haplotypes in that interval;
+- each row becomes one horizontal step in the demographic plot;
+- ABB and SBB use the same interval pattern but have different fitted rates because they come from different genomes.
+
+These are the main numerical results, but they are not yet expressed in calendar years or numbers of individuals. The plotting step scales them using an assumed mutation rate and generation time.
+
 **Check:**
 
 ~~~bash
@@ -165,7 +204,7 @@ head "$OUTDIR/ABB_${ABB_ID}.final.txt"
 head "$OUTDIR/SBB_${SBB_ID}.final.txt"
 ~~~
 
-Both tables should contain time boundaries and a coalescence-rate column named **lambda**.
+Both tables should contain time boundaries and a coalescence-rate column named **lambda** or **lambda_00**.
 
 The time boundaries and rates are in MSMC2's scaled units. They are not yet calendar years or directly readable values of effective population size.
 
@@ -175,7 +214,14 @@ The time boundaries and rates are in MSMC2's scaled units. They are not yet cale
 
 **Input:** the two **.final.txt** files from Step 3 and the provided [plotting script](../scripts/plot_msmc2.R).
 
-The script uses a mutation rate of **1.82 × 10⁻⁸ per site per generation** and a generation time of **11 years** for both bears. It uses the geometric midpoint of each fitted time interval, calculates `Ne = 1 / (2 × mu × lambda)`, and plots only positive, finite values on logarithmic axes. These are explicit scaling assumptions, not values estimated by MSMC2; justify or revise them for a formal analysis.
+The script performs four short operations:
+
+1. reads the ABB and SBB `.final.txt` tables and identifies the `lambda` or `lambda_00` column;
+2. represents each fitted interval by the geometric midpoint of its two time boundaries;
+3. scales time as `midpoint / mu × generation_time` and population size as `Ne = 1 / (2 × mu × lambda)`;
+4. draws both trajectories as step functions on logarithmic axes and saves the plot as a PDF.
+
+The supplied mutation rate (`mu`) is **1.82 × 10⁻⁸ per site per generation** and the generation time is **11 years**. These are scaling assumptions, not values estimated by MSMC2. Changing them changes the axes, so they should be justified in a formal analysis. The script removes zero, negative, or non-finite values that cannot be displayed on logarithmic axes.
 
 From the course root, run:
 
@@ -183,7 +229,7 @@ From the course root, run:
 Rscript scripts/plot_msmc2.R
 ~~~
 
-**Expected:** the script prints the path **results/msmc2/MSMC2_ABB_4573_SBB_U1916.pdf**. The PDF contains two stepwise trajectories on the same axes. No interactive R session or `q(save="no")` command is needed.
+**Expected:** the script prints the path **results/msmc2/MSMC2_ABB_4573_SBB_U1916.pdf**. The PDF contains two stepwise trajectories over the complete retained time range. No interactive R session or `q(save="no")` command is needed.
 
 **Check:**
 
@@ -277,13 +323,13 @@ The count should be **20**: ten ABB replicates and ten SBB replicates.
 
 ~~~bash
 for REP in $(seq 1 "$N_BOOT"); do
-  msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
+  msmc2 -t 2 -p '1*2+15*1+1*2' \
     -o "$BOOTDIR/ABB_${REP}/ABB_${REP}" \
     "$BOOTDIR/ABB_${REP}/bootstrap_multihetsep.chr1.txt"
 done
 
 for REP in $(seq 1 "$N_BOOT"); do
-  msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
+  msmc2 -t 2 -p '1*2+15*1+1*2' \
     -o "$BOOTDIR/SBB_${REP}/SBB_${REP}" \
     "$BOOTDIR/SBB_${REP}/bootstrap_multihetsep.chr1.txt"
 done
@@ -301,7 +347,7 @@ The count should be **20**. If classroom time is limited, run two or three repli
 
 ### Step D — Display bootstrap variation
 
-**Purpose:** draw the original ABB and SBB estimates as thick lines and the bootstrap estimates as faint lines. The [bootstrap plotting script](../scripts/plot_msmc2_bootstrap.R) uses the same mutation rate and generation time as the main plot. It checks that bootstrap results exist **before** opening a PDF device, avoiding an empty PDF if Step C was skipped.
+**Purpose:** draw the original ABB and SBB estimates as thick lines and the bootstrap estimates as faint lines. The [bootstrap plotting script](../scripts/plot_msmc2_bootstrap.R) uses the same mutation rate, generation time, and full retained time range as the main plot. It checks that bootstrap results exist **before** opening a PDF device, avoiding an empty PDF if Step C was skipped.
 
 From the course root, run:
 

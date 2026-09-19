@@ -13,7 +13,7 @@ CHROM=Scaffold_25
 APN_SINGLE=data/UrArMa_4573_s25.vcf.gz
 SVK_SINGLE=data/UrArMa_U1916_s25.vcf.gz
 POP=data/UrArMa_18i_s25.vcf.gz
-MASK=data/UrArMa_callable_s25.bed.gz
+MASK=data/UrArMa_callable.bed.gz
 ~~~
 
 **Expected:** nothing is printed because these commands assign shell variables.
@@ -32,7 +32,7 @@ Chromosome: Scaffold_25
 Apennine VCF: data/UrArMa_4573_s25.vcf.gz
 Slovak VCF: data/UrArMa_U1916_s25.vcf.gz
 Population VCF: data/UrArMa_18i_s25.vcf.gz
-Mask: data/UrArMa_callable_s25.bed.gz
+Mask: data/UrArMa_callable.bed.gz
 ~~~
 
 ## Step 2 — Verify that the files exist
@@ -172,16 +172,16 @@ gzip -cd "$MASK" | \
 **Expected:** records in BED format:
 
 ~~~text
-Scaffold_25     0       2
-Scaffold_25     519     588
-Scaffold_25     1130    1270
-Scaffold_25     2005    2006
-Scaffold_25     8267    8269
-Scaffold_25     8509    8565
-Scaffold_25     8611    8616
-Scaffold_25     8885    9006
-Scaffold_25     11667   11781
-Scaffold_25     11793   11802
+Scaffold_25     0       740
+Scaffold_25     769     1567
+Scaffold_25     1914    2013
+Scaffold_25     2102    3531
+Scaffold_25     3575    4060
+Scaffold_25     4171    6326
+Scaffold_25     6403    6506
+Scaffold_25     6890    7221
+Scaffold_25     7874    8952
+Scaffold_25     8989    9807
 ~~~
 
 Each row describes one callable interval:
@@ -217,7 +217,7 @@ gzip -cd "$MASK" | \
 - the first command prints the number of callable intervals on **Scaffold_25**;
 - the second prints **Callable bp:** followed by a positive integer.
 
-**Check:** BED intervals are zero-based and half-open. Their lengths are therefore calculated as column 3 minus column 2. The callable-base total should be positive and should not exceed the length of **Scaffold_25** (45511629 bp).
+**Check:** BED intervals are zero-based and half-open. Their lengths are therefore calculated as column 3 minus column 2. The callable-base total should be positive and should not exceed the length of **Scaffold_25**.
 
 ## Why are VCF and BED files counted differently?
 
@@ -225,4 +225,12 @@ A VCF normally contains one row per variant record. Counting VCF rows tells us h
 
 A BED mask contains genomic intervals. Counting its rows gives the number of intervals, not the number of covered bases. Callable base pairs must be calculated by summing **end − start** across the intervals belonging to the selected scaffold.
 
+## Stop and discuss
 
+1. What is the main difference between the single-individual VCF and the population VCF?
+2. How were individuals assigned to the two populations, and what assumption does that naming rule make?
+3. Why must callable sequence in the BED mask be counted differently from variant records in the VCF?
+4. Does the mask represent callable sequence or only variant positions?
+5. What happens if the BED and VCF chromosome labels differ?
+
+Record the sample counts, VCF record counts, BED interval count, and callable-base total in the [answer sheet](../answers/student_answers.md). Continue to the [first analysis](01-msmc2.md).

@@ -28,7 +28,7 @@ Our chromosome-level dataset contains 18 individuals:
 
 For the individual-genome comparison, we use ABB individual **4573** and SBB individual **U1916**. These abbreviations are used throughout the practical.
 
-All analyses use **Scaffold_34** to keep computation short. A single scaffold is appropriate for learning the workflow, but provides less information and greater stochastic variation than a genome-wide analysis.
+All analyses use **Scaffold_25** to keep computation short. A single scaffold is appropriate for learning the workflow, but provides less information and greater stochastic variation than a genome-wide analysis.
 
 ## The investigation
 
@@ -66,17 +66,17 @@ By the end, you should be able to connect each estimator to its genomic signal a
 | 02:20–02:35 | Sampling, uncertainty, and method assumptions |
 | 02:35–03:00 | [Combine the evidence](lessons/04-synthesis.md) |
 
-The [SMC++ extension](lessons/03-smcpp-optional.md) uses all 10 ABB and 8 SBB individuals on Scaffold_34. The [currentNe2 extension](lessons/03b-currentne2-optional.md) reuses the GONE2 inputs to illustrate a contemporary LD estimate. Both are outside the timed practical and should be tested by the instructor first.
+The [SMC++ extension](lessons/03-smcpp-optional.md) uses all 10 ABB and 8 SBB individuals on Scaffold_25. The [currentNe2 extension](lessons/03b-currentne2-optional.md) reuses the GONE2 inputs to illustrate a contemporary LD estimate. Both are outside the timed practical and should be tested by the instructor first.
 
 ## Input files
 
 ~~~text
-data/UrArMa_18i_s34.vcf.gz
-data/UrArMa_18i_s34.vcf.gz.csi
-data/UrArMa_4573_s34.vcf.gz
-data/UrArMa_4573_s34.vcf.gz.csi
-data/UrArMa_U1916_s34.vcf.gz
-data/UrArMa_U1916_s34.vcf.gz.csi
+data/UrArMa_18i_s25.vcf.gz
+data/UrArMa_18i_s25.vcf.gz.csi
+data/UrArMa_4573_s25.vcf.gz
+data/UrArMa_4573_s25.vcf.gz.csi
+data/UrArMa_U1916_s25.vcf.gz
+data/UrArMa_U1916_s25.vcf.gz.csi
 data/UrArMa_callable.bed.gz
 ~~~
 

@@ -9,7 +9,7 @@ Install and test currentNe2 using the [software setup](../software/README.md). R
 **Purpose:** put each population's existing PED/MAP pair in its own currentNe2 input location without adding a new SNP filter.
 
 ```bash
-CHROM=Scaffold_34
+CHROM=Scaffold_25
 GONE2_INPUT=results/gone2/input
 OUTDIR=results/currentne2
 mkdir -p "$OUTDIR"
