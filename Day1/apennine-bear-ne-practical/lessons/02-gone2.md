@@ -24,7 +24,7 @@ test -x "$GONE2_BIN" && echo "GONE2 ready: $GONE2_BIN"
 
 The first two commands should print paths inside the `bear-ne-practical` environment. The last command should print the complete path to the executable. If it prints nothing, confirm that you are in the course root and that GONE2 was compiled before class.
 
-GONE2 estimates recent effective population size from linkage disequilibrium (LD) at different recombination distances. We analyse Apennine brown bears (ABB) and Slovak brown bears (SBB) separately and compare their trajectories.
+> GONE2 estimates recent effective population size from linkage disequilibrium (LD) at different recombination distances. We analyse Apennine brown bears (ABB) and Slovak brown bears (SBB) separately and compare their trajectories.
 
 This is a one-scaffold teaching analysis. The small samples and limited genomic coverage mean that diagnostics are as important as the estimated curves.
 
