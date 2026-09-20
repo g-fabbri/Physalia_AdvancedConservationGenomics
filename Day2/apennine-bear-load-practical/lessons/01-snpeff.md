@@ -22,7 +22,7 @@ The database uses the Apennine-bear gene annotation and a reference FASTA (https
 
 **Purpose:** understand exactly which genome sequence and gene models SnpEff uses to predict variant consequences and prepare them.
 
-**Input:** the frozen GFF3 and the **verified reference FASTA used to call the teaching VCF**. The original recipe called the database mUrsArc2 but copied a FASTA named mUrsArc1.1; those names must be reconciled before entering a real path below. A matching scaffold name alone does not prove that two assemblies are identical.
+**Input:** the GFF3 and the **reference FASTA used to call the teaching VCF**.
 
 ### 1.1 — Identify and compare the reference inputs
 
@@ -32,9 +32,9 @@ From your **private course directory**, set:
 
 ~~~bash
 SNPEFF_HOME="$COURSE_DIR/software/snpEff"
-DB=UrArMar_mUrsArc2
-GFF=/jarvis/scratch/usr/biello/bear/annotation/annotation_versions/frozen/UrArMar.braker3.tsebra.gff3
-REF_FASTA=/path/to/verified/VCF_reference.fasta
+DB=mUrsArc1.1
+GFF="$COURSE_DIR/data/mUrsArc1.1.annotation.s25.gff3"
+REF_FASTA="$COURSE_DIR/data/mUrsArc1.1.genome.s25.fasta"
 ~~~
 
 ~~~bash
