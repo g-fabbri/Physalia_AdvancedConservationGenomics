@@ -16,26 +16,28 @@ Conda supplies the shared tools; standalone programs are kept under Day 2 `softw
 
 SnpEff compares each VCF allele with gene models and writes predicted consequences to the VCF `ANN` field. The same SNP can have multiple transcript annotations. `HIGH`, `MODERATE`, `LOW`, and `MODIFIER` are **predicted impact categories**, not measurements of selection coefficients or fitness.
 
-The database uses the Apennine-bear gene annotation and a reference FASTA (https://zenodo.org/records/15349716). We first show how those biological inputs are assembled. The software itself should already be available; its installation is described separately in [software setup](../software/README.md).
+The **UrArMar_mUrsArc1.1** database uses the Apennine-bear gene annotation and the matching reference FASTA available from [Zenodo](https://zenodo.org/records/15349716). For this exercise, both files have already been restricted to Scaffold_25 and given consistent names. We first show how those biological inputs are assembled. The software itself should already be available; its installation is described separately in [software setup](../software/README.md).
 
 ## Step 1 — Prepare the bear reference and gene annotation
 
-**Purpose:** understand exactly which genome sequence and gene models SnpEff uses to predict variant consequences and prepare them.
+**Purpose:** understand exactly which genome sequence and gene models SnpEff uses to predict variant consequences and prepare them in the structure expected by SnpEff.
 
-**Input:** the GFF3 and the **reference FASTA used to call the teaching VCF**.
+**Input:** the Scaffold_25 GFF3 and the **reference FASTA used to call the teaching VCF**.
 
 ### 1.1 — Identify and compare the reference inputs
 
 **Purpose:** verify that the VCF, gene annotation, and FASTA use the same assembly before building the custom database.
 
-From your **private course directory**, set:
+Set the definitive database name and input paths:
 
 ~~~bash
 SNPEFF_HOME="$COURSE_DIR/software/snpEff"
-DB=mUrsArc1.1
+DB=UrArMar_mUrsArc1.1
 GFF="$COURSE_DIR/data/mUrsArc1.1.annotation.s25.gff3"
 REF_FASTA="$COURSE_DIR/data/mUrsArc1.1.genome.s25.fasta"
 ~~~
+
+Inspect the assembly identifiers independently:
 
 ~~~bash
 bcftools view -h "$VCF" | grep '^##contig' | head
@@ -49,9 +51,35 @@ grep '^>' "$REF_FASTA" | head
 awk '$0 !~ /^#/ {print $1; if (++n==5) exit}' "$GFF"
 ~~~
 
-**Expected:** scaffold IDs from the VCF, FASTA, and GFF3 that can be matched to the same assembly. The instructor must also check contig lengths and sampled VCF REF alleles against the FASTA; this short inspection is only an orientation check.
+**Expected:** the VCF, FASTA, and GFF3 all use **Scaffold_25** from the same assembly. Matching names are necessary, although database provenance and coordinate compatibility must also have been verified during course preparation.
 
-### 1.2 — Place the verified database inputs
+### 1.2 — Understand the SnpEff configuration entry
+
+**Purpose:** connect the database name used on the command line with the custom genome stored under the SnpEff data directory.
+
+The instructor has already added the following entry to **software/snpEff/snpEff.config**:
+
+~~~text
+#---
+# Non-standard Databases
+#---
+
+# Ursus arctos marsicanus genome, version mUrsArc1.1
+UrArMar_mUrsArc1.1.genome : Ursus arctos marsicanus
+UrArMar_mUrsArc1.1.codonTable : Standard
+~~~
+
+The text before `.genome` is the database identifier. It must match both the value of **DB** and the directory name under **software/snpEff/data/**. The `.genome` line supplies a human-readable description, while `.codonTable` tells SnpEff to interpret coding sequences using the standard genetic code.
+
+Students do **not** need to edit the shared config file. Check that the prepared entry is present:
+
+~~~bash
+grep '^UrArMar_mUrsArc1.1\.' "$SNPEFF_HOME/snpEff.config"
+~~~
+
+**Expected:** the two database properties shown above. If nothing is printed, stop and ask the instructor rather than modifying the shared installation during class.
+
+### 1.3 — Place the verified database inputs
 
 **Purpose:** give SnpEff the GFF3 and FASTA filenames expected by its GFF3 database build. Do this only after the reference has been verified.
 
@@ -63,9 +91,9 @@ gzip "$SNPEFF_HOME/data/$DB/genes.gff"
 gzip "$SNPEFF_HOME/data/$DB/sequences.fa"
 ~~~
 
-**Expected:** **genes.gff.gz** and **sequences.fa.gz** under **software/snpEff/data/UrArMar_mUrsArc2/**. The previous Jarvis preparation also kept a GTF, but the supplied build used **-gff3**, so that build reads the GFF3. These files prepare the database inputs; the instructor's [database-build instructions](../software/README.md) explain the config entry and build command. Do not rebuild a shared installation from every student account.
+**Expected:** **genes.gff.gz** and **sequences.fa.gz** under **software/snpEff/data/UrArMar_mUrsArc1.1/**. The database build uses the GFF3 file. Students receive these files and the built database already prepared; they do not rebuild a shared installation from every account.
 
-### 1.3 — Check the prepared database files
+### 1.4 — Check the prepared database files
 
 **Purpose:** ensure both compressed inputs exist before the instructor builds or supplies the database.
 
@@ -78,7 +106,7 @@ ls -lh "$SNPEFF_HOME/data/$DB/genes.gff.gz" \
 
 **Purpose:** add consequences on the same reference assembly used for variant calling.
 
-**Input:** the teaching VCF and the prebuilt, instructor-verified **UrArMar_mUrsArc2** SnpEff database.
+**Input:** the teaching VCF and the prebuilt, instructor-verified **UrArMar_mUrsArc1.1** SnpEff database.
 
 ### 2.1 — Add consequence annotations
 
@@ -89,7 +117,9 @@ SNPEFF_DB="$DB"
 SNPEFF_CONFIG="$SNPEFF_HOME/snpEff.config"
 SNPEFF_JAR="$SNPEFF_HOME/snpEff.jar"
 ANNOTATED="$OUTDIR/Bears_4pops_s25.ann.vcf"
+~~~
 
+~~~bash
 java -Xmx4g -jar "$SNPEFF_JAR" \
   -c "$SNPEFF_CONFIG" \
   -dataDir "$SNPEFF_HOME/data" \
@@ -105,6 +135,9 @@ java -Xmx4g -jar "$SNPEFF_JAR" \
 
 ~~~bash
 bcftools view -h "$ANNOTATED" | grep 'ID=ANN'
+~~~
+
+~~~bash
 bcftools query -f '%CHROM\t%POS\t%INFO/ANN\n' "$ANNOTATED" | head -n 3
 ~~~
 
@@ -127,3 +160,4 @@ bcftools query -f '%INFO/ANN\n' "$ANNOTATED" | \
 **Expected:** counts labelled `HIGH`, `MODERATE`, `LOW`, and/or `MODIFIER`. This quick check uses the **first** transcript annotation per VCF record; it is not a complete transcript-aware summary.
 
 **Check:** record which categories are common. Discuss how transcript choice and reference gene-model quality could change the labels. Continue to [polarization and burden](02-genoloader.md).
+
