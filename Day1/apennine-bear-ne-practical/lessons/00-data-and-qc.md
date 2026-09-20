@@ -2,6 +2,25 @@
 
 Estimated time: 10 minutes.
 
+## Start your terminal
+
+From the Day 1 course directory, activate the course environment:
+
+~~~bash
+conda activate bear-ne-practical
+~~~
+
+Run this command whenever you open a new terminal. It makes the command-line programs used in this lesson, including BCFtools, available.
+
+**Check:**
+
+~~~bash
+command -v bcftools
+~~~
+
+The command should print the path to `bcftools` inside the `bear-ne-practical` environment.
+
+
 ## Step 1 — Name the input files
 
 **Purpose:** use short, consistent names and avoid repeatedly typing paths.
@@ -172,8 +191,16 @@ gzip -cd "$MASK" | \
 **Expected:** records in BED format:
 
 ~~~text
-Scaffold_25     0       740
-Scaffold_25     769     1567
+Scaffold_25     0       2
+Scaffold_25     519     588
+Scaffold_25     1130    1270
+Scaffold_25     2005    2006
+Scaffold_25     8267    8269
+Scaffold_25     8509    8565
+Scaffold_25     8611    8616
+Scaffold_25     8885    9006
+Scaffold_25     11667   11781
+Scaffold_25     11793   11802
 ~~~
 
 Each row describes one callable interval:
@@ -209,7 +236,7 @@ gzip -cd "$MASK" | \
 - the first command prints the number of callable intervals on **Scaffold_25**;
 - the second prints **Callable bp:** followed by a positive integer.
 
-**Check:** BED intervals are zero-based and half-open. Their lengths are therefore calculated as column 3 minus column 2. The callable-base total should be positive and should not exceed the length of **Scaffold_25**.
+**Check:** BED intervals are zero-based and half-open. Their lengths are therefore calculated as column 3 minus column 2. The callable-base total should be positive and should not exceed the length of **Scaffold_25** (45,511,629 bp).
 
 ## Why are VCF and BED files counted differently?
 

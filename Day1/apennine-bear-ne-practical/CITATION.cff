@@ -3,8 +3,8 @@ message: "If you use this teaching material, cite the repository and the origina
 title: "Estimating effective population size from genomes: an Apennine brown bear practical"
 type: software
 authors:
-  - family-names: "Biello"
-    given-names: "Roberto"
+  - family-names: "Instructor"
+    given-names: "Add name"
 version: 0.1.0
 date-released: 2026-09-03
 license: CC-BY-4.0

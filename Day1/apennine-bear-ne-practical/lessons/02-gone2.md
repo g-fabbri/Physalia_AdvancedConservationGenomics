@@ -2,7 +2,29 @@
 
 Estimated practical time: 30 minutes.
 
-GONE2 estimates recent effective population size from linkage disequilibrium (LD) at different recombination distances. We analyse Apennine brown bears (ABB) and Slovak brown bears (SBB) separately and compare their trajectories.
+## Start your terminal
+
+From the Day 1 course directory, activate the course environment and identify the local GONE2 executable:
+
+~~~bash
+conda activate bear-ne-practical
+COURSE_DIR=$(pwd)
+GONE2_BIN="$COURSE_DIR/software/GONE2/gone2"
+~~~
+
+`conda activate` makes BCFtools, PLINK, and the other shared dependencies available. GONE2 is compiled separately inside the course `software/` directory, so `GONE2_BIN` records its complete path. Run this block whenever you open a new terminal.
+
+**Check:**
+
+~~~bash
+command -v bcftools
+command -v plink
+test -x "$GONE2_BIN" && echo "GONE2 ready: $GONE2_BIN"
+~~~
+
+The first two commands should print paths inside the `bear-ne-practical` environment. The last command should print the complete path to the executable. If it prints nothing, confirm that you are in the course root and that GONE2 was compiled before class.
+
+> GONE2 estimates recent effective population size from linkage disequilibrium (LD) at different recombination distances. We analyse Apennine brown bears (ABB) and Slovak brown bears (SBB) separately and compare their trajectories.
 
 This is a one-scaffold teaching analysis. The small samples and limited genomic coverage mean that diagnostics are as important as the estimated curves.
 
@@ -25,10 +47,10 @@ Software is prepared before class. Installation instructions are in the [softwar
 **Input:** the checked 18-individual VCF and the ABB/SBB sample lists.
 
 ~~~bash
-CHROM=Scaffold_34
-ALL_VCF=data/UrArMa_18i_s34.vcf.gz
-ABB_VCF=data/ABB_s34.vcf.gz
-SBB_VCF=data/SBB_s34.vcf.gz
+CHROM=Scaffold_25
+ALL_VCF=data/UrArMa_18i_s25.vcf.gz
+ABB_VCF=data/ABB_s25.vcf.gz
+SBB_VCF=data/SBB_s25.vcf.gz
 
 bcftools view -S data/apennine.samples "$ALL_VCF" \
   -Oz -o "$ABB_VCF"
@@ -39,18 +61,25 @@ bcftools index -t "$ABB_VCF"
 bcftools index -t "$SBB_VCF"
 ~~~
 
-**Expected:** **ABB_s34.vcf.gz** contains the 10 ABB individuals and **SBB_s34.vcf.gz** contains the 8 SBB individuals.
+**Expected:** **ABB_s25.vcf.gz** contains the 10 ABB individuals and **SBB_s25.vcf.gz** contains the 8 SBB individuals.
 
 ## Step 2 — Create the PED/MAP files
 
 **Purpose:** apply the same variant filters to each population and create the PLINK files read by GONE2.
+
+PLINK's text format uses two matching files with the same prefix:
+
+- the **PED file** contains one row per individual. Its first six columns describe the sample and family, followed by two allele entries for every marker;
+- the **MAP file** contains one row per marker, giving its chromosome, marker ID, genetic-map position, and physical base-pair position.
+
+The marker order in the MAP file must exactly match the genotype order in every PED row. Together, the files tell GONE2 which alleles each bear carries and where those markers occur along the scaffold.
 
 ~~~bash
 INPUTDIR=results/gone2/input
 mkdir -p "$INPUTDIR"
 
 for POPULATION in ABB SBB; do
-  VCF="data/${POPULATION}_s34.vcf.gz"
+  VCF="data/${POPULATION}_s25.vcf.gz"
   PREFIX="$INPUTDIR/${POPULATION}_${CHROM}"
 
   plink \
@@ -59,8 +88,6 @@ for POPULATION in ABB SBB; do
     --allow-extra-chr \
     --snps-only just-acgt \
     --biallelic-only strict \
-    --geno 0.10 \
-    --mac 2 \
     --recode \
     --out "${PREFIX}_original_label"
 
@@ -76,16 +103,14 @@ The loop performs exactly the same commands for ABB and SBB. The derived MAP use
 |---|---|
 | **--snps-only just-acgt** | Retain canonical A/C/G/T SNPs |
 | **--biallelic-only strict** | Retain strictly biallelic sites |
-| **--geno 0.10** | Remove sites missing in more than 10% of individuals |
-| **--mac 2** | Require at least two copies of the minor allele |
 
 **Expected:**
 
 ~~~text
-results/gone2/input/ABB_Scaffold_34.ped
-results/gone2/input/ABB_Scaffold_34.map
-results/gone2/input/SBB_Scaffold_34.ped
-results/gone2/input/SBB_Scaffold_34.map
+results/gone2/input/ABB_Scaffold_25.ped
+results/gone2/input/ABB_Scaffold_25.map
+results/gone2/input/SBB_Scaffold_25.ped
+results/gone2/input/SBB_Scaffold_25.map
 ~~~
 
 **Check:**
@@ -110,6 +135,7 @@ OUTDIR="$COURSE_DIR/results/gone2"
 "$GONE2_BIN" \
   -g 0 \
   -r 1 \
+  -u 0.02 \
   -t 2 \
   -S 1 \
   -E \
@@ -119,6 +145,7 @@ OUTDIR="$COURSE_DIR/results/gone2"
 "$GONE2_BIN" \
   -g 0 \
   -r 1 \
+  -u 0.02 \
   -t 2 \
   -S 1 \
   -E \
@@ -130,12 +157,17 @@ OUTDIR="$COURSE_DIR/results/gone2"
 |---|---|
 | **-g 0** | Treat genotypes as unphased diploids |
 | **-r 1** | Assume a constant recombination rate of 1 cM/Mb |
+| **-u 0.02** | Use LD bins only up to a recombination fraction of 0.02 |
 | **-t 2** | Use two threads |
 | **-S 1** | Fix the random seed for reproducibility |
 | **-E** | Request variation among genetic-algorithm rounds |
 | **-o** | Set the output prefix |
 
-The upper recombination fraction is not specified, so GONE2 uses its default **-u 0.05**. Changing `-u` can be explored separately as an instructor sensitivity analysis, not part of the student lesson.
+### Why use `-u 0.02`?
+
+GONE2 relates LD between marker pairs to the time in the past that generated that LD. As a useful approximation, LD at recombination fraction `c` is most informative about approximately `1/(2c)` generations ago. The default upper bound is `0.05`, corresponding roughly to information from about 10 generations ago. Here we set the upper bound to `0.02`, corresponding roughly to **25 generations ago**.
+
+This choice excludes the most weakly linked marker pairs and focuses the fit on more tightly linked pairs. For this one-scaffold exercise, it reduces sensitivity to noisy LD at larger distances and to error from assuming a uniform recombination rate of 1 cM/Mb instead of using a detailed genetic map. The trade-off is important: `-u 0.02` provides **less information about the most recent generations** than the default `0.05`; it is not universally a better value. It should be reported explicitly, and a formal analysis should compare plausible `-u` settings and, where possible, use an empirical recombination map.
 
 Do not use **-x** in the main run. It fits a structured metapopulation model, while this exercise initially treats ABB and SBB as separate populations.
 
@@ -143,12 +175,71 @@ Do not use **-x** in the main run. It fits a structured metapopulation model, wh
 
 ## Step 4 — Inspect the results
 
+**Purpose:** understand the structure of the output before drawing or interpreting the demographic trajectories.
+
+GONE2 writes several files for each population. The two most important for this practical are **GONE2_STATS**, which documents the run and its diagnostics, and **GONE2_Ne**, which contains the estimated trajectory.
+
+### Step 4.1 — Read the run summary and diagnostics
+
+**Input:** the two `GONE2_STATS` files.
+
 ~~~bash
-head "$OUTDIR/ABB_GONE2_Ne"
-head "$OUTDIR/SBB_GONE2_Ne"
 cat "$OUTDIR/ABB_GONE2_STATS"
 cat "$OUTDIR/SBB_GONE2_STATS"
 ~~~
+
+The exact layout can vary slightly among GONE2 versions, but the file records information such as:
+
+| Item | Meaning and interpretation |
+|---|---|
+| **Individuals and loci** | Number of samples and markers actually read. Unexpected values may indicate a problem in the PED/MAP preparation. |
+| **Genome or chromosome length** | Genetic length inferred from the MAP positions and the recombination-rate assumption. An unrealistic value changes how LD distance is translated into time. |
+| **Fis** | Departure from Hardy–Weinberg genotype proportions. A high positive value can reflect inbreeding, population structure, related individuals, or genotype/missing-data problems. |
+| **LD-fit information** | Describes how well the fitted model reproduces the observed decay of LD. A poor fit suggests that the inferred trajectory does not adequately explain the data. |
+| **Selected model/combination** | The optimisation solution retained by GONE2. Different retained solutions across sensitivity runs can indicate instability. |
+| **Warnings** | Messages about structure, excessive Fis, chromosome length, marker limits, or model failure. These must be investigated before biological interpretation. |
+
+**Expected:** both files should report a completed analysis rather than an error. Confirm that ABB has 10 individuals, SBB has 8, and that each run contains a plausible nonzero number of loci.
+
+**Check:** if GONE2 produces only a `GONE2_STATS` file and no `GONE2_Ne` file, inspect the end of the summary for the reason:
+
+~~~bash
+tail -n 20 "$OUTDIR/ABB_GONE2_STATS"
+tail -n 20 "$OUTDIR/SBB_GONE2_STATS"
+~~~
+
+### Step 4.2 — Inspect the Ne trajectories
+
+**Input:** the two `GONE2_Ne` tables.
+
+~~~bash
+head "$OUTDIR/ABB_GONE2_Ne"
+head "$OUTDIR/SBB_GONE2_Ne"
+~~~
+
+Each row represents one point in the reconstructed demographic trajectory:
+
+| Column | Meaning |
+|---|---|
+| **Generation** | Time before the sampled generation. Small values are more recent; larger values are further in the past. |
+| **Ne** or a column beginning with **Ne** | Estimated effective population size at that generation. Ne is the size of an idealised population experiencing the observed genetic drift, not a direct census count. |
+
+Depending on the GONE2 version and options, the table may contain additional Ne-related columns. Display the column names with:
+
+~~~bash
+head -n 1 "$OUTDIR/ABB_GONE2_Ne"
+head -n 1 "$OUTDIR/SBB_GONE2_Ne"
+~~~
+
+**Expected:** generation values should increase into the past, while Ne should be positive. Large jumps between adjacent generations—especially near the youngest or oldest boundary—should be treated cautiously because resolution is not uniform through time.
+
+**Check:** confirm that both trajectory files exist, are nonempty, and contain more than a header:
+
+~~~bash
+wc -l "$OUTDIR/ABB_GONE2_Ne" "$OUTDIR/SBB_GONE2_Ne"
+~~~
+
+### Step 4.3 — Recognise the supporting LD file
 
 Principal outputs:
 
@@ -158,38 +249,33 @@ Principal outputs:
 | **GONE2_d2** | Observed and predicted LD by recombination bin |
 | **GONE2_STATS** | Inputs, parameters, Hardy–Weinberg diagnostics, runtime, and warnings |
 
-If only a **GONE2_STATS** file is produced, read its failure explanation. Before interpreting a curve, examine the number of individuals and SNPs, estimated Fis, inferred genome length, and any population-structure warning.
+The `GONE2_d2` file contains the observed LD statistic and the values predicted by the fitted demographic model across recombination-distance bins. Students do not need to plot it during this short exercise, but it is useful for checking whether a visually attractive Ne trajectory is actually supported by a reasonable fit to the LD data.
+
+Before interpreting either population, examine the number of individuals and loci, Fis, inferred genetic length, fit information, and every warning in `GONE2_STATS`. The `GONE2_Ne` file is the model result; the `GONE2_STATS` and `GONE2_d2` files help determine whether that result is trustworthy.
 
 ## Step 5 — Plot ABB and SBB
 
-Start R from the course root:
+**Purpose:** compare ABB and SBB over a chosen number of generations and save the figure directly as a PDF.
+
+The provided [R script](../scripts/plot_gone2.R) reads both `GONE2_Ne` tables, finds the Ne column, removes non-positive or non-finite values, restricts the trajectories to the requested generations, and draws them with a logarithmic Ne axis. The first command-line number is the youngest generation to display and the second is the oldest.
+
+For example, plot generations 1–100 from the course root:
 
 ~~~bash
-R
+Rscript scripts/plot_gone2.R 1 100
 ~~~
 
-~~~r
-abb <- read.table("results/gone2/ABB_GONE2_Ne", header=TRUE)
-sbb <- read.table("results/gone2/SBB_GONE2_Ne", header=TRUE)
+To choose another interval, replace `1 100`; for example, `10 75` plots generations 10–75. With no numbers, the script defaults to generations 1–100.
 
-abb_ne <- abb[[grep("^Ne", names(abb), value=TRUE)[1]]]
-sbb_ne <- sbb[[grep("^Ne", names(sbb), value=TRUE)[1]]]
+**Expected:** the script prints the selected interval and creates **results/gone2/GONE2_ABB_SBB_generations_1_100.pdf**. The present is toward the left and older generations are toward the right.
 
-pdf("results/gone2/GONE2_ABB_SBB.pdf", width=7, height=5)
-plot(abb$Generation, abb_ne,
-     type="l", log="y", lwd=2, col="firebrick",
-     xlim=rev(range(c(abb$Generation, sbb$Generation))),
-     ylim=range(c(abb_ne, sbb_ne), finite=TRUE),
-     xlab="Generations before present",
-     ylab="Effective population size")
-lines(sbb$Generation, sbb_ne,
-      lwd=2, col="steelblue")
-legend("topright", legend=c("ABB", "SBB"),
-       col=c("firebrick", "steelblue"), lwd=2)
-dev.off()
+**Check:**
+
+~~~bash
+ls -lh results/gone2/GONE2_ABB_SBB_generations_1_100.pdf
 ~~~
 
-**Expected:** **results/gone2/GONE2_ABB_SBB.pdf**. The present is on the left and older generations are on the right.
+The PDF should have a nonzero size and contain both coloured trajectories. Do not request generations outside those available in the two result tables.
 
 ## Questions for discussion
 

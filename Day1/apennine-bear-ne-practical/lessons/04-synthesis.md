@@ -44,4 +44,3 @@ Write three sentences for a conservation manager:
 2. the largest uncertainty or assumption;
 3. the next analysis or measurement needed.
 
-Avoid converting a chromosome-level teaching estimate directly into a management prescription.
