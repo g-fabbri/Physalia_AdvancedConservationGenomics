@@ -1,0 +1,33 @@
+PLINK v1.9.0-b.8 64-bit (22 Oct 2024)
+Options in effect:
+  --allow-extra-chr
+  --biallelic-only strict
+  --double-id
+  --out results/gone2/input/ABB_Scaffold_25_original_label
+  --recode
+  --snps-only just-acgt
+  --vcf data/ABB_s25.vcf.gz
+
+Hostname: jarvis
+Working directory: /jarvis/scratch/usr/biello/test/day01
+Start time: Sat Sep 19 16:49:41 2026
+
+Random number seed: 1789829381
+32021 MB RAM detected; reserving 16010 MB for main workspace.
+--vcf: results/gone2/input/ABB_Scaffold_25_original_label-temporary.bed +
+results/gone2/input/ABB_Scaffold_25_original_label-temporary.bim +
+results/gone2/input/ABB_Scaffold_25_original_label-temporary.fam written.
+200626 variants loaded from .bim file.
+10 people (0 males, 0 females, 10 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+results/gone2/input/ABB_Scaffold_25_original_label.nosex .
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 10 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is exactly 1.
+200626 variants and 10 people pass filters and QC.
+Note: No phenotypes present.
+--recode ped to results/gone2/input/ABB_Scaffold_25_original_label.ped +
+results/gone2/input/ABB_Scaffold_25_original_label.map ... done.
+
+End time: Sat Sep 19 16:49:42 2026

@@ -1,0 +1,52 @@
+# (GONE v2.0)
+# Command: /jarvis/scratch/usr/biello/test/day01/software/GONE2/gone2 -g 0 -r 1 -u 0.02 -t 2 -S 1 -E -o /jarvis/scratch/usr/biello/test/day01/results/gone2/SBB /jarvis/scratch/usr/biello/test/day01/results/gone2/input/SBB_Scaffold_25.ped
+# Running time:102.516sec
+#
+# PREPROCESSING INFORMATION:
+# Temporal Ne estimation using unphased diploid data under the assumption of
+#   a single population model with panmixia.
+# The marker locations in a physical map are known and the chromosome sizes and the
+#   total genome size will be calculated using those locations. The physical map will be
+#   converted into a genetic map using a constant recombination rate across the genome: 
+#   distances in Morgans will be calculated using the physical distances (in Mb).
+# Ne will be inferred using the recombination rates between loci and the weighted cuadratic
+#   correlations of alleles of loci pairs.
+# The complete theoretical model will be used to search for the historical Ne series
+#   that best fit the the observed correlations across bins of recomination.
+#
+# INPUT PARAMETERS:
+# Type of genotyping data. 0:unphased diploids, 1:haploids, 2:phased diploids, 3:pseudohaploids:
+0
+# Rate of base call errors:
+0.00000
+# Number of chromosomes:
+1
+# Genome size in Morgans:
+0.4550
+# Genome size in Mb:
+45.50
+# Total number of individuals in the input file:
+8
+# Number of individuals included in the analysis:
+8
+# Average Number of individuals included in the analysis (corrected for missing genotypes):
+8.0000
+# Effective Number of individuals for correlations (corrected for missing genotypes):
+8.0000
+# Number of markers in the input file:
+200626
+# Number of SNPs included in the analysis (only polymorphic and with less than 20% missing data):
+106958
+# Proportion of missing data:
+0.00000000
+#
+# Estimated Fis value of the population (deviation from H-W proportions):
+0.08270225
+# Heterozygosity observed in the sample (only polymorphic sites):
+0.32406879
+# Heterozygosity observed in the sample (all sites):
+0.17276799
+# Heterozygosity expected (H-W eq.) in the sample (only polymorphic sites):
+0.32937987
+# Heterozygosity expected (H-W eq.) in the sample (all sites):
+0.17559944
