@@ -16,7 +16,7 @@ Conda supplies the shared tools; standalone programs are kept under Day 2 `softw
 
 SnpEff compares each VCF allele with gene models and writes predicted consequences to the VCF `ANN` field. The same SNP can have multiple transcript annotations. `HIGH`, `MODERATE`, `LOW`, and `MODIFIER` are **predicted impact categories**, not measurements of selection coefficients or fitness.
 
-The **UrArMar_mUrsArc2** database uses the frozen Apennine-bear BRAKER3/TSEBRA gene annotation and a reference FASTA. We first show how those biological inputs are assembled. The software itself should already be available; its installation is described separately in [software setup](../software/README.md).
+The database uses the Apennine-bear gene annotation and a reference FASTA (https://zenodo.org/records/15349716). We first show how those biological inputs are assembled. The software itself should already be available; its installation is described separately in [software setup](../software/README.md).
 
 ## Step 1 — Prepare the bear reference and gene annotation
 
