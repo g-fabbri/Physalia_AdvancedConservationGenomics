@@ -130,6 +130,17 @@ Both files must exist before continuing.
 
 ### 2.2 — Build the database
 
+The `build` command does not annotate the bear variants yet. It prepares a reusable representation of the reference genome and its gene annotation. In broad terms, SnpEff:
+
+1. reads **sequences.fa.gz** and creates the Scaffold_25 reference sequence in its internal genome model;
+2. parses **genes.gff.gz** and connects features through their GFF3 IDs and parent relationships;
+3. reconstructs the hierarchy of genes, transcripts, exons, CDS segments, and UTRs, including their coordinates and strands;
+4. assigns the configured codon table and derives transcript/coding information from the reference sequence;
+5. checks the feature structure and, unless disabled, can compare reconstructed CDS and proteins with independent validation FASTAs;
+6. serializes the resulting predictor so it can be loaded quickly when variants are annotated.
+
+The essential point is that SnpEff is compiling a coordinate-aware gene model. Later, when it receives a VCF position and allele change, it can determine which genomic features overlap that position and predict how the alternate allele changes each affected transcript.
+
 ~~~bash
 java -Xmx4g -jar "$SNPEFF_JAR" build \
   -gff3 \
@@ -157,15 +168,34 @@ java -Xmx4g -jar "$SNPEFF_JAR" build \
 
 The two `-noCheck...` options are used because the course supplies the reference FASTA and GFF3 but not independent CDS and protein FASTA files. They allow the build to proceed, but they also remove two useful validation checks. In a production annotation workflow, provide matching CDS and protein sequences and keep those checks enabled whenever possible.
 
-**Expected:** SnpEff reads the config, reference sequence, and GFF3; reports genes, transcripts, exons, and coding features found on Scaffold_25; and finishes without a fatal error. Warnings should be read rather than ignored, particularly warnings about missing sequences, chromosome names, or malformed transcripts.
+**Expected terminal output:** SnpEff reports the config and database paths, reads the GFF3 and reference sequence, and prints summaries of the genes, transcripts, exons, and coding features found on Scaffold_25. It then announces that it is saving the database. The command should return to the prompt without a Java exception or fatal error.
+
+Warnings should be read rather than ignored, particularly warnings about missing chromosome sequences, inconsistent scaffold names, features outside the reference boundaries, missing parents, or malformed transcripts. The build can sometimes finish while dropping or modifying problematic features, so “a file was created” is necessary but not sufficient evidence of a high-quality annotation database.
+
+The database directory contains both source inputs and compiled output:
+
+| File | Created when? | What it contains |
+|---|---|---|
+| **genes.gff.gz** | Prepared in Step 1 | Source gene annotation: genomic features, coordinates, strands, IDs, and parent-child relationships |
+| **sequences.fa.gz** | Prepared in Step 1 | Source reference nucleotide sequence for Scaffold_25 |
+| **snpEffectPredictor.bin** | Created by `build` | SnpEff's serialized predictor: the parsed genome and feature hierarchy used to locate genes/transcripts and predict allele effects efficiently |
+| **sequence.Scaffold_25.bin** | Created by `build` | Serialized Scaffold_25 nucleotide sequence. SnpEff uses it to recover reference bases, construct transcript/CDS sequences, and evaluate codon and amino-acid changes |
+| **Other `.bin` files, if present** | Version- or option-dependent | Auxiliary regulation, motif, or other feature data; they are not expected from every simple GFF3 build |
+
+Recent SnpEff versions store reference sequence in chromosome-specific binary files by default. Therefore, the approximately 1 MB predictor and the larger Scaffold_25 sequence file serve different purposes: the predictor describes **where and how genomic features are organized**, while the sequence file provides the **nucleotides underlying those features**.
+
+The build does **not** create an annotated VCF, a table of variants, or genetic-load results. Those are produced only when the compiled predictor is applied to the teaching VCF in Step 3.
 
 **Check:** confirm that the compiled database file was created:
 
 ~~~bash
-ls -lh "$SNPEFF_HOME/data/$DB/snpEffectPredictor.bin"
+ls -lh "$SNPEFF_HOME/data/$DB/snpEffectPredictor.bin" \
+  "$SNPEFF_HOME/data/$DB/sequence.${CHROM}.bin"
+find "$SNPEFF_HOME/data/$DB" -maxdepth 1 -type f -printf '%f\n' | sort
 ~~~
 
-The file should exist and have a nonzero size. If it is missing, the database build did not complete successfully; inspect the final build messages before attempting annotation.
+Both binary files should exist and have nonzero sizes. The file listing should also show the two compressed source inputs. If either `snpEffectPredictor.bin` or `sequence.Scaffold_25.bin` is missing, inspect the final build messages before attempting annotation.
+
 
 ## Step 3 — Annotate the teaching VCF
 
