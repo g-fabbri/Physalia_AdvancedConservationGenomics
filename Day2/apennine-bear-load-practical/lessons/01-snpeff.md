@@ -20,7 +20,7 @@ The **UrArMar_mUrsArc2** database uses the frozen Apennine-bear BRAKER3/TSEBRA g
 
 ## Step 1 — Prepare the bear reference and gene annotation
 
-**Purpose:** understand exactly which genome sequence and gene models SnpEff uses to predict variant consequences. This is data preparation, not software installation. The instructor can demonstrate it or provide the prepared database as a checkpoint if copying a whole genome would take too long in class.
+**Purpose:** understand exactly which genome sequence and gene models SnpEff uses to predict variant consequences and prepare them.
 
 **Input:** the frozen GFF3 and the **verified reference FASTA used to call the teaching VCF**. The original recipe called the database mUrsArc2 but copied a FASTA named mUrsArc1.1; those names must be reconciled before entering a real path below. A matching scaffold name alone does not prove that two assemblies are identical.
 
