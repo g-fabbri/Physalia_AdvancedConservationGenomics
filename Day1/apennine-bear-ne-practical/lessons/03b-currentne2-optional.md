@@ -2,7 +2,7 @@
 
 This extension is **outside the timed practical** and requires a full autosomal VCF that is not included in the one-scaffold classroom dataset. GONE2 estimates a recent trajectory from LD at different recombination distances. currentNe2 also uses LD, but targets a **contemporary** effective population size. Agreement between them is therefore not independent confirmation.
 
-This is an example that students or instructors can try later when a suitable genome-wide VCF is available. Do not run currentNe2 on Scaffold_25 alone: currentNe2 recognises chromosome information only when at least two chromosomes are present, and a one-scaffold estimate would not represent genome-wide contemporary Ne.
+This is an example that students can try later when a suitable genome-wide VCF is available. Do not run currentNe2 on Scaffold_25 alone: currentNe2 recognises chromosome information only when at least two chromosomes are present, and a one-scaffold estimate would not represent genome-wide contemporary Ne.
 
 ## Start your terminal
 
