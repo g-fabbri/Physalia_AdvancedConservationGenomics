@@ -110,7 +110,7 @@ ls -lh "$SNPEFF_HOME/data/$DB/genes.gff.gz" \
 
 ## Step 2 — Annotate the teaching VCF
 
-**Purpose:** add consequences on the same reference assembly used for variant calling.
+**Purpose:** predict and record how each alternate allele may affect annotated genes and transcripts—for example, whether it is synonymous, missense, stop-gained, intronic, or intergenic. The SnpEff database must use the same reference assembly and coordinates as the VCF.
 
 **Input:** the teaching VCF and the prebuilt, instructor-verified **mUrsArc1.1** SnpEff database.
 
