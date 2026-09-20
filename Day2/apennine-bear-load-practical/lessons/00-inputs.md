@@ -44,7 +44,13 @@ mkdir -p "$OUTDIR"
 
 ~~~bash
 ls -lh "$VCF" "$VCF.csi" "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
+~~~
+
+~~~bash
 bcftools query -l "$VCF" | wc -l
+~~~
+
+~~~bash
 for LIST in "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"; do
   printf '%s: ' "$LIST"
   wc -l < "$LIST"
