@@ -35,9 +35,17 @@ SNPEFF_HOME="$COURSE_DIR/software/snpEff"
 DB=UrArMar_mUrsArc2
 GFF=/jarvis/scratch/usr/biello/bear/annotation/annotation_versions/frozen/UrArMar.braker3.tsebra.gff3
 REF_FASTA=/path/to/verified/VCF_reference.fasta
+~~~
 
+~~~bash
 bcftools view -h "$VCF" | grep '^##contig' | head
+~~~
+
+~~~bash
 grep '^>' "$REF_FASTA" | head
+~~~
+
+~~~bash
 awk '$0 !~ /^#/ {print $1; if (++n==5) exit}' "$GFF"
 ~~~
 
