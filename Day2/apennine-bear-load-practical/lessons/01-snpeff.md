@@ -85,8 +85,14 @@ grep '^mUrsArc1.1\.' "$SNPEFF_HOME/snpEff.config"
 
 ~~~bash
 mkdir -p "$SNPEFF_HOME/data/$DB"
+~~~
+
+~~~bash
 cp "$GFF" "$SNPEFF_HOME/data/$DB/genes.gff"
 cp "$REF_FASTA" "$SNPEFF_HOME/data/$DB/sequences.fa"
+~~~
+
+~~~bash
 gzip "$SNPEFF_HOME/data/$DB/genes.gff"
 gzip "$SNPEFF_HOME/data/$DB/sequences.fa"
 ~~~
