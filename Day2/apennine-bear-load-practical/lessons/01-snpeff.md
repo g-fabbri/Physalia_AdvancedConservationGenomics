@@ -259,7 +259,7 @@ SnpEff normally writes the annotated VCF to standard output and progress or warn
 
 **Expected terminal output:** progress messages may identify the SnpEff version, config, database, and input file. There should be no fatal error about a missing database, chromosome, or reference mismatch.
 
-**Expected file:** **results/genetic_load/Bears_4pops_s25.ann.vcf**, an uncompressed VCF containing the original records and sample genotypes plus SnpEff header definitions and `ANN` values. GenoLoader's documented C++ command accepts a `.vcf` input; keeping this file uncompressed avoids assuming gzip support.
+**Expected file:** **results/genetic_load/Bears_4pops_s25.ann.vcf**, an uncompressed VCF containing the original records and sample genotypes plus SnpEff header definitions and `ANN` values.
 
 **Check:** confirm that the file is nonempty and that annotation did not change the number of VCF records:
 
@@ -289,7 +289,7 @@ bcftools view -h "$ANNOTATED" | grep 'ID=ANN'
 bcftools query -f '%CHROM\t%POS\t%INFO/ANN\n' "$ANNOTATED" | head -n 3
 ~~~
 
-The first command should find an `ANN` header. The second should show consequence strings separated by `|`. If annotations are unexpectedly absent, stop and check chromosome names, genome build, and database provenance. GenoLoader skips loci without `ANN`.
+The first command should find an `ANN` header. The second should show consequence strings separated by `|`. If annotations are unexpectedly absent, stop and check chromosome names, genome build, and database provenance.
 
 The ANN field is comma-separated when one allele has annotations for multiple transcripts. Within each annotation, pipe-separated fields describe items such as:
 
