@@ -203,6 +203,9 @@ The build does **not** create an annotated VCF, a table of variants, or genetic-
 ~~~bash
 ls -lh "$SNPEFF_HOME/data/$DB/snpEffectPredictor.bin" \
   "$SNPEFF_HOME/data/$DB/sequence.${CHROM}.bin"
+~~~
+
+~~~bash
 find "$SNPEFF_HOME/data/$DB" -maxdepth 1 -type f -printf '%f\n' | sort
 ~~~
 
@@ -232,7 +235,9 @@ SnpEff annotates variants; it does not change the sample genotypes, infer ancest
 ~~~bash
 SNPEFF_DB="$DB"
 ANNOTATED="$OUTDIR/Bears_4pops_s25.ann.vcf"
+~~~
 
+~~~bash
 java -Xmx4g -jar "$SNPEFF_JAR" \
   -c "$SNPEFF_CONFIG" \
   -dataDir "$SNPEFF_HOME/data" \
@@ -260,7 +265,13 @@ SnpEff normally writes the annotated VCF to standard output and progress or warn
 
 ~~~bash
 ls -lh "$ANNOTATED"
+~~~
+
+~~~bash
 printf 'Input records: '; bcftools view -H "$VCF" | wc -l
+~~~
+
+~~~bash
 printf 'Annotated records: '; bcftools view -H "$ANNOTATED" | wc -l
 ~~~
 
@@ -272,6 +283,9 @@ The two record counts should match. Equal counts do not mean every record has a 
 
 ~~~bash
 bcftools view -h "$ANNOTATED" | grep 'ID=ANN'
+~~~
+
+~~~bash
 bcftools query -f '%CHROM\t%POS\t%INFO/ANN\n' "$ANNOTATED" | head -n 3
 ~~~
 
