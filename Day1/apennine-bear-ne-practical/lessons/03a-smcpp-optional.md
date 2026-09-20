@@ -195,7 +195,7 @@ Fitting may take much longer than the classroom slot. SMC++ folds the frequency-
 **Purpose:** convert the two final model files into one figure on a common time scale. `-g 11` changes generations into years using an 11-year brown-bear generation time, while `--logy` places Ne on a logarithmic axis.
 
 ```bash
-smc++ plot -g 11 --logy \
+smc++ plot -g 11 \
   "$OUTDIR/SMCPP_ABB_SBB_${CHROM}.pdf" \
   "$OUTDIR/ABB_bounded/model.final.json" \
   "$OUTDIR/SBB_bounded/model.final.json"
