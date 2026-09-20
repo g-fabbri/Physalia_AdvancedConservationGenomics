@@ -53,10 +53,29 @@ cd ..
 ls -lh software/snpEff/snpEff.jar software/snpEff/snpEff.config
 ```
 
-The instructor must also prepare the custom `UrArMar_mUrsArc2` database from the verified Apennine reference FASTA and GFF3 annotation. Students should receive the completed database under:
+The instructor must also prepare the custom `UrArMar_mUrsArc1.1` database from:
 
 ```text
-software/snpEff/data/UrArMar_mUrsArc2/
+data/mUrsArc1.1.annotation.s25.gff3
+data/mUrsArc1.1.genome.s25.fasta
+```
+
+Add this block to `software/snpEff/snpEff.config` before building the database:
+
+```text
+#---
+# Non-standard Databases
+#---
+
+# Ursus arctos marsicanus genome, version mUrsArc1.1
+UrArMar_mUrsArc1.1.genome : Ursus arctos marsicanus
+UrArMar_mUrsArc1.1.codonTable : Standard
+```
+
+Students should receive the config file already modified and the completed database under:
+
+```text
+software/snpEff/data/UrArMar_mUrsArc1.1/
 ```
 
 ## 3. Download and compile GenoLoader
