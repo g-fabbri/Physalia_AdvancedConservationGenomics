@@ -69,7 +69,13 @@ Every file must exist; the four list counts should sum to the expected number of
 
 ~~~bash
 bcftools view -H "$VCF" | head -n 3
+~~~
+
+~~~bash
 bcftools index -n "$VCF"
+~~~
+
+~~~bash
 bcftools query -f '%CHROM\n' "$VCF" | sort -u
 ~~~
 
