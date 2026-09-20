@@ -10,9 +10,21 @@ From the Day 2 directory containing `data/`, `software/`, and `results/`, run th
 conda activate bear-load-practical
 COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+VCF="$COURSE_DIR/data/Bears_4pops_s25.vcf.gz"
+OUTDIR="$COURSE_DIR/results/genetic_load"
+mkdir -p "$OUTDIR"
 ```
 
-Conda supplies the shared tools; standalone programs are kept under Day 2 `software/`. SnpEff is called through its JAR at `software/snpEff/snpEff.jar`, so it does not need a PATH entry. The variables from Part 0 must also be set if you opened a new terminal.
+Conda supplies the shared tools; standalone programs are kept under Day 2 `software/`. SnpEff is called through its JAR at `software/snpEff/snpEff.jar`, so it does not need a PATH entry. `VCF` identifies the four-population Scaffold_25 input, while `OUTDIR` identifies the directory where the annotated VCF and later genetic-load results are written. Defining them here makes this lesson safe to start from a new terminal.
+
+**Check:**
+
+```bash
+printf 'Input VCF: %s\nOutput directory: %s\n' "$VCF" "$OUTDIR"
+ls -lh "$VCF"
+```
+
+The VCF must exist and have a nonzero size. The output directory may initially be empty.
 
 SnpEff compares each VCF allele with gene models and writes predicted consequences to the VCF `ANN` field. The same SNP can have multiple transcript annotations. `HIGH`, `MODERATE`, `LOW`, and `MODIFIER` are **predicted impact categories**, not measurements of selection coefficients or fitness.
 
