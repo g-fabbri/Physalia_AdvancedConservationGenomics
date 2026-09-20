@@ -24,7 +24,7 @@ ABB and SBB are the **focal populations**. BLB and POB (polar bears) are **outgr
 
 ### 1.1 — Set the input paths
 
-**Purpose:** give the prepared VCF, sample lists, and results directory names that later commands can reuse.
+**Purpose:** give the prepared VCF and sample lists.
 
 ~~~bash
 VCF=data/Bears_4pops_s25.vcf.gz
@@ -32,8 +32,6 @@ ABB_LIST=data/ABB.samples
 SBB_LIST=data/SBB.samples
 BLB_LIST=data/BLB.samples
 POB_LIST=data/POB.samples
-OUTDIR=results/genetic_load
-mkdir -p "$OUTDIR"
 ~~~
 
 **Expected:** no output. These variables exist only in the current terminal.
