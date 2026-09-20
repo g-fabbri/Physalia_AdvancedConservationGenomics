@@ -1,93 +1,178 @@
-# Optional Part 3B — currentNe2: a contemporary LD estimate
+# Optional Part 3B — currentNe2 with a full autosomal VCF
 
-GONE2 uses LD at different recombination distances to fit a recent trajectory. currentNe2 also uses LD, but reports a **contemporary** effective-size estimate. Because the methods share a broad signal, agreement is not independent confirmation.
+This extension is **outside the timed practical** and requires a full autosomal VCF that is not included in the one-scaffold classroom dataset. GONE2 estimates a recent trajectory from LD at different recombination distances. currentNe2 also uses LD, but targets a **contemporary** effective population size. Agreement between them is therefore not independent confirmation.
 
-There is an important software limitation for this exercise: currentNe2 recognises chromosome-map information only when the input contains at least **two chromosomes**. A MAP containing only Scaffold_25 is read, but currentNe2 then reports `Number of chromosomes: Not given` and cannot use `-r` to estimate Ne from its physical positions. We can still demonstrate the program by supplying the approximate genetic span of Scaffold_25 explicitly, but currentNe2 will then assume that the markers are evenly distributed across that span. This is not a substitute for a multi-chromosome analysis.
+This is an example that students or instructors can try later when a suitable genome-wide VCF is available. Do not run currentNe2 on Scaffold_25 alone: currentNe2 recognises chromosome information only when at least two chromosomes are present, and a one-scaffold estimate would not represent genome-wide contemporary Ne.
 
-Install and test currentNe2 using the [software setup](../software/README.md). Run these commands from the Day 1 course directory after completing [GONE2](02-gone2.md).
+## Start your terminal
 
-## Step 1 — Reuse the ABB and SBB genotypes
+From the Day 1 course directory, activate the main environment and identify the executable:
 
-**Purpose:** put each population's existing PED/MAP pair in its own currentNe2 input location without adding a new SNP filter.
-
-```bash
-CHROM=Scaffold_25
-GONE2_INPUT=results/gone2/input
-OUTDIR=results/currentne2
-mkdir -p "$OUTDIR"
-
-for POPULATION in ABB SBB; do
-  cp "$GONE2_INPUT/${POPULATION}_${CHROM}.ped" "$OUTDIR/${POPULATION}_${CHROM}.ped"
-  cp "$GONE2_INPUT/${POPULATION}_${CHROM}.map" "$OUTDIR/${POPULATION}_${CHROM}.map"
-  printf '%s individuals: ' "$POPULATION"
-  wc -l < "$OUTDIR/${POPULATION}_${CHROM}.ped"
-  printf '%s markers: ' "$POPULATION"
-  wc -l < "$OUTDIR/${POPULATION}_${CHROM}.map"
-done
-```
-
-**Expected:** 10 ABB and 8 SBB individuals, with a positive marker count for each. Both MAPs describe the same physical scaffold, numbered `1`. Do **not** concatenate ABB and SBB: this step estimates each population separately.
-
-## Step 2 — Calculate the teaching scaffold span
-
-**Purpose:** approximate the genetic span covered by the Scaffold_25 markers under the same assumption used in the GONE2 lesson: 1 cM/Mb.
-
-```bash
-MAP="$OUTDIR/ABB_${CHROM}.map"
-
-GENOME_MORGANS=$(awk '
-  NR==1 {minimum=$4; maximum=$4}
-  $4 < minimum {minimum=$4}
-  $4 > maximum {maximum=$4}
-  END {printf "%.8f", (maximum-minimum)/100000000}
-' "$MAP")
-
-printf 'Approximate analysed span: %s Morgans\n' "$GENOME_MORGANS"
-```
-
-The fourth MAP column is the physical base-pair position. At 1 cM/Mb, a span of 100 Mb corresponds to 100 cM, or 1 Morgan; therefore the base-pair span is divided by 100,000,000.
-
-**Expected:** one positive decimal value. This is the span between the first and last marker, not the complete genetic length of the bear genome and not necessarily the full length of Scaffold_25.
-
-## Step 3 — Estimate an illustrative contemporary size
-
-**Purpose:** run currentNe2 using the supplied genetic span. Because currentNe2 does not accept a one-chromosome MAP as chromosome-map information, it will assume that the markers are evenly distributed over this total length.
-
-```bash
+~~~bash
+conda activate bear-ne-practical
 CURRENTNE2_BIN="$PWD/software/currentNe2/currentne2"
+~~~
 
+**Check:**
+
+~~~bash
+command -v bcftools
+test -x "$CURRENTNE2_BIN" && echo "currentNe2 ready: $CURRENTNE2_BIN"
+~~~
+
+## Step 1 — Define the full autosomal VCF
+
+**Purpose:** select a multisample VCF containing the autosomes, physical positions, and all ABB and SBB individuals.
+
+~~~bash
+FULL_VCF=data/UrArMa_18i_autosomes.vcf.gz
+WORKDIR=results/currentne2/input
+OUTDIR=results/currentne2
+mkdir -p "$WORKDIR" "$OUTDIR"
+~~~
+
+The filename is an example. Replace it with the path to the prepared full autosomal VCF. It should already contain high-quality biallelic SNPs and exclude sex chromosomes, unplaced sequence, and loci that failed the project-level genotype filters.
+
+**Check:**
+
+~~~bash
+bcftools query -l "$FULL_VCF" | wc -l
+bcftools index -s "$FULL_VCF" | head
+bcftools index -n "$FULL_VCF"
+~~~
+
+**Expected:** 18 samples, multiple autosomes, and a positive record count. CHROM and POS in the VCF provide the map information used by currentNe2.
+
+## Step 2 — Create one VCF per population
+
+**Purpose:** estimate ABB and SBB separately while retaining the same autosomal regions and variant-processing rules.
+
+~~~bash
+bcftools view \
+  -S data/apennine.samples \
+  -m2 -M2 -v snps \
+  -Oz -o "$WORKDIR/ABB_autosomes.vcf.gz" \
+  "$FULL_VCF"
+
+bcftools view \
+  -S data/slovak.samples \
+  -m2 -M2 -v snps \
+  -Oz -o "$WORKDIR/SBB_autosomes.vcf.gz" \
+  "$FULL_VCF"
+
+bcftools index -f "$WORKDIR/ABB_autosomes.vcf.gz"
+bcftools index -f "$WORKDIR/SBB_autosomes.vcf.gz"
+~~~
+
+The sample list selects individuals, **-v snps** retains SNPs, and **-m2 -M2** retains biallelic records. Some sites can become monomorphic after separating populations; currentNe2 removes non-polymorphic sites during preprocessing.
+
+**Check:**
+
+~~~bash
 for POPULATION in ABB SBB; do
-  "$CURRENTNE2_BIN" -t 2 \
-    "$OUTDIR/${POPULATION}_${CHROM}.ped" \
-    "$GENOME_MORGANS"
+  printf '%s samples: ' "$POPULATION"
+  bcftools query -l "$WORKDIR/${POPULATION}_autosomes.vcf.gz" | wc -l
+
+  printf '%s chromosomes: ' "$POPULATION"
+  bcftools query -f '%CHROM\n' "$WORKDIR/${POPULATION}_autosomes.vcf.gz" |
+    sort -u | wc -l
+
+  printf '%s records: ' "$POPULATION"
+  bcftools index -n "$WORKDIR/${POPULATION}_autosomes.vcf.gz"
 done
+~~~
 
-ls -lh "$OUTDIR"/*_currentNe2_OUTPUT.txt
-```
+**Expected:** 10 ABB samples, 8 SBB samples, more than one chromosome in both files, and positive record counts.
 
-`-t 2` uses two threads. The final positional value, `GENOME_MORGANS`, supplies the analysed genetic span; it is not another option flag. We do not use `-r`, because physical marker locations are not used in this one-chromosome fallback. We also do not use `-x`, which requires chromosome assignments and fits a structured metapopulation model.
+## Step 3 — Reduce very large inputs reproducibly
 
-**Expected:** one output text file per population. currentNe2's documented default is to write beside the input with the `_currentNe2_OUTPUT.txt` suffix. In the output, `Genome size in Morgans` should now be the supplied positive value, and an Ne estimate should replace `Ne cannot be estimated because there is no map information`.
+**Purpose:** remain below currentNe2's default compiled limit of 2,000,000 input loci and reduce memory and pairwise-comparison requirements.
 
-If the output still reports a genome size of `0.00`, check that `GENOME_MORGANS` is defined in the current terminal and appears after the PED filename in the command.
+If either population VCF approaches or exceeds two million records, thin both using the same rule:
 
-## Step 4 — Read and discuss
+~~~bash
+for POPULATION in ABB SBB; do
+  bcftools +prune \
+    "$WORKDIR/${POPULATION}_autosomes.vcf.gz" \
+    -Oz -o "$WORKDIR/${POPULATION}_autosomes_thinned.vcf.gz" \
+    -- -n 1 -w 2kb -N rand --random-seed 1
 
-```bash
-cat "$OUTDIR/ABB_${CHROM}_currentNe2_OUTPUT.txt"
-cat "$OUTDIR/SBB_${CHROM}_currentNe2_OUTPUT.txt"
-```
+  bcftools index -f "$WORKDIR/${POPULATION}_autosomes_thinned.vcf.gz"
+done
+~~~
 
-First check the preprocessing section:
+This keeps at most one randomly selected SNP per 2 kb window with a fixed seed. It is a computational teaching choice, not a universally optimal biological filter. Use the same window and seed for both populations. The retained sites need not be identical because polymorphism differs between ABB and SBB.
 
-- the total and effective numbers of individuals should be 10 for ABB and 8 for SBB;
-- the input SNP count should match the PED, while the included count contains only polymorphic markers with less than 20% missing data;
-- the proportion of missing data should be zero for these prepared files;
-- `Genome size in Morgans` should be positive.
+**Check:**
 
-Then inspect observed d², expected and observed heterozygosity, the F statistic, inferred full-sibling pairs, and the reported contemporary Ne. A negative F, as observed in the first ABB attempt, means an excess of heterozygotes relative to Hardy–Weinberg expectations; it is a diagnostic that may reflect sampling, filtering, family composition, or biological processes and should not be silently ignored. The inferred sibling pairs are model-based candidates, not verified pedigrees.
+~~~bash
+for POPULATION in ABB SBB; do
+  printf '%s thinned records: ' "$POPULATION"
+  bcftools index -n "$WORKDIR/${POPULATION}_autosomes_thinned.vcf.gz"
+done
+~~~
 
-Record the estimate and any uncertainty or diagnostic information. Ask whether ABB and SBB differ, whether the most recent part of GONE2 points in the same direction, and whether sampling noise or their shared LD assumptions could explain a mismatch.
+Each count must be below 2,000,000. Increase the window if necessary. If the original VCFs are already comfortably below the limit, skip this step.
 
-**Do not present either value as the current effective size of the whole population.** This fallback ignores the actual spacing among markers and analyses only one scaffold. A substantive currentNe2 analysis should contain multiple autosomes so the program can use physical or genetic marker positions and compare within- and between-chromosome LD. It should also assess sample size, relatedness, filtering, and population structure.
+## Step 4 — Write plain VCF input
+
+**Purpose:** create uncompressed VCF files with predictable filenames for currentNe2.
+
+~~~bash
+for POPULATION in ABB SBB; do
+  bcftools view \
+    -Ov -o "$WORKDIR/${POPULATION}_autosomes_currentNe2.vcf" \
+    "$WORKDIR/${POPULATION}_autosomes_thinned.vcf.gz"
+done
+~~~
+
+If Step 3 was skipped, replace the thinned input filename with **${POPULATION}_autosomes.vcf.gz**.
+
+**Expected:** two nonempty text VCFs. currentNe2 reads chromosome assignments from CHROM, physical locations from POS, and population genotypes from the sample columns.
+
+## Step 5 — Estimate contemporary Ne
+
+**Purpose:** convert physical distance to genetic distance under the same approximation for both populations and estimate contemporary Ne.
+
+~~~bash
+for POPULATION in ABB SBB; do
+  "$CURRENTNE2_BIN" \
+    -r 1 \
+    -t 2 \
+    -o "$OUTDIR/${POPULATION}_currentNe2_OUTPUT.txt" \
+    "$WORKDIR/${POPULATION}_autosomes_currentNe2.vcf"
+done
+~~~
+
+| Option | Meaning |
+|---|---|
+| **-r 1** | Convert physical positions using a constant recombination rate of 1 cM/Mb. An empirical genetic map is preferable when available. |
+| **-t 2** | Use two computational threads. |
+| **-o** | Write each population's report to an explicit output filename. |
+
+No genome-size argument is supplied: the full VCF provides multiple chromosome assignments and physical positions. We do not use **-x**, which fits a two-subpopulation metapopulation model and represents a different biological hypothesis.
+
+**Expected:** two reports with a chromosome count, positive genome size, retained SNP count, diagnostics, and contemporary Ne estimates. The run may require substantial RAM and time because the number of possible SNP pairs grows rapidly with marker count.
+
+## Step 6 — Inspect the reports
+
+~~~bash
+cat "$OUTDIR/ABB_currentNe2_OUTPUT.txt"
+cat "$OUTDIR/SBB_currentNe2_OUTPUT.txt"
+~~~
+
+First inspect:
+
+- total and effective sample sizes;
+- input and retained polymorphic SNP counts;
+- chromosome count and inferred genome size;
+- missing-data proportion;
+- warnings or convergence messages.
+
+Then examine observed d², expected and observed heterozygosity, the F statistic, inferred full-sibling pairs, and the reported Ne estimates. Candidate sibling pairs are model-based inferences, not verified pedigrees. A positive F indicates a homozygote excess; a negative F indicates a heterozygote excess. Either may reflect biology, structure, relatives, sampling, or filtering and should be investigated.
+
+Compare ABB and SBB only after confirming comparable autosomal coverage, filtering, thinning, recombination assumptions, and sample definitions. Ask whether currentNe2 and the recent portion of GONE2 point in the same direction, and whether shared LD assumptions could explain agreement or disagreement.
+
+Even with a full VCF, Ne is not census size. Small samples, relatives, population structure, uneven recombination, genotyping error, missingness, and SNP ascertainment can strongly influence a contemporary LD estimate.
+
 
