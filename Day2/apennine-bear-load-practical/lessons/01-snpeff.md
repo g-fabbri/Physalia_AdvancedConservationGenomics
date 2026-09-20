@@ -203,6 +203,16 @@ Both binary files should exist and have nonzero sizes. The file listing should a
 
 **Input:** the teaching VCF and the **mUrsArc1.1** SnpEff database built in Step 2.
 
+During annotation, SnpEff processes each VCF record as follows:
+
+1. it confirms that the VCF chromosome and position can be located in the database;
+2. it compares the VCF REF allele with the stored Scaffold_25 reference sequence;
+3. it finds genes, transcripts, exons, CDS regions, splice regions, UTRs, or intergenic regions overlapping the variant;
+4. for coding variants, it reconstructs the affected codon and predicts any amino-acid change;
+5. it creates one or more transcript-specific annotations and adds them to the VCF INFO field named **ANN**.
+
+SnpEff annotates variants; it does not change the sample genotypes, infer ancestral alleles, calculate allele frequencies, or measure genetic load. The original VCF columns and sample data remain present in the output.
+
 ### 3.1 — Add predicted functional annotations
 
 **Purpose:** write an ANN-annotated, uncompressed VCF that GenoLoader can read.
@@ -218,7 +228,31 @@ java -Xmx4g -jar "$SNPEFF_JAR" \
   "$SNPEFF_DB" "$VCF" > "$ANNOTATED"
 ~~~
 
-**Expected:** an uncompressed annotated VCF. GenoLoader's documented C++ command accepts a `.vcf` input; the uncompressed output avoids assuming gzip support.
+| Argument | Meaning |
+|---|---|
+| **-Xmx4g** | Allow Java to use up to 4 GB of memory |
+| **-c** | Read database definitions from the prepared course config |
+| **-dataDir** | Load the compiled database from the Day 2 course directory |
+| **-noStats** | Do not create the optional SnpEff HTML and gene-summary statistics reports |
+| **mUrsArc1.1** | Load the database built in Step 2 |
+| **$VCF** | Read the original four-population Scaffold_25 variants and genotypes |
+| **> $ANNOTATED** | Redirect the annotated VCF written to standard output into the selected file |
+
+SnpEff normally writes the annotated VCF to standard output and progress or warning messages to standard error. The `>` redirection captures only the VCF stream. Do not omit it: otherwise the annotated VCF will be printed to the terminal rather than saved.
+
+**Expected terminal output:** progress messages may identify the SnpEff version, config, database, and input file. There should be no fatal error about a missing database, chromosome, or reference mismatch.
+
+**Expected file:** **results/genetic_load/Bears_4pops_s25.ann.vcf**, an uncompressed VCF containing the original records and sample genotypes plus SnpEff header definitions and `ANN` values. GenoLoader's documented C++ command accepts a `.vcf` input; keeping this file uncompressed avoids assuming gzip support.
+
+**Check:** confirm that the file is nonempty and that annotation did not change the number of VCF records:
+
+~~~bash
+ls -lh "$ANNOTATED"
+printf 'Input records: '; bcftools view -H "$VCF" | wc -l
+printf 'Annotated records: '; bcftools view -H "$ANNOTATED" | wc -l
+~~~
+
+The two record counts should match. Equal counts do not mean every record has a useful gene annotation: intergenic records can be annotated as intergenic, and records that cannot be matched correctly require investigation.
 
 ### 3.2 — Inspect the ANN field
 
@@ -231,6 +265,20 @@ bcftools query -f '%CHROM\t%POS\t%INFO/ANN\n' "$ANNOTATED" | head -n 3
 
 The first command should find an `ANN` header. The second should show consequence strings separated by `|`. If annotations are unexpectedly absent, stop and check chromosome names, genome build, and database provenance. GenoLoader skips loci without `ANN`.
 
+The ANN field is comma-separated when one allele has annotations for multiple transcripts. Within each annotation, pipe-separated fields describe items such as:
+
+| ANN component | Meaning |
+|---|---|
+| **Allele** | Alternate allele being annotated |
+| **Annotation** | Sequence Ontology effect term, such as `missense_variant` or `synonymous_variant` |
+| **Impact** | Broad predicted category: `HIGH`, `MODERATE`, `LOW`, or `MODIFIER` |
+| **Gene name / gene ID** | Affected annotated gene, when applicable |
+| **Feature type / feature ID** | Usually the affected transcript and its identifier |
+| **Biotype** | Transcript class, such as protein coding, when provided by the GFF3 |
+| **Rank** | Exon or intron number within the transcript |
+| **HGVS.c / HGVS.p** | Predicted coding-DNA and protein-level change, when applicable |
+
+One VCF variant may therefore receive several ANN entries with different predicted effects because transcripts can use different exons or reading frames. The annotation is a model-based prediction determined by the reference allele, alternate allele, transcript model, and selected database; it is not direct experimental evidence that the variant changes fitness.
 ## Step 4 — Compare predicted-effect classes
 
 **Purpose:** see what the annotations actually contain before treating any class as putatively deleterious.
