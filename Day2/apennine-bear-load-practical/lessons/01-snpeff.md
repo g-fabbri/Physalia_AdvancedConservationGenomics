@@ -40,7 +40,7 @@ REF_FASTA="$COURSE_DIR/data/mUrsArc1.1.genome.s25.fasta"
 Inspect the assembly identifiers independently:
 
 ~~~bash
-bcftools view -h "$VCF" | grep '^##contig' | head
+bcftools query -f '%CHROM\n' "$VCF" | sort -u
 ~~~
 
 ~~~bash
