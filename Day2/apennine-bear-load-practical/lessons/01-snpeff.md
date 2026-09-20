@@ -16,7 +16,7 @@ Conda supplies the shared tools; standalone programs are kept under Day 2 `softw
 
 SnpEff compares each VCF allele with gene models and writes predicted consequences to the VCF `ANN` field. The same SNP can have multiple transcript annotations. `HIGH`, `MODERATE`, `LOW`, and `MODIFIER` are **predicted impact categories**, not measurements of selection coefficients or fitness.
 
-The **UrArMar_mUrsArc1.1** database uses the Apennine-bear gene annotation and the matching reference FASTA available from [Zenodo](https://zenodo.org/records/15349716). For this exercise, both files have already been restricted to Scaffold_25 and given consistent names. We first show how those biological inputs are assembled. The software itself should already be available; its installation is described separately in [software setup](../software/README.md).
+The **mUrsArc1.1** database uses the Apennine-bear gene annotation and the matching reference FASTA available from [Zenodo](https://zenodo.org/records/15349716). For this exercise, both files have already been restricted to Scaffold_25 and given consistent names. We first show how those biological inputs are assembled. The software itself should already be available; its installation is described separately in [software setup](../software/README.md).
 
 ## Step 1 — Prepare the bear reference and gene annotation
 
@@ -32,7 +32,7 @@ Set the definitive database name and input paths:
 
 ~~~bash
 SNPEFF_HOME="$COURSE_DIR/software/snpEff"
-DB=UrArMar_mUrsArc1.1
+DB=mUrsArc1.1
 GFF="$COURSE_DIR/data/mUrsArc1.1.annotation.s25.gff3"
 REF_FASTA="$COURSE_DIR/data/mUrsArc1.1.genome.s25.fasta"
 ~~~
@@ -65,8 +65,8 @@ The instructor has already added the following entry to **software/snpEff/snpEff
 #---
 
 # Ursus arctos marsicanus genome, version mUrsArc1.1
-UrArMar_mUrsArc1.1.genome : Ursus arctos marsicanus
-UrArMar_mUrsArc1.1.codonTable : Standard
+mUrsArc1.1.genome : Ursus arctos marsicanus
+mUrsArc1.1.codonTable : Standard
 ~~~
 
 The text before `.genome` is the database identifier. It must match both the value of **DB** and the directory name under **software/snpEff/data/**. The `.genome` line supplies a human-readable description, while `.codonTable` tells SnpEff to interpret coding sequences using the standard genetic code.
@@ -74,7 +74,7 @@ The text before `.genome` is the database identifier. It must match both the val
 Students do **not** need to edit the shared config file. Check that the prepared entry is present:
 
 ~~~bash
-grep '^UrArMar_mUrsArc1.1\.' "$SNPEFF_HOME/snpEff.config"
+grep '^mUrsArc1.1\.' "$SNPEFF_HOME/snpEff.config"
 ~~~
 
 **Expected:** the two database properties shown above. If nothing is printed, stop and ask the instructor rather than modifying the shared installation during class.
@@ -91,7 +91,7 @@ gzip "$SNPEFF_HOME/data/$DB/genes.gff"
 gzip "$SNPEFF_HOME/data/$DB/sequences.fa"
 ~~~
 
-**Expected:** **genes.gff.gz** and **sequences.fa.gz** under **software/snpEff/data/UrArMar_mUrsArc1.1/**. The database build uses the GFF3 file. Students receive these files and the built database already prepared; they do not rebuild a shared installation from every account.
+**Expected:** **genes.gff.gz** and **sequences.fa.gz** under **software/snpEff/data/mUrsArc1.1/**. The database build uses the GFF3 file. Students receive these files and the built database already prepared; they do not rebuild a shared installation from every account.
 
 ### 1.4 — Check the prepared database files
 
@@ -106,7 +106,7 @@ ls -lh "$SNPEFF_HOME/data/$DB/genes.gff.gz" \
 
 **Purpose:** add consequences on the same reference assembly used for variant calling.
 
-**Input:** the teaching VCF and the prebuilt, instructor-verified **UrArMar_mUrsArc1.1** SnpEff database.
+**Input:** the teaching VCF and the prebuilt, instructor-verified **mUrsArc1.1** SnpEff database.
 
 ### 2.1 — Add consequence annotations
 
@@ -127,7 +127,7 @@ java -Xmx4g -jar "$SNPEFF_JAR" \
   "$SNPEFF_DB" "$VCF" > "$ANNOTATED"
 ~~~
 
-**Expected:** an uncompressed annotated VCF. GenoLoader's documented C++ command accepts a `.vcf` input; the uncompressed output avoids assuming gzip support.
+**Expected:** an uncompressed annotated VCF.
 
 ### 2.2 — Inspect the ANN field
 
@@ -141,7 +141,7 @@ bcftools view -h "$ANNOTATED" | grep 'ID=ANN'
 bcftools query -f '%CHROM\t%POS\t%INFO/ANN\n' "$ANNOTATED" | head -n 3
 ~~~
 
-The first command should find an `ANN` header. The second should show consequence strings separated by `|`. If annotations are unexpectedly absent, stop and check chromosome names, genome build, and database provenance. GenoLoader skips loci without `ANN`.
+The first command should find an `ANN` header. The second should show consequence strings separated by `|`. If annotations are unexpectedly absent, stop and check chromosome names, genome build, and database provenance.
 
 ## Step 3 — Compare consequence classes
 
