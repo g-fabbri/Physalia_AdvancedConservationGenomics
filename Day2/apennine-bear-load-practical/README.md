@@ -30,7 +30,7 @@ This is a **draft with explicit input placeholders**, not yet a tested runnable 
 
 - `data/Bears_4pops_s25.vcf.gz` and its `.csi` index; confirm it contains only biallelic SNPs on Scaffold_25 before GenoLoader;
 - the four actual lists `data/ABB.samples`, `data/SBB.samples`, `data/BLB.samples`, and `data/POB.samples`;
-- the custom **UrArMar_mUrsArc2** SnpEff database, after resolving the mUrsArc1.1 FASTA-name discrepancy and verifying that its reference and gene model match the VCF;
+- the custom **UrArMar_mUrsArc1.1** SnpEff database, built from the matching Scaffold_25 reference and annotation files supplied for the course;
 - a precomputed annotation checkpoint for the same Scaffold_25 VCF if live SnpEff annotation takes too long;
 - GenoLoader compiled and tested against that VCF;
 - for the optional GERP extension: the score track's **source assembly**, score definition and format, a validated Scaffold_25-to-score-assembly chain, and a precomputed site-score checkpoint with mapping QC.
@@ -40,3 +40,4 @@ The four sample-list filenames follow the supplied Jarvis `day02/data/` listing.
 ## Begin
 
 Before class, follow the [software installation and verification guide](software/README.md). It installs the core tools and the four commands used by the optional GERP lesson for every student. Then start with [the input and sample check](lessons/00-inputs.md) and record outputs in the [answer sheet](answers/student_answers.md).
+
