@@ -11,7 +11,7 @@ conda activate bear-load-practical
 COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
 VCF="$COURSE_DIR/data/Bears_4pops_s25.vcf.gz"
-OUTDIR="$COURSE_DIR/results/genetic_load"
+OUTDIR="$COURSE_DIR/results/snpEff"
 mkdir -p "$OUTDIR"
 ```
 
