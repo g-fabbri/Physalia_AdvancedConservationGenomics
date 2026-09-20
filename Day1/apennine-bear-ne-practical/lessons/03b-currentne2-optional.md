@@ -1,6 +1,6 @@
 # Optional Part 3B — currentNe2: a contemporary LD estimate
 
-This extension is **outside the timed practical**. GONE2 uses LD at different recombination distances to fit a recent trajectory. currentNe2 also uses LD, but reports a **contemporary** effective-size estimate. Because the methods share a broad signal, agreement is not independent confirmation.
+GONE2 uses LD at different recombination distances to fit a recent trajectory. currentNe2 also uses LD, but reports a **contemporary** effective-size estimate. Because the methods share a broad signal, agreement is not independent confirmation.
 
 There is an important software limitation for this exercise: currentNe2 recognises chromosome-map information only when the input contains at least **two chromosomes**. A MAP containing only Scaffold_25 is read, but currentNe2 then reports `Number of chromosomes: Not given` and cannot use `-r` to estimate Ne from its physical positions. We can still demonstrate the program by supplying the approximate genetic span of Scaffold_25 explicitly, but currentNe2 will then assume that the markers are evenly distributed across that span. This is not a substitute for a multi-chromosome analysis.
 
@@ -91,4 +91,3 @@ Record the estimate and any uncertainty or diagnostic information. Ask whether A
 
 **Do not present either value as the current effective size of the whole population.** This fallback ignores the actual spacing among markers and analyses only one scaffold. A substantive currentNe2 analysis should contain multiple autosomes so the program can use physical or genetic marker positions and compare within- and between-chromosome LD. It should also assess sample size, relatedness, filtering, and population structure.
 
-Return to the [synthesis](04-synthesis.md).
