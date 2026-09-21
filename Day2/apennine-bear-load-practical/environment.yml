@@ -14,5 +14,6 @@ dependencies:
   - ucsc-bigwigtobedgraph
   - ucsc-liftover
   - python=3.11
+  - matplotlib
   - wget
   - unzip
