@@ -172,7 +172,8 @@ No output means that every ABB and SBB sample was found.
 ~~~bash
 python scripts/summarize_genoloader.py \
   "$GT" "$ABB_LIST" "$SBB_LIST" \
-  "$OUTDIR/derived_burden_by_sample.tsv"
+  "$OUTDIR/derived_burden_by_sample.tsv" \
+  "$OUTDIR/GenoLoader_ABB_SBB_Scaffold_25.pdf"
 
 column -t "$OUTDIR/derived_burden_by_sample.tsv" | head -n 16
 ~~~
@@ -187,12 +188,25 @@ The helper script does not re-run polarization. It reads the `.gt` table, keeps 
 | **derived_copies** | Sum of dosage values: heterozygote contributes 1 and derived homozygote contributes 2 |
 | **homozygous_derived** | Number of sites with dosage 2; a proxy relevant to recessive effects |
 | **derived_copies_per_called_site** | Derived copies divided by called sites, helping account for different denominators |
+| **homozygous_derived_per_called_site** | Homozygous-derived sites divided by called sites |
 
 **Expected:** three rows per ABB/SBB individual: `HIGH`, `missense`, and `synonymous`. The script retains flags beginning with `unfolded`—a monomorphic combined outgroup—or `allFix`; other fallback and polymorphic-outgroup flags are excluded.
 
-**Check:** the script prints how many annotated loci it read and retained after conservative flag filtering. If `called_sites` is zero for a category, do not compare its ratio. A transcript's impact label is not a direct estimate of deleteriousness. Every result here is a **Scaffold_25 burden proxy**, not a whole-genome load estimate.
+**Check:** the script prints how many annotated loci it read and retained after conservative flag filtering, followed by the paths of the TSV and PDF. If `called_sites` is zero for a category, do not compare its ratio. A transcript's impact label is not a direct estimate of deleteriousness. Every result here is a **Scaffold_25 burden proxy**, not a whole-genome load estimate.
 
 This summary deliberately reports several proxies instead of one number called “genetic load.” Derived copies are closer to an additive count, while homozygous-derived sites are informative for completely recessive models. Neither incorporates selection coefficients, dominance values, expression, or validated phenotypic effects.
+
+### 3.2 — Inspect the population comparison plot
+
+**Purpose:** visualize individual variation and population means without confusing different numbers of annotated sites with different burdens.
+
+~~~bash
+ls -lh "$OUTDIR/GenoLoader_ABB_SBB_Scaffold_25.pdf"
+~~~
+
+Open **results/genoloader/GenoLoader_ABB_SBB_Scaffold_25.pdf**. The left panel shows derived copies per called site, an additive-style proxy. The right panel shows the proportion of called sites that are homozygous derived, a recessive-style proxy. Each point is one individual and each short horizontal bar is the population mean. The three annotation categories are shown separately because they have different biological interpretations and very different numbers of sites.
+
+Do not infer statistical significance from overlapping or separated points in this teaching plot. There are only 10 ABB and 8 SBB individuals, all loci come from one scaffold, individuals may be related, and sites are not statistically independent.
 
 ## Step 4 — Interpret, then challenge, the comparison
 
@@ -207,3 +221,4 @@ This summary deliberately reports several proxies instead of one number called �
 5. What changes if black bears and polar bears are used **separately** as outgroups? Treat that as a sensitivity analysis, not a way to choose the preferred answer.
 
 Write a cautious conclusion in the [answer sheet](../answers/student_answers.md). This completes the **core Day 2 practical**. If the instructor decides there is time, continue to the [optional GERP lesson](03-gerp.md).
+
