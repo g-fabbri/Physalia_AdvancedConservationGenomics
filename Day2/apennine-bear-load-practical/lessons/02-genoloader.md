@@ -174,7 +174,7 @@ python scripts/summarize_genoloader.py \
   "$GT" "$ABB_LIST" "$SBB_LIST" \
   "$OUTDIR/derived_burden_by_sample.tsv" \
   "$OUTDIR/derived_frequency_by_impact.tsv" \
-  "$OUTDIR/GenoLoader_ABB_SBB_Scaffold_25.pdf"
+  "$OUTDIR/GenoLoader_ABB_SBB_Scaffold_25"
 
 column -t "$OUTDIR/derived_burden_by_sample.tsv" | head -n 16
 column -t "$OUTDIR/derived_frequency_by_impact.tsv"
@@ -205,7 +205,9 @@ The second TSV has one row for each SnpEff impact class:
 
 `Rxy > 1` means the derived allele is relatively more frequent in ABB than SBB for that class; `Rxy < 1` means the reverse. This is directional and depends on which population is placed in the numerator.
 
-**Check:** the script prints how many annotated loci it read and retained after conservative flag filtering, followed by the paths of the TSV and PDF. If `called_sites` is zero for a category, do not compare its ratio. A transcript's impact label is not a direct estimate of deleteriousness. Every result here is a **Scaffold_25 burden proxy**, not a whole-genome load estimate.
+The final argument is an output **prefix**, not a complete filename. The script adds an informative suffix and `.pdf` for each separate figure.
+
+**Check:** the script prints how many annotated loci it read and retained after conservative flag filtering, followed by the paths of both TSVs and all PDFs. If `called_sites` is zero for a category, do not compare its ratio. A transcript's impact label is not a direct estimate of deleteriousness. Every result here is a **Scaffold_25 burden proxy**, not a whole-genome load estimate.
 
 This summary deliberately reports several proxies instead of one number called “genetic load.” Derived copies are closer to an additive count, while homozygous-derived sites are informative for completely recessive models. Neither incorporates selection coefficients, dominance values, expression, or validated phenotypic effects.
 
@@ -214,16 +216,23 @@ This summary deliberately reports several proxies instead of one number called �
 **Purpose:** visualize individual variation and population means without confusing different numbers of annotated sites with different burdens.
 
 ~~~bash
-ls -lh "$OUTDIR/GenoLoader_ABB_SBB_Scaffold_25.pdf"
+ls -lh "$OUTDIR"/GenoLoader_ABB_SBB_Scaffold_25_*.pdf
 ~~~
 
-Open **results/genoloader/GenoLoader_ABB_SBB_Scaffold_25.pdf**. It is a three-page document:
+The script creates six separate figures:
 
-1. **Normalized burden proxies:** derived copies per called site and homozygous-derived sites per called site for HIGH, missense, and synonymous variants. Each point is one individual and each short horizontal bar is the population mean.
-2. **GenoLoader-style genotype counts:** a 3 × 4 grid showing the raw numbers of dosage-0, dosage-1, and dosage-2 genotypes in the four SnpEff impact classes. These panels reproduce the main idea of GenoLoader's example `counts_plots` function.
-3. **Population frequencies and Rxy:** mean derived-allele frequency for ABB and SBB plus the directional `Rxy` comparison for each impact class.
+| Figure | Contents |
+|---|---|
+| **..._normalized_burden.pdf** | Derived copies per called site and homozygous-derived sites per called site for HIGH, missense, and synonymous variants |
+| **..._MODIFIER.pdf** | Total derived copies, heterozygous sites, and homozygous-derived sites for MODIFIER variants |
+| **..._LOW.pdf** | The same three measures for LOW-impact variants |
+| **..._MODERATE.pdf** | The same three measures for MODERATE-impact variants |
+| **..._HIGH.pdf** | The same three measures for HIGH-impact variants |
+| **..._frequency_Rxy.pdf** | Mean derived-allele frequency for ABB and SBB plus directional `Rxy` for every impact class |
 
-The first page is the most useful starting point because it accounts for each individual's number of called sites. Page 2 shows why the result arises—more heterozygous calls, more homozygous-derived calls, or both—but raw counts can change with the number of retained and callable sites. Page 3 summarizes allele-frequency shifts; it does not describe dominance or individual genotype state.
+In every individual-level panel, each point is one bear and the short horizontal line is the population mean. **Total derived copies** is calculated as `heterozygous sites + 2 × homozygous-derived sites`. Therefore, a difference in total derived copies can be decomposed into its heterozygous and homozygous-derived contributions in the adjacent panels.
+
+Start with the normalized-burden figure because it accounts for each individual's number of called sites. The four impact-specific figures explain whether the pattern arises through more heterozygous sites, more homozygous-derived sites, or both, but their raw counts can change with the number of retained and callable sites. The frequency/`Rxy` figure summarizes allele-frequency shifts; it does not describe dominance or individual genotype state.
 
 Do not infer statistical significance from overlapping or separated points in these teaching plots. There are only 10 ABB and 8 SBB individuals, all loci come from one scaffold, individuals may be related, and sites are not statistically independent. Neither SnpEff impact, derived-allele frequency, nor `Rxy` is a direct estimate of selection coefficients, fitness, or realized genetic load.
 
@@ -240,5 +249,6 @@ Do not infer statistical significance from overlapping or separated points in th
 5. What changes if black bears and polar bears are used **separately** as outgroups? Treat that as a sensitivity analysis, not a way to choose the preferred answer.
 
 Write a cautious conclusion in the [answer sheet](../answers/student_answers.md). This completes the **core Day 2 practical**. If the instructor decides there is time, continue to the [optional GERP lesson](03-gerp.md).
+
 
 
