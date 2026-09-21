@@ -10,12 +10,8 @@ From the Day 2 directory containing `data/`, `software/`, and `results/`, run th
 conda activate bear-load-practical
 COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
-```
-
-```bash
-SNPEFF_ANNOTATED="$COURSE_DIR/results/snpeff/Bears_4pops_s25.ann.vcf"
 OUTDIR="$COURSE_DIR/results/genoloader"
-ANNOTATED="$OUTDIR/Bears_4pops_s25.ann.vcf"
+ANNOTATED="$COURSE_DIR/results/snpeff/Bears_4pops_s25.ann.vcf"
 ABB_LIST="$COURSE_DIR/data/ABB.samples"
 SBB_LIST="$COURSE_DIR/data/SBB.samples"
 BLB_LIST="$COURSE_DIR/data/BLB.samples"
@@ -24,25 +20,14 @@ GENOLOADER="$COURSE_DIR/software/genoloader/genoloader"
 mkdir -p "$OUTDIR"
 ```
 
-Conda supplies the shared tools, and GenoLoader lives in Day 2 `software/genoloader/`. `SNPEFF_ANNOTATED` is the result produced in Part 1, while `OUTDIR` is a new directory reserved for GenoLoader inputs and results. Defining all paths here makes the lesson safe to start in a new terminal.
+Conda supplies the shared tools, and GenoLoader lives in Day 2 `software/genoloader/`. `ANNOTATED` is the result produced in Part 1, while `OUTDIR` stores the sample lists and summary tables made in this lesson. Defining all paths here makes the lesson safe to start in a new terminal.
 
-GenoLoader has no separate output-directory option. It adds the polarization mode and `.gt` to the input filename—for example, `Bears_4pops_s25.ann.vcf.POP_OUT.gt`—and writes that file beside its input VCF. We therefore copy the annotated VCF into `results/genoloader/` before running GenoLoader. This keeps the files from the two analyses separate and leaves the original SnpEff result unchanged.
-
-
-Prepare the GenoLoader input:
-
-```bash
-cp "$SNPEFF_ANNOTATED" "$ANNOTATED"
-```
+GenoLoader has no separate output-directory option. It removes the final `.vcf` extension, adds the polarization mode and `.gt`, and writes the result beside the input. Therefore, the annotated VCF remains in `results/snpeff/`, and GenoLoader creates `results/snpeff/Bears_4pops_s25.ann.POP_OUT.gt`. Nothing is copied or moved.
 
 **Check:**
 
 ```bash
-ls -lh "$SNPEFF_ANNOTATED" "$ANNOTATED" \
-  "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
-```
-
-```bash
+ls -lh "$ANNOTATED" "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
 test -x "$GENOLOADER" && echo "GenoLoader ready: $GENOLOADER"
 ```
 
@@ -126,12 +111,17 @@ The population lists guide polarization, but GenoLoader writes dosage columns fo
 
 **Expected terminal output:** GenoLoader reports the number of loci written, the number re-polarized relative to VCF REF, and the number failing the requested missingness thresholds. A zero or unexpectedly small retained count should trigger checks of sample IDs, group sizes, `ANN`, and genotype completeness.
 
-**Expected file:** **results/genetic_load/Bears_4pops_s25.ann.vcf.POP_OUT.gt**. It is a tab-delimited text table, not a VCF. No original genotypes are modified; this is a new representation written beside the annotated input.
+Define the path of the table created by GenoLoader:
+
+~~~bash
+GT="${ANNOTATED%.vcf}.POP_OUT.gt"
+~~~
+
+`${ANNOTATED%.vcf}` means “use the value of `ANNOTATED` after removing the final `.vcf`”. Therefore, `GT` becomes **results/snpeff/Bears_4pops_s25.ann.POP_OUT.gt**. It is a tab-delimited text table, not a VCF, and no original genotypes are modified.
 
 **Check:**
 
 ~~~bash
-GT="$ANNOTATED.POP_OUT.gt"
 ls -lh "$GT"
 wc -l "$GT"
 ~~~
