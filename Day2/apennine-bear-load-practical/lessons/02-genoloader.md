@@ -26,7 +26,8 @@ mkdir -p "$OUTDIR"
 
 Conda supplies the shared tools, and GenoLoader lives in Day 2 `software/genoloader/`. `SNPEFF_ANNOTATED` is the result produced in Part 1, while `OUTDIR` is a new directory reserved for GenoLoader inputs and results. Defining all paths here makes the lesson safe to start in a new terminal.
 
-GenoLoader has no separate output-directory option. It creates a file named <input VCF>.<polarization mode>.gt beside its input VCF. We therefore copy the annotated VCF into `results/genoloader/` before running GenoLoader. This keeps the files from the two analyses separate and leaves the original SnpEff result unchanged.
+GenoLoader has no separate output-directory option. It adds the polarization mode and `.gt` to the input filename—for example, `Bears_4pops_s25.ann.vcf.POP_OUT.gt`—and writes that file beside its input VCF. We therefore copy the annotated VCF into `results/genoloader/` before running GenoLoader. This keeps the files from the two analyses separate and leaves the original SnpEff result unchanged.
+
 
 Prepare the GenoLoader input:
 
@@ -39,6 +40,9 @@ cp "$SNPEFF_ANNOTATED" "$ANNOTATED"
 ```bash
 ls -lh "$SNPEFF_ANNOTATED" "$ANNOTATED" \
   "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
+```
+
+```bash
 test -x "$GENOLOADER" && echo "GenoLoader ready: $GENOLOADER"
 ```
 
