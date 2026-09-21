@@ -10,6 +10,9 @@ From the Day 2 directory containing `data/`, `software/`, and `results/`, run th
 conda activate bear-load-practical
 COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+```
+
+```bash
 OUTDIR="$COURSE_DIR/results/genetic_load"
 ANNOTATED="$OUTDIR/Bears_4pops_s25.ann.vcf"
 ABB_LIST="$COURSE_DIR/data/ABB.samples"
