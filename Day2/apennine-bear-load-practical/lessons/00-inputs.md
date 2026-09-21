@@ -1,3 +1,4 @@
+<img width="1672" height="941" alt="bears" src="https://github.com/user-attachments/assets/c170f884-4c5c-4533-8b25-14843d024010" />
 # Part 0 — Meet the four-species dataset
 
 Estimated terminal time: 10 minutes.
