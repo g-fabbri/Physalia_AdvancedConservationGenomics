@@ -10,11 +10,40 @@ From the Day 2 directory containing `data/`, `software/`, and `results/`, run th
 conda activate bear-load-practical
 COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+OUTDIR="$COURSE_DIR/results/genetic_load"
+ANNOTATED="$OUTDIR/Bears_4pops_s25.ann.vcf"
+ABB_LIST="$COURSE_DIR/data/ABB.samples"
+SBB_LIST="$COURSE_DIR/data/SBB.samples"
+BLB_LIST="$COURSE_DIR/data/BLB.samples"
+POB_LIST="$COURSE_DIR/data/POB.samples"
+GENOLOADER="$COURSE_DIR/software/genoloader/genoloader"
+mkdir -p "$OUTDIR"
 ```
 
-Conda supplies the shared tools; GenoLoader lives in Day 2 `software/genoloader/`. If this is a new terminal, also restore the input variables from Part 0 and the annotated-VCF variable from Part 1.
+Conda supplies the shared tools; GenoLoader lives in Day 2 `software/genoloader/`. `OUTDIR` is the shared results directory created in the SnpEff lesson, and `ANNOTATED` points to the SnpEff-annotated VCF. Defining all paths here makes the lesson safe to start in a new terminal.
+
+GenoLoader has no separate output-directory option. It creates a file named **<input VCF>.<polarization mode>.gt** beside the input VCF. Because `ANNOTATED` is inside `OUTDIR`, the GenoLoader table will also be written there.
+
+**Check:**
+
+```bash
+ls -lh "$ANNOTATED" "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
+test -x "$GENOLOADER" && echo "GenoLoader ready: $GENOLOADER"
+```
+
+Every input must exist, and the last command should print the executable path.
 
 The VCF `REF` allele is defined by the Apennine assembly. It need not be ancestral. GenoLoader uses genotypes in an outgroup to polarize each annotated biallelic SNP, recoding every individual as `0`, `1`, or `2` derived copies. We use black and polar bears together as a **strict-consensus outgroup**: disagreement or missing calls should be excluded from the conservative summary, not silently converted into ancestry.
+
+The workflow is:
+
+~~~text
+SnpEff-annotated VCF + ABB/SBB/outgroup sample lists
+                         ↓ GenoLoader
+polarized per-individual derived-allele dosage table (.gt)
+                         ↓ conservative flag filtering
+HIGH, missense, and synonymous burden proxies by individual
+~~~
 
 ## Step 1 — Build the combined outgroup list
 
@@ -34,7 +63,20 @@ N_OUT=$(wc -l < "$OUTDIR/outgroups.samples")
 printf 'ABB=%s SBB=%s outgroups=%s\n' "$N_ABB" "$N_SBB" "$N_OUT"
 ~~~
 
-**Expected:** the outgroup count equals BLB plus POB counts if no IDs overlap. Outgroup support is a **hypothesis**, not a guarantee: shared ancestral polymorphism, sequencing error, and bear introgression can cause disagreement.
+`cat` joins the black-bear and polar-bear IDs, while `sort -u` removes any accidental duplicate. The three `N_*` variables are later used as missing-data thresholds: GenoLoader will require that many called individuals in each group.
+
+**Expected:** the outgroup count equals the BLB count plus the POB count if no IDs overlap. The ABB and SBB values should match the sample counts recorded in Part 0.
+
+**Check:**
+
+~~~bash
+cat "$OUTDIR/outgroups.samples"
+comm -12 <(sort "$BLB_LIST") <(sort "$POB_LIST")
+~~~
+
+The first command displays the combined list. The second should print nothing; any output would identify an ID assigned to both outgroup lists.
+
+Outgroup support is a **hypothesis**, not a guarantee. Shared ancestral polymorphism, sequencing or genotype error, and historical introgression among bear lineages can cause the two outgroup species to disagree.
 
 ## Step 2 — Run GenoLoader
 
@@ -47,7 +89,6 @@ printf 'ABB=%s SBB=%s outgroups=%s\n' "$N_ABB" "$N_SBB" "$N_OUT"
 **Purpose:** run GenoLoader with ABB and SBB as focal groups and the combined outgroup list as ancestral-state evidence.
 
 ~~~bash
-GENOLOADER="$COURSE_DIR/software/genoloader/genoloader"
 "$GENOLOADER" "$ANNOTATED" \
   --p1 "$ABB_LIST" --p2 "$SBB_LIST" \
   --p0 "$OUTDIR/outgroups.samples" \
@@ -55,21 +96,65 @@ GENOLOADER="$COURSE_DIR/software/genoloader/genoloader"
   --polX POP_OUT --low_cov NO
 ~~~
 
-`--p1` and `--p2` define the focal groups; `--p0` supplies outgroup genotypes. The `--m*` values request called individuals in each group. `POP_OUT` uses outgroup information, but its output flags reveal whether a locus was truly outgroup-polarized or used a fallback. `--low_cov NO` keeps diploid dosage rather than one-read resampling.
+For each biallelic annotated SNP, GenoLoader reads the focal and outgroup genotypes, chooses an ancestral allele according to `POP_OUT`, and recodes all VCF samples relative to that allele. If the inferred ancestral allele is the VCF ALT allele, GenoLoader reverses the orientation so the original ALT copies become ancestral and original REF copies become derived.
 
-**Expected:** a table named like `results/genetic_load/Bears_4pops_s25.ann.vcf.POP_OUT.gt`. The exact path is printed by GenoLoader; confirm it before the next command.
+| Argument | Meaning |
+|---|---|
+| **$ANNOTATED** | SnpEff-annotated, uncompressed input VCF; records without `ANN` are skipped |
+| **--p1 / --p2** | ABB and SBB sample lists used as focal populations |
+| **--p0** | Combined black- and polar-bear list used for outgroup polarization |
+| **--m1 / --m2 / --m0** | Minimum numbers of called individuals required in the three groups; here they equal the full group sizes |
+| **--polX POP_OUT** | Infer ancestry from an allele fixed in the outgroup when possible and record alternative cases with diagnostic flags |
+| **--low_cov NO** | Use diploid GT dosages; do not perform one-read pseudo-haploid resampling |
+
+The population lists guide polarization, but GenoLoader writes dosage columns for **all samples present in the VCF**, including outgroups. We later summarize only ABB and SBB.
+
+**Expected terminal output:** GenoLoader reports the number of loci written, the number re-polarized relative to VCF REF, and the number failing the requested missingness thresholds. A zero or unexpectedly small retained count should trigger checks of sample IDs, group sizes, `ANN`, and genotype completeness.
+
+**Expected file:** **results/genetic_load/Bears_4pops_s25.ann.vcf.POP_OUT.gt**. It is a tab-delimited text table, not a VCF. No original genotypes are modified; this is a new representation written beside the annotated input.
+
+**Check:**
+
+~~~bash
+GT="$ANNOTATED.POP_OUT.gt"
+ls -lh "$GT"
+wc -l "$GT"
+~~~
+
+The file must have a nonzero size and more than one line. One line is the header; the remaining lines are annotated loci written by GenoLoader.
 
 ### 2.2 — Inspect dosages and polarization flags
 
 **Purpose:** verify the table structure and count reliable versus fallback or ambiguous polarization states.
 
 ~~~bash
-GT="$ANNOTATED.POP_OUT.gt"
 head -n 3 "$GT"
 awk -F'\t' 'NR>1 {n[$5]++} END {for (flag in n) print flag,n[flag]}' "$GT" | sort
 ~~~
 
-The header should contain `scaffold`, `position`, `effect`, `vartype`, `flag`, `ref`, and sample IDs. Dosages are `0`, `1`, `2`, or missing. The flag counts show how many loci have reliable outgroup polarization versus fallback or ambiguous states.
+The output columns mean:
+
+| Column | Meaning |
+|---|---|
+| **scaffold / position** | Genomic location copied from VCF CHROM and POS |
+| **effect** | SnpEff impact category, such as HIGH, MODERATE, LOW, or MODIFIER |
+| **vartype** | Simplified annotation class, such as missense, synonymous, intron, or intergenic |
+| **flag** | Trace of how the ancestral allele was chosen and whether fallback information was needed |
+| **ref** | GenoLoader's inferred ancestral allele; it is not necessarily the original VCF REF allele |
+| **sample columns** | Derived-allele dosage: 0 for ancestral homozygote, 1 for heterozygote, 2 for derived homozygote, and `nan` for missing |
+
+The flag counts show how many loci were supported by a monomorphic outgroup and how many used ambiguous or fallback polarization. Flags beginning with `unfolded` indicate a monomorphic outgroup, but the suffix still records the ingroup configuration—for example fixation, segregation, missingness, or possible incomplete lineage sorting. `allFold`, `inFold`, and other folded/fallback flags should not be silently treated as secure outgroup polarization.
+
+**Check:** the header should include every expected focal individual. Confirm explicitly:
+
+~~~bash
+for SAMPLE in $(cat "$ABB_LIST" "$SBB_LIST"); do
+  head -n 1 "$GT" | tr '\t' '\n' | grep -Fx "$SAMPLE" >/dev/null || \
+    echo "Missing sample column: $SAMPLE"
+done
+~~~
+
+No output means that every ABB and SBB sample was found.
 
 ## Step 3 — Summarize putative burden proxies
 
@@ -87,9 +172,22 @@ python scripts/summarize_genoloader.py \
 column -t "$OUTDIR/derived_burden_by_sample.tsv" | head -n 16
 ~~~
 
-**Expected:** three rows per ABB/SBB individual: `HIGH`, `missense`, and `synonymous`. The table reports called sites, derived copies (`heterozygote=1`, derived homozygote=2), homozygous-derived sites, and copies per called site. The script retains only flags indicating a monomorphic outgroup or an `allFix` site; all other fallback and ambiguous flags are excluded.
+The helper script does not re-run polarization. It reads the `.gt` table, keeps conservative outgroup-supported flags, assigns each retained locus to a comparison category, and sums each focal individual's dosages.
+
+| Output column | Meaning |
+|---|---|
+| **population / sample** | Focal group and individual ID |
+| **category** | HIGH impact, missense, or synonymous comparator |
+| **called_sites** | Retained category sites with a non-missing dosage for that individual |
+| **derived_copies** | Sum of dosage values: heterozygote contributes 1 and derived homozygote contributes 2 |
+| **homozygous_derived** | Number of sites with dosage 2; a proxy relevant to recessive effects |
+| **derived_copies_per_called_site** | Derived copies divided by called sites, helping account for different denominators |
+
+**Expected:** three rows per ABB/SBB individual: `HIGH`, `missense`, and `synonymous`. The script retains flags beginning with `unfolded`—a monomorphic combined outgroup—or `allFix`; other fallback and polymorphic-outgroup flags are excluded.
 
 **Check:** the script prints how many annotated loci it read and retained after conservative flag filtering. If `called_sites` is zero for a category, do not compare its ratio. A transcript's impact label is not a direct estimate of deleteriousness. Every result here is a **Scaffold_25 burden proxy**, not a whole-genome load estimate.
+
+This summary deliberately reports several proxies instead of one number called “genetic load.” Derived copies are closer to an additive count, while homozygous-derived sites are informative for completely recessive models. Neither incorporates selection coefficients, dominance values, expression, or validated phenotypic effects.
 
 ## Step 4 — Interpret, then challenge, the comparison
 
