@@ -1,4 +1,3 @@
-<img width="1672" height="941" alt="bears" src="https://github.com/user-attachments/assets/c170f884-4c5c-4533-8b25-14843d024010" />
 # Part 0 — Meet the four-species dataset
 
 Estimated terminal time: 10 minutes.
@@ -16,6 +15,9 @@ export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
 Conda supplies the shared tools; standalone programs are kept under Day 2 `software/`. The instructor places command-line executables needed for GERP in `software/bin/`. Check your location with `pwd` before continuing.
 
 ABB and SBB are the **focal populations**. BLB and POB (polar bears) are **outgroups** used to infer ancestral states; they are not added to either focal population. All four groups were called against the Apennine reference assembly, so REF is the assembly allele, not necessarily the ancestral allele. This practical examines **Scaffold_25 only**.
+
+
+<img width="1672" height="941" alt="bears" src="https://github.com/user-attachments/assets/fe759e80-2d70-4a5c-9bfe-15cde52b9686" />
 
 ## Step 1 — Name the inputs
 
