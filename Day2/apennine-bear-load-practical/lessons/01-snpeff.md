@@ -9,7 +9,10 @@ From the Day 2 directory containing `data/`, `software/`, and `results/`, run th
 ```bash
 conda activate bear-load-practical
 COURSE_DIR=$(pwd)
-export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+export PATH="$COURSE_DIR/software/bin:$PATH"
+```
+
+```bash
 VCF="$COURSE_DIR/data/Bears_4pops_s25.vcf.gz"
 OUTDIR="$COURSE_DIR/results/snpeff"
 mkdir -p "$OUTDIR"
