@@ -13,7 +13,8 @@ export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
 ```
 
 ```bash
-OUTDIR="$COURSE_DIR/results/genetic_load"
+SNPEFF_ANNOTATED="$COURSE_DIR/results/snpeff/Bears_4pops_s25.ann.vcf"
+OUTDIR="$COURSE_DIR/results/genoloader"
 ANNOTATED="$OUTDIR/Bears_4pops_s25.ann.vcf"
 ABB_LIST="$COURSE_DIR/data/ABB.samples"
 SBB_LIST="$COURSE_DIR/data/SBB.samples"
@@ -23,14 +24,21 @@ GENOLOADER="$COURSE_DIR/software/genoloader/genoloader"
 mkdir -p "$OUTDIR"
 ```
 
-Conda supplies the shared tools; GenoLoader lives in Day 2 `software/genoloader/`. `OUTDIR` is the shared results directory created in the SnpEff lesson, and `ANNOTATED` points to the SnpEff-annotated VCF. Defining all paths here makes the lesson safe to start in a new terminal.
+Conda supplies the shared tools, and GenoLoader lives in Day 2 `software/genoloader/`. `SNPEFF_ANNOTATED` is the result produced in Part 1, while `OUTDIR` is a new directory reserved for GenoLoader inputs and results. Defining all paths here makes the lesson safe to start in a new terminal.
 
-GenoLoader has no separate output-directory option. It creates a file named **<input VCF>.<polarization mode>.gt** beside the input VCF. Because `ANNOTATED` is inside `OUTDIR`, the GenoLoader table will also be written there.
+GenoLoader has no separate output-directory option. It creates a file named **<input VCF>.<polarization mode>.gt** beside its input VCF. We therefore copy the annotated VCF into `results/genoloader/` before running GenoLoader. This keeps the files from the two analyses separate and leaves the original SnpEff result unchanged.
+
+Prepare the GenoLoader input:
+
+```bash
+cp "$SNPEFF_ANNOTATED" "$ANNOTATED"
+```
 
 **Check:**
 
 ```bash
-ls -lh "$ANNOTATED" "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
+ls -lh "$SNPEFF_ANNOTATED" "$ANNOTATED" \
+  "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
 test -x "$GENOLOADER" && echo "GenoLoader ready: $GENOLOADER"
 ```
 
