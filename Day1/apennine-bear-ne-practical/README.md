@@ -52,21 +52,6 @@ Combine evidence and identify limitations
 
 By the end, you should be able to connect each estimator to its genomic signal and time scale, prepare and validate inputs, justify important parameters, and compare populations without ignoring sampling limitations.
 
-## Schedule
-
-| Time | Activity |
-|---:|---|
-| 00:00–00:15 | Effective population size and the bear case study |
-| 00:15–00:25 | [Meet and inspect the data](lessons/00-data-and-qc.md) |
-| 00:25–00:50 | Coalescence and historical demography |
-| 00:50–01:20 | [Compare individual histories with MSMC2](lessons/01-msmc2.md) |
-| 01:20–01:30 | Break |
-| 01:30–01:50 | LD and recent demography |
-| 01:50–02:20 | [Compare population histories with GONE2](lessons/02-gone2.md) |
-| 02:20–02:35 | Sampling, uncertainty, and method assumptions |
-| 02:35–03:00 | [Combine the evidence](lessons/04-synthesis.md) |
-
-The [SMC++ extension](lessons/03-smcpp-optional.md) uses all 10 ABB and 8 SBB individuals on Scaffold_25. The [currentNe2 extension](lessons/03b-currentne2-optional.md) reuses the GONE2 inputs to illustrate a contemporary LD estimate. Both are outside the timed practical and should be tested by the instructor first.
 
 ## Input files
 
