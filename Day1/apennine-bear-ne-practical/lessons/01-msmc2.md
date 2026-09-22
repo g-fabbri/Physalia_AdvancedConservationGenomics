@@ -1,7 +1,5 @@
 # Part 1 — MSMC2: comparing historical population-size trajectories
 
-Estimated practical time: 30 minutes.
-
 ## Start your terminal
 
 From the Day 1 course directory, activate the course environment and add the MSMC helper scripts to `PATH`:
