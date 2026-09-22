@@ -1,6 +1,5 @@
 # Terminal orientation and data QC
 
-Estimated time: 10 minutes.
 
 ## Start your terminal
 
