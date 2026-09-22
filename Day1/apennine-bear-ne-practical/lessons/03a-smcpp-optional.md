@@ -50,13 +50,23 @@ VCF=data/UrArMa_18i_s25.vcf.gz
 CALLABLE=data/UrArMa_callable_s25.bed.gz
 OUTDIR=results/smcpp
 mkdir -p "$OUTDIR"
+```
 
+```bash
 ABB_SAMPLES=$(paste -sd, data/apennine.samples)
 SBB_SAMPLES=$(paste -sd, data/slovak.samples)
 printf 'ABB: %s\nSBB: %s\n' "$ABB_SAMPLES" "$SBB_SAMPLES"
-bcftools query -l "$VCF" | wc -l
+```
 
+```bash
+bcftools query -l "$VCF" | wc -l
+```
+
+```bash
 bcftools index -s "$VCF" | awk -v c="$CHROM" '$1==c && $2~/^[0-9]+$/ {print $1"\t"$2}' > "$OUTDIR/${CHROM}.genome"
+```
+
+```bash
 cat "$OUTDIR/${CHROM}.genome"
 ```
 
@@ -79,15 +89,24 @@ zcat "$CALLABLE" |
   awk -v c="$CHROM" '$1==c {print $1"\t"$2"\t"$3}' |
   sort -k1,1 -k2,2n |
   bedtools merge -i - > "$OUTDIR/${CHROM}.callable.bed"
+```
 
+```bash
 bedtools complement \
   -i "$OUTDIR/${CHROM}.callable.bed" \
   -g "$OUTDIR/${CHROM}.genome" \
   | bgzip -c > "$OUTDIR/${CHROM}.uncallable.bed.gz"
+```
 
+```bash
 tabix -f -p bed "$OUTDIR/${CHROM}.uncallable.bed.gz"
+```
 
+```bash
 zcat "$OUTDIR/${CHROM}.uncallable.bed.gz" | head
+```
+
+```bash
 ls -lh "$OUTDIR/${CHROM}.uncallable.bed.gz" \
   "$OUTDIR/${CHROM}.uncallable.bed.gz.tbi"
 ```
@@ -115,12 +134,16 @@ smc++ vcf2smc \
   -d 4573 4573 \
   --mask "$OUTDIR/${CHROM}.uncallable.bed.gz" \
   "$VCF" "$OUTDIR/ABB_${CHROM}.smc.gz" "$CHROM" "ABB:$ABB_SAMPLES"
+```
 
+```bash
 smc++ vcf2smc \
   -d U1916 U1916 \
   --mask "$OUTDIR/${CHROM}.uncallable.bed.gz" \
   "$VCF" "$OUTDIR/SBB_${CHROM}.smc.gz" "$CHROM" "SBB:$SBB_SAMPLES"
+```
 
+```bash
 ls -lh "$OUTDIR"/*.smc.gz
 ```
 
@@ -145,21 +168,27 @@ During conversion, SMC++ should report one population, two distinguished lineage
 
 ```bash
 MU=1.82e-8
+```
 
+```bash
 smc++ estimate \
   --timepoints 10 100000 \
   --knots 6 \
   --cores 2 \
   -o "$OUTDIR/ABB_bounded" \
   "$MU" "$OUTDIR/ABB_${CHROM}.smc.gz"
+```
 
+```bash
 smc++ estimate \
   --timepoints 10 100000 \
   --knots 6 \
   --cores 2 \
   -o "$OUTDIR/SBB_bounded" \
   "$MU" "$OUTDIR/SBB_${CHROM}.smc.gz"
+```
 
+```bash
 ls -lh "$OUTDIR"/{ABB_bounded,SBB_bounded}/model.final.json
 ```
 
