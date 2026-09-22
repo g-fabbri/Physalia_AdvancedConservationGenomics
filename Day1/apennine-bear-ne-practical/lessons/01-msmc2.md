@@ -46,9 +46,6 @@ MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a forma
 
 The preliminary QC has already confirmed the files, sample IDs, chromosome labels, indexes, and genotype filtering. We therefore begin by preparing the MSMC2 input rather than repeating those checks.
 
-## A note about the common mask
-
-Both bears were aligned to the Apennine reference, and this exercise uses **UrArMa_callable.bed.gz** as a common teaching mask. This is appropriate if the file describes reference mappability or regions callable in both genomes. In a full analysis, sample-specific callability masks—or their intersection for a comparison—are preferable when callability was estimated from read depth and genotype quality.
 
 ## Step 1 — Define the analysis variables
 
@@ -101,7 +98,9 @@ generate_multihetsep.py \
   --mask "$MASK" \
   "$ABB_VCF" \
   > "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt"
+~~~
 
+~~~bash
 generate_multihetsep.py \
   --chr "$CHROM" \
   --mask "$MASK" \
@@ -137,7 +136,9 @@ The four columns contain:
 ~~~bash
 head "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt"
 head "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
+~~~
 
+~~~bash
 wc -l \
   "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt" \
   "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
@@ -161,7 +162,9 @@ Each run treats the two haplotypes of one bear as the genetic sample. The `-p` p
 msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
   -o "$OUTDIR/ABB_${ABB_ID}" \
   "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt"
+~~~
 
+~~~bash
 msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
   -o "$OUTDIR/SBB_${SBB_ID}" \
   "$OUTDIR/SBB_${SBB_ID}.${CHROM}.multihetsep.txt"
@@ -259,13 +262,19 @@ The BED intervals can have gaps, so summing callable bases would not give the sc
 CHUNK_SIZE=5000000
 N_BOOT=10
 BOOTDIR="$OUTDIR/bootstrap"
+mkdir -p "$BOOTDIR"
+~~~
 
+~~~bash
 SCAFFOLD_END=$(zcat "$MASK" |
   awk -v chrom="$CHROM" '$1 == chrom && $3 > end {end=$3} END {print end}')
+~~~
 
+~~~bash
 N_CHUNKS=$(( (SCAFFOLD_END + CHUNK_SIZE - 1) / CHUNK_SIZE ))
+~~~
 
-mkdir -p "$BOOTDIR"
+~~~bash
 printf 'Scaffold length: %s bp\nBootstrap blocks per replicate: %s\n' \
   "$SCAFFOLD_END" "$N_CHUNKS"
 ~~~
@@ -287,7 +296,9 @@ multihetsep_bootstrap.py \
   --seed 12345 \
   "$BOOTDIR/ABB" \
   "$OUTDIR/ABB_${ABB_ID}.${CHROM}.multihetsep.txt"
+~~~
 
+~~~bash
 multihetsep_bootstrap.py \
   -n "$N_BOOT" \
   -s "$CHUNK_SIZE" \
@@ -327,7 +338,9 @@ for REP in $(seq 1 "$N_BOOT"); do
     -o "$BOOTDIR/ABB_${REP}/ABB_${REP}" \
     "$BOOTDIR/ABB_${REP}/bootstrap_multihetsep.chr1.txt"
 done
+~~~
 
+~~~bash
 for REP in $(seq 1 "$N_BOOT"); do
   msmc2_Linux -t 2 -p '1*2+15*1+1*2' \
     -o "$BOOTDIR/SBB_${REP}/SBB_${REP}" \
