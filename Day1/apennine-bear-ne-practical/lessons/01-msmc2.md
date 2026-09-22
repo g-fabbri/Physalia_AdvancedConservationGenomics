@@ -371,14 +371,3 @@ find results/msmc2/bootstrap -name '*.final.txt'
 
 The spread of ten replicates is a teaching visualization, not a precise confidence interval. Bootstrapping one scaffold measures sensitivity to blocks within that scaffold; it cannot compensate for limited genome coverage, systematic callability bias, or uncertainty in mutation rate and generation time.
 
-## Interpretation questions
-
-1. Where do the ABB and SBB trajectories begin to differ, and where do they overlap?
-2. What aspects of isolation, connectivity, or bottleneck history might explain the contrast?
-3. Why should the recent ends of single-genome MSMC2 trajectories be interpreted cautiously?
-4. How might using only Scaffold_25 affect the smoothness and uncertainty of the curves?
-5. Which assumptions are shared by both curves, and which sources of bias could differ between ABB and SBB?
-6. What happens to the time axis if generation time increases? What happens to both axes if the mutation rate changes?
-7. In which periods are the bootstrap trajectories most variable? What does that imply about confidence in the ABB–SBB contrast?
-
-Record the main comparison and its limitations in the [answer sheet](../answers/student_answers.md). Continue to [GONE2](02-gone2.md).
