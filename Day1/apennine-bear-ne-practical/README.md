@@ -69,7 +69,7 @@ The 18-individual VCF supplies population data. The two already-filtered single-
 
 ### About the callable mask
 
-All individuals were aligned to the Apennine brown bear reference assembly. The course uses **UrArMa_callable.bed.gz** as a common teaching mask.
+All individuals were aligned to the Apennine brown bear reference assembly. The course uses **UrArMa_callable_s25.bed.gz** as a common teaching mask.
 
 Sharing a reference assembly does not automatically make a sample-specific callable mask transferable. A shared mask is appropriate when it describes reference mappability or regions callable in all relevant samples. In a complete analysis, depth- and genotype-quality-based callability should be assessed separately for each individual and then combined explicitly.
 
