@@ -100,16 +100,14 @@ Installation is not part of the timed practical. Create the shared environment a
 - One scaffold provides much less independent information than a whole genome.
 - Coverage, callability, missingness, relatedness, and population structure can imitate demographic differences.
 - Classroom runs use fewer replicates to reduce runtime.
-- Results demonstrate methods and hypotheses; they should not be used directly for management decisions.
-
+  
 ## Begin
 
 Start with [Terminal orientation and data QC](lessons/00-data-and-qc.md).
 
-## Background and inspiration
+## Background
 
 - [Benazzo et al. 2017](https://pmc.ncbi.nlm.nih.gov/articles/PMC5692547/)
 - [NCBI BioProject PRJNA395974](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395974)
-- Tutorial structure inspired by the narrative, command-first approach of the [Speciation & Population Genomics guide](https://speciationgenomics.github.io/pca/).
 
 Additional method references are listed in [REFERENCES.md](REFERENCES.md).
