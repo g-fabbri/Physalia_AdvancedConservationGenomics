@@ -1,6 +1,5 @@
 # Part 2 — GONE2: comparing recent history in two bear populations
 
-Estimated practical time: 30 minutes.
 
 ## Start your terminal
 
@@ -51,12 +50,16 @@ CHROM=Scaffold_25
 ALL_VCF=data/UrArMa_18i_s25.vcf.gz
 ABB_VCF=data/ABB_s25.vcf.gz
 SBB_VCF=data/SBB_s25.vcf.gz
+~~~
 
+~~~bash
 bcftools view -S data/apennine.samples "$ALL_VCF" \
   -Oz -o "$ABB_VCF"
 bcftools view -S data/slovak.samples "$ALL_VCF" \
   -Oz -o "$SBB_VCF"
+~~~
 
+~~~bash
 bcftools index -t "$ABB_VCF"
 bcftools index -t "$SBB_VCF"
 ~~~
@@ -77,7 +80,9 @@ The marker order in the MAP file must exactly match the genotype order in every 
 ~~~bash
 INPUTDIR=results/gone2/input
 mkdir -p "$INPUTDIR"
+~~~
 
+~~~bash
 for POPULATION in ABB SBB; do
   VCF="data/${POPULATION}_s25.vcf.gz"
   PREFIX="$INPUTDIR/${POPULATION}_${CHROM}"
@@ -117,6 +122,9 @@ results/gone2/input/SBB_Scaffold_25.map
 
 ~~~bash
 wc -l "$INPUTDIR/ABB_${CHROM}.ped" "$INPUTDIR/SBB_${CHROM}.ped"
+~~~
+
+~~~bash
 cut -f1 "$INPUTDIR/ABB_${CHROM}.map" | sort -u
 cut -f1 "$INPUTDIR/SBB_${CHROM}.map" | sort -u
 ~~~
@@ -131,7 +139,9 @@ The PED files should contain 10 and 8 rows. Each MAP check should print only **1
 COURSE_DIR=$(pwd)
 GONE2_BIN="$COURSE_DIR/software/GONE2/gone2"
 OUTDIR="$COURSE_DIR/results/gone2"
+~~~
 
+~~~bash
 "$GONE2_BIN" \
   -g 0 \
   -r 1 \
@@ -141,7 +151,9 @@ OUTDIR="$COURSE_DIR/results/gone2"
   -E \
   -o "$OUTDIR/ABB" \
   "$COURSE_DIR/$INPUTDIR/ABB_${CHROM}.ped"
+~~~
 
+~~~bash
 "$GONE2_BIN" \
   -g 0 \
   -r 1 \
@@ -185,6 +197,9 @@ GONE2 writes several files for each population. The two most important for this 
 
 ~~~bash
 cat "$OUTDIR/ABB_GONE2_STATS"
+~~~
+
+~~~bash
 cat "$OUTDIR/SBB_GONE2_STATS"
 ~~~
 
@@ -205,6 +220,9 @@ The exact layout can vary slightly among GONE2 versions, but the file records in
 
 ~~~bash
 tail -n 20 "$OUTDIR/ABB_GONE2_STATS"
+~~~
+
+~~~bash
 tail -n 20 "$OUTDIR/SBB_GONE2_STATS"
 ~~~
 
@@ -214,6 +232,9 @@ tail -n 20 "$OUTDIR/SBB_GONE2_STATS"
 
 ~~~bash
 head "$OUTDIR/ABB_GONE2_Ne"
+~~~
+
+~~~bash
 head "$OUTDIR/SBB_GONE2_Ne"
 ~~~
 
@@ -277,13 +298,4 @@ ls -lh results/gone2/GONE2_ABB_SBB_generations_1_100.pdf
 
 The PDF should have a nonzero size and contain both coloured trajectories. Do not request generations outside those available in the two result tables.
 
-## Questions for discussion
 
-1. Which parts of the ABB and SBB trajectories differ?
-2. Do the **GONE2_STATS** diagnostics support a panmictic population model?
-3. Could relatedness, structure, or SNP ascertainment imitate a recent population change?
-4. What information is lost by analysing only one scaffold?
-5. Why are 10 ABB and 8 SBB individuals insufficient for strong biological conclusions?
-6. Which additional chromosomes, individuals, or maps would most improve the analysis?
-
-Continue to the [synthesis](04-synthesis.md). For further work, try the optional [SMC++](03-smcpp-optional.md) or [currentNe2](03b-currentne2-optional.md) extensions.
