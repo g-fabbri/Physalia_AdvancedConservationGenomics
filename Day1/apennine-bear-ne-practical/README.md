@@ -62,7 +62,7 @@ data/UrArMa_4573_s25.vcf.gz
 data/UrArMa_4573_s25.vcf.gz.csi
 data/UrArMa_U1916_s25.vcf.gz
 data/UrArMa_U1916_s25.vcf.gz.csi
-data/UrArMa_callable.bed.gz
+data/UrArMa_callable_s25.bed.gz
 ~~~
 
 The 18-individual VCF supplies population data. The two already-filtered single-individual VCFs provide the ABB and SBB representatives for the historical comparison.
