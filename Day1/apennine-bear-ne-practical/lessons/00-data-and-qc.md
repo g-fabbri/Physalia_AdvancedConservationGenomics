@@ -244,12 +244,4 @@ A VCF normally contains one row per variant record. Counting VCF rows tells us h
 
 A BED mask contains genomic intervals. Counting its rows gives the number of intervals, not the number of covered bases. Callable base pairs must be calculated by summing **end − start** across the intervals belonging to the selected scaffold.
 
-## Stop and discuss
 
-1. What is the main difference between the single-individual VCF and the population VCF?
-2. How were individuals assigned to the two populations, and what assumption does that naming rule make?
-3. Why must callable sequence in the BED mask be counted differently from variant records in the VCF?
-4. Does the mask represent callable sequence or only variant positions?
-5. What happens if the BED and VCF chromosome labels differ?
-
-Record the sample counts, VCF record counts, BED interval count, and callable-base total in the [answer sheet](../answers/student_answers.md). Continue to the [first analysis](01-msmc2.md).
