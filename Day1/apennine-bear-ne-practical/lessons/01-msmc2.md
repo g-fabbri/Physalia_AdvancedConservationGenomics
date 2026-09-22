@@ -32,7 +32,7 @@ We compare one representative genome from each population:
 
 Our biological question is:
 
-> Do the ABB and SBB genomes record different histories of coalescence and effective population size?
+> **Do the ABB and SBB genomes record different histories of coalescence and effective population size?**
 
 MSMC2 does not read BAM or VCF files directly. It reads **multihetsep**, a format that combines segregating sites with the amount of callable sequence between them.
 
