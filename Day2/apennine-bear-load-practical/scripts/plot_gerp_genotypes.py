@@ -59,9 +59,8 @@ with open_text(args.gerp) as stream:
             parser.error(f"Duplicate GERP score for {fields[0]}:{end}")
         scores[key] = score
 
-impact_classes = ("MODIFIER", "LOW", "MODERATE", "HIGH")
-gerp_threshold = 4.0
-site_scores = defaultdict(list)
+gerp_threshold = 2.0
+site_scores = []
 # called scored sites, derived copies, heterozygous sites > threshold,
 # homozygous-derived sites > threshold
 summary = defaultdict(lambda: [0, 0, 0, 0])
@@ -72,7 +71,7 @@ seen_scored_sites = set()
 
 with open(args.gt, encoding="utf-8", newline="") as stream:
     reader = csv.DictReader(stream, delimiter="\t")
-    needed = set(samples) | {"scaffold", "position", "effect", "flag"}
+    needed = set(samples) | {"scaffold", "position", "flag"}
     missing = needed - set(reader.fieldnames or [])
     if missing:
         parser.error("Missing .gt columns: " + ", ".join(sorted(missing)))
@@ -89,9 +88,6 @@ with open(args.gt, encoding="utf-8", newline="") as stream:
             continue
         if key not in scores:
             continue
-        effect = row["effect"].upper()
-        if effect not in impact_classes:
-            continue
         if key in seen_scored_sites:
             parser.error(
                 f"Duplicate trusted GenoLoader row at {key[0]}:{key[1]}; "
@@ -99,14 +95,14 @@ with open(args.gt, encoding="utf-8", newline="") as stream:
             )
         score = scores[key]
         scored_rows += 1
-        site_scores[effect].append(score)
+        site_scores.append(score)
         seen_scored_sites.add(key)
 
         for sample, group in samples.items():
             dosage = row[sample]
             if dosage not in {"0", "1", "2"}:
                 continue
-            values = summary[(group, sample, effect)]
+            values = summary[(group, sample)]
             values[0] += 1
             values[1] += int(dosage)
             if score > gerp_threshold and dosage == "1":
@@ -120,126 +116,77 @@ with open(args.output_tsv, "w", encoding="utf-8", newline="") as stream:
         [
             "population",
             "sample",
-            "impact",
             "called_scored_sites",
             "derived_copies",
-            "heterozygous_derived_sites_GERP_gt4",
-            "homozygous_derived_sites_GERP_gt4",
-            "total_derived_sites_GERP_gt4",
-            "total_GERP_gt4_sites_per_called_scored_site",
+            "heterozygous_derived_sites_GERP_gt2",
+            "homozygous_derived_sites_GERP_gt2",
+            "total_derived_sites_GERP_gt2",
+            "total_GERP_gt2_sites_per_called_scored_site",
         ]
     )
     for group in ("ABB", "SBB"):
         for sample in groups[group]:
-            for effect in impact_classes:
-                called, copies, hetero, homo = summary[(group, sample, effect)]
-                total = hetero + homo
-                writer.writerow(
-                    [
-                        group,
-                        sample,
-                        effect,
-                        called,
-                        copies,
-                        hetero,
-                        homo,
-                        total,
-                        f"{total / called:.6g}" if called else "NA",
-                    ]
-                )
+            called, copies, hetero, homo = summary[(group, sample)]
+            total = hetero + homo
+            writer.writerow(
+                [
+                    group,
+                    sample,
+                    called,
+                    copies,
+                    hetero,
+                    homo,
+                    total,
+                    f"{total / called:.6g}" if called else "NA",
+                ]
+            )
 
 colors = {"ABB": "#B22222", "SBB": "#4682B4"}
 
-# Figure 1: raw score distribution, including negative values.
+# Figure 1: raw score distribution, including negative values and without
+# separating sites by SnpEff impact.
 distribution_pdf = f"{args.output_prefix}_score_distribution.pdf"
-all_scores = [score for effect in impact_classes for score in site_scores[effect]]
-figure, axes = plt.subplots(1, 2, figsize=(10, 4.8))
-axes[0].hist(all_scores, bins=50, color="#6A7D89", edgecolor="white", linewidth=0.3)
-axes[0].axvline(0, color="black", linestyle="--", linewidth=1)
-axes[0].axvline(
-    gerp_threshold, color="#B22222", linestyle=":", linewidth=1.5, label="GERP = 4"
+figure, axis = plt.subplots(figsize=(7, 5))
+axis.hist(site_scores, bins=50, color="#6A7D89", edgecolor="white", linewidth=0.3)
+axis.axvline(0, color="black", linestyle="--", linewidth=1)
+axis.axvline(
+    gerp_threshold, color="#B22222", linestyle=":", linewidth=1.5, label="GERP = 2"
 )
-axes[0].set_xlabel("GERP score")
-axes[0].set_ylabel("Number of scored SNPs")
-axes[0].set_title("All retained sites")
-axes[0].legend(frameon=False)
-
-box_values = [site_scores[effect] for effect in impact_classes]
-axes[1].boxplot(box_values, tick_labels=impact_classes, showfliers=False)
-axes[1].axhline(0, color="black", linestyle="--", linewidth=1)
-axes[1].axhline(gerp_threshold, color="#B22222", linestyle=":", linewidth=1.5)
-axes[1].set_ylabel("GERP score")
-axes[1].set_title("Scores by SnpEff impact")
-axes[1].tick_params(axis="x", rotation=25)
-for axis in axes:
-    axis.grid(axis="y", color="0.92", linewidth=0.7)
-    axis.spines["top"].set_visible(False)
-    axis.spines["right"].set_visible(False)
+axis.set_xlabel("GERP score")
+axis.set_ylabel("Number of scored SNPs")
+axis.legend(frameon=False)
+axis.grid(axis="y", color="0.92", linewidth=0.7)
+axis.spines["top"].set_visible(False)
+axis.spines["right"].set_visible(False)
 figure.suptitle("GERP scores at uniquely mapped Scaffold_25 SNPs")
-figure.tight_layout(rect=(0, 0, 1, 0.94))
+figure.tight_layout(rect=(0, 0, 1, 0.95))
 figure.savefig(distribution_pdf)
 plt.close(figure)
 
-
-def plot_points(axis, metric_index, ylabel):
-    offsets = {"ABB": -0.16, "SBB": 0.16}
-    for effect_index, effect in enumerate(impact_classes):
-        for group in ("ABB", "SBB"):
+# Figure 2: derived-site counts across all annotations, with GERP > 2.
+derived_sites_pdf = f"{args.output_prefix}_derived_sites_GERP_gt2.pdf"
+figure, axis = plt.subplots(figsize=(8, 5.5))
+offsets = {"ABB": -0.16, "SBB": 0.16}
+categories = (
+    ("Heterozygous", 2),
+    ("Homozygous derived", 3),
+    ("Total", None),
+)
+for category_index, (_label, metric_index) in enumerate(categories):
+    for group in ("ABB", "SBB"):
+        if metric_index is None:
             values = [
-                summary[(group, sample, effect)][metric_index]
+                summary[(group, sample)][2] + summary[(group, sample)][3]
                 for sample in groups[group]
             ]
-            center = effect_index + offsets[group]
-            x_values = [
-                center + (index - (len(values) - 1) / 2) * 0.025
-                for index in range(len(values))
-            ]
-            axis.scatter(
-                x_values,
-                values,
-                s=30,
-                alpha=0.8,
-                color=colors[group],
-                edgecolor="white",
-                linewidth=0.4,
-                label=group if effect_index == 0 else None,
-                zorder=2,
-            )
-            mean = sum(values) / len(values)
-            axis.plot(
-                [center - 0.1, center + 0.1],
-                [mean, mean],
-                color=colors[group],
-                linewidth=2.3,
-                zorder=3,
-            )
-    axis.set_xticks(range(len(impact_classes)), impact_classes, rotation=25)
-    axis.set_ylabel(ylabel)
-    axis.grid(axis="y", color="0.92", linewidth=0.7)
-    axis.spines["top"].set_visible(False)
-    axis.spines["right"].set_visible(False)
-
-
-# Figure 2: counts of derived sites with GERP strictly greater than 4.
-derived_sites_pdf = f"{args.output_prefix}_derived_sites_GERP_gt4.pdf"
-figure, axes = plt.subplots(1, 3, figsize=(13, 4.8))
-plot_points(axes[0], 2, "Heterozygous derived sites")
-plot_points(axes[1], 3, "Homozygous-derived sites")
-
-# Total is derived from the two stored components rather than a list index.
-offsets = {"ABB": -0.16, "SBB": 0.16}
-for effect_index, effect in enumerate(impact_classes):
-    for group in ("ABB", "SBB"):
-        values = [
-            summary[(group, sample, effect)][2] + summary[(group, sample, effect)][3]
-            for sample in groups[group]
-        ]
-        center = effect_index + offsets[group]
+        else:
+            values = [summary[(group, sample)][metric_index] for sample in groups[group]]
+        center = category_index + offsets[group]
         x_values = [
             center + (index - (len(values) - 1) / 2) * 0.025
             for index in range(len(values))
         ]
-        axes[2].scatter(
+        axis.scatter(
             x_values,
             values,
             s=30,
@@ -247,25 +194,24 @@ for effect_index, effect in enumerate(impact_classes):
             color=colors[group],
             edgecolor="white",
             linewidth=0.4,
+            label=group if category_index == 0 else None,
             zorder=2,
         )
         mean = sum(values) / len(values)
-        axes[2].plot(
+        axis.plot(
             [center - 0.1, center + 0.1],
             [mean, mean],
             color=colors[group],
             linewidth=2.3,
             zorder=3,
         )
-axes[2].set_xticks(range(len(impact_classes)), impact_classes, rotation=25)
-axes[2].set_ylabel("Total derived sites")
-axes[2].grid(axis="y", color="0.92", linewidth=0.7)
-axes[2].spines["top"].set_visible(False)
-axes[2].spines["right"].set_visible(False)
-
-handles, labels = axes[0].get_legend_handles_labels()
-figure.legend(handles, labels, loc="upper center", ncol=2, frameon=False)
-figure.suptitle("Derived sites with GERP > 4 on Scaffold_25", y=0.95)
+axis.set_xticks(range(len(categories)), [label for label, _ in categories])
+axis.set_ylabel("Number of derived sites with GERP > 2")
+axis.grid(axis="y", color="0.92", linewidth=0.7)
+axis.spines["top"].set_visible(False)
+axis.spines["right"].set_visible(False)
+axis.legend(frameon=False)
+figure.suptitle("Derived sites at constrained positions on Scaffold_25", y=0.96)
 figure.text(
     0.5,
     0.01,
@@ -273,7 +219,7 @@ figure.text(
     ha="center",
     fontsize=9,
 )
-figure.tight_layout(rect=(0, 0.05, 1, 0.89))
+figure.tight_layout(rect=(0, 0.05, 1, 0.93))
 figure.savefig(derived_sites_pdf)
 plt.close(figure)
 
