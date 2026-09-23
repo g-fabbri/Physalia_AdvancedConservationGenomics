@@ -30,6 +30,9 @@ GenoLoader has no separate output-directory option. It removes the final `.vcf` 
 
 ```bash
 ls -lh "$ANNOTATED" "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
+```
+
+```bash
 test -x "$GENOLOADER" && echo "GenoLoader ready: $GENOLOADER"
 ```
 
