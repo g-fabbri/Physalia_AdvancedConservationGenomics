@@ -68,7 +68,7 @@ Do not repeat the download for every student. Confirm the inputs and software:
 ```bash
 ls -lh "$APP_FA" "$POLAR_FA" "$VCF" "$GT"
 ls -lh "$GERP_BW"
-test -n "$TRANSANNO" && "$TRANSANNO" minimap2-to-chain --help | head
+test -n "$TRANSANNO" && "$TRANSANNO" minimap2chain --help | head
 grep '^>' "$APP_FA" | head
 grep '^>' "$POLAR_FA" | head
 ```
@@ -102,7 +102,7 @@ Do not select a preset simply because it maps the most bases: permissive setting
 **Purpose:** create the coordinate-mapping file that liftOver will use.
 
 ```bash
-"$TRANSANNO" minimap2-to-chain "$PREP/Apennine_to_polar.paf" \
+"$TRANSANNO" minimap2chain "$PREP/Apennine_to_polar.paf" \
   --output "$PREP/Apennine_to_polar.chain"
 head -n 1 "$PREP/Apennine_to_polar.chain"
 ```
