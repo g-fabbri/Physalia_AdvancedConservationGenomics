@@ -1,8 +1,5 @@
-# Optional Part 3 — Add GERP constraint scores to Scaffold_25
+# Optional Part 3 — Examine GERP conservation scores
 
-Estimated terminal time: 15 minutes **if the instructor supplies the chain and score files**. Building the assembly alignment is instructor preparation; the full process is shown so the liftOver is transparent and can be repeated outside class.
-
-This lesson is an **optional extension**. The core Day 2 practical is complete after GenoLoader; the instructor may teach GERP if time allows or leave it for independent work. No GERP output is needed for the core conclusion.
 
 ## Start your terminal
 
