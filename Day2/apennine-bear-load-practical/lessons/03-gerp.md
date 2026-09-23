@@ -115,7 +115,7 @@ Do not select a preset simply because it maps the most bases: permissive setting
 
 **Check:** an empty PAF means there is no usable alignment.
 
-1.3 — Convert the alignment to a chain
+### 1.3 — Convert the alignment to a chain
 
 **Purpose:** convert the pairwise assembly alignment into the coordinate-mapping format read by `liftOver`.
 
