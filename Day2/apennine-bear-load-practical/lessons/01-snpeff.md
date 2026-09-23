@@ -1,6 +1,5 @@
 # Part 1 — What might each SNP do?
 
-Estimated terminal time: 20 minutes with a prebuilt database; allow extra time if students prepare database files themselves.
 
 ## Start your terminal
 
