@@ -279,4 +279,4 @@ print(f"Read {gt_rows} GenoLoader rows; retained {trusted_rows} trusted rows")
 print(f"Matched {len(seen_scored_sites)} unique trusted sites to GERP scores")
 print(f"Wrote {args.output_tsv}")
 print(f"Wrote {distribution_pdf}")
-print(f"Wrote {weighted_pdf}"
+print(f"Wrote {weighted_pdf}")
