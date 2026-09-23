@@ -1,6 +1,8 @@
-# Optional Part 3 — Examine GERP conservation scores
+# Optional Part 3 — Add GERP constraint scores to Scaffold_25
 
+Estimated terminal time: 15 minutes **if the instructor supplies the chain and score files**. Building the assembly alignment is instructor preparation; the full process is shown so the liftOver is transparent and can be repeated outside class.
 
+This lesson is an **optional extension**. The core Day 2 practical is complete after GenoLoader; the instructor may teach GERP if time allows or leave it for independent work. No GERP output is needed for the core conclusion.
 
 ## Start your terminal
 
@@ -9,10 +11,16 @@ From the Day 2 directory containing `data/`, `software/`, and `results/`, run th
 ```bash
 conda activate bear-load-practical
 COURSE_DIR=$(pwd)
-export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+export PATH="$COURSE_DIR/software/bin:$PATH"
 ```
 
-Conda supplies the shared tools, including `minimap2`, `transanno`, `liftOver`, and `bigWigToBedGraph`. During setup, `bash software/link_conda_tools.sh` creates their course-local links in Day 2 `software/bin/`. Check them with `command -v minimap2 transanno liftOver bigWigToBedGraph` before the chain-building steps.
+Conda supplies the shared tools, including `minimap2`, `transanno`, `liftOver`, and `bigWigToBedGraph`. During setup, `bash software/link_conda_tools.sh` creates course-local links in Day 2 `software/bin/` where needed. Check the active commands before continuing:
+
+```bash
+command -v minimap2 transanno liftOver bigWigToBedGraph
+```
+
+`transanno` is installed from Bioconda by `environment.yml`; students do **not** need to download it separately. If `command -v transanno` prints nothing, update the Conda environment rather than adding an unrelated binary manually. The [Bioconda Transanno recipe](https://bioconda.github.io/recipes/transanno/README.html) documents `conda install transanno`; the [Transanno repository](https://github.com/informationsea/transanno) provides releases and source-build instructions as alternatives when Conda is unavailable.
 
 SnpEff predicts consequences from gene models; GERP measures evolutionary constraint at an alignment column. Neither identifies a bear allele's fitness effect. We will score the **Scaffold_25 SNPs** used in Parts 1–2.
 
@@ -20,93 +28,85 @@ SnpEff predicts consequences from gene models; GERP measures evolutionary constr
 
 A **bigWig** (`.bw`) is an indexed, compressed binary track of numerical values along a genome—for example, one GERP conservation score at a genomic position. Unlike a text BED or bedGraph file, it is not meant to be read with `head`. Its index lets `bigWigToBedGraph` retrieve a selected chromosome interval without converting the entire track. The extracted **bedGraph** is a small, readable table with `chrom start end score` columns. [UCSC bigWig guide](https://genome.ucsc.edu/goldenPath/help/bigWig).
 
-The score track for this exercise is Ensembl release 114's [91-mammal GERP bigWig for polar bear](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score), named `gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw`. Its filename identifies the intended **UrsMar_1.0 polar-bear coordinates**; still verify its contig names and lengths against `POLAR_FA` before liftOver. The polar FASTA must be this same assembly, not merely any polar-bear reference. **Scaffold_25 is an Apennine scaffold, not a name to search for in the polar bigWig.** We first lift its SNPs to the corresponding polar region(s), which may span more than one polar contig, and then extract only scores in those regions. Finally, we carry scores back to Apennine coordinates using stable site IDs.
+The score track for this exercise is Ensembl release 114's [91-mammal GERP bigWig for polar bear](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw), named `gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw`. Its filename identifies the intended **UrsMar_1.0 polar-bear coordinates**. The matching reference assembly is available from the [NCBI UrsMar_1.0 directory](https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/225/GCF_000687225.1_UrsMar_1.0/); the FASTA used here is `GCF_000687225.1_UrsMar_1.0_genomic.fna`.
+
+The polar FASTA and bigWig must describe the same assembly and contig names. **Scaffold_25 is an Apennine scaffold, not a name to search for in the polar bigWig.** We first map that Apennine scaffold to its corresponding polar region(s), lift the SNP positions, and retrieve polar-coordinate GERP values. Stable site IDs then return those values to Apennine coordinates.
 
 ## Step 1 — Build the one-scaffold chain (instructor preparation)
 
 **Purpose:** map Apennine Scaffold_25 to the polar coordinate system of the verified score track.
 
-**Input:** the exact Apennine VCF-reference FASTA, the polar score-reference FASTA, minimap2, and Transanno. [Part 0](00-inputs.md) checks the matching `data/Bears_4pops_s25.vcf.gz`. If that file is absent, extract Scaffold_25 from the verified, indexed **genome-wide four-population VCF** before class; do not extract from a VCF containing a different scaffold.
+**Input:** the prepared Apennine Scaffold_25 VCF-reference FASTA, the complete polar score-reference FASTA, minimap2, and Transanno. [Part 0](00-inputs.md) has already checked `data/Bears_4pops_s25.vcf.gz`; this lesson does not recreate it.
 
-### 1.1 — Prepare the VCF only if it is missing
-
-**Purpose:** make a one-scaffold input without changing allele-frequency filters. Skip this substep when the verified teaching VCF is already present.
-
-Only when the Scaffold_25 VCF has **not** already been prepared, and after confirming the source contains the intended four populations, create it once:
-
-```bash
-SOURCE_VCF=/jarvis/scratch/usr/biello/bear/snpeff/VCF/marpolblk.sorted.merged.alignable.final.SNP.vcf.gz
-```
-
-```bash
-bcftools view -r Scaffold_25 -Oz \
-  -o data/Bears_4pops_s25.vcf.gz "$SOURCE_VCF"
-```
-
-```bash
-bcftools index -f data/Bears_4pops_s25.vcf.gz
-```
-
-```bash
-bcftools query -l data/Bears_4pops_s25.vcf.gz
-```
-
-**Expected:** only Scaffold_25 records and the expected four-population sample IDs. This is extraction, not a new allele-frequency filter; Part 0 checks site representation. Do not overwrite an existing verified teaching VCF.
-
-### 1.2 — Name the assemblies and output directory
+### 1.1 — Name the assemblies and output directories
 
 **Purpose:** keep the source and destination assemblies explicit throughout the liftOver. Replace `POLAR_FA` only after verifying the bigWig's assembly.
 
 ```bash
 CHROM=Scaffold_25
-APP_FA=/jarvis/data/refgenomes/Uarcmar/mUrsArc1.1.primarysoftmask.fasta
-POLAR_FA=/path/to/verified/UrsMar_1.0.fasta
-TRANSANNO="$COURSE_DIR/software/bin/transanno"
-PREP=results/gerp/preparation
+APP_FA="$COURSE_DIR/data/mUrsArc1.1.genome.s25.fasta"
+POLAR_FA="$COURSE_DIR/data/GCF_000687225.1_UrsMar_1.0_genomic.fna"
+GERP_BW="$COURSE_DIR/data/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw"
+VCF="$COURSE_DIR/data/Bears_4pops_s25.vcf.gz"
+GT="$COURSE_DIR/results/snpeff/Bears_4pops_s25.ann.POP_OUT.gt"
+TRANSANNO=$(command -v transanno)
+OUTDIR="$COURSE_DIR/results/gerp"
+PREP="$OUTDIR/preparation"
 mkdir -p "$PREP"
 ```
 
-**Expected:** nothing is printed; these variables point to the assemblies and workspace used in the following commands. **Check:** `ls -lh "$APP_FA" "$POLAR_FA" "$TRANSANNO"` must find all three files.
+`APP_FA` is already restricted to Scaffold_25, so no additional FASTA extraction is necessary. `POLAR_FA` is the complete NCBI UrsMar_1.0 assembly matching the GERP coordinate system. `GERP_BW` is the large indexed score track; students need it only when reproducing instructor-preparation Steps 4–5.
 
-### 1.3 — Extract the Apennine scaffold
-
-**Purpose:** keep the alignment focused on Scaffold_25 rather than sending the whole Apennine genome to minimap2.
+If the polar FASTA has not already been prepared, the instructor can download and decompress the matching NCBI file once:
 
 ```bash
-samtools faidx "$APP_FA" "$CHROM" > "$PREP/${CHROM}.fa"
+wget -c \
+  https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/225/GCF_000687225.1_UrsMar_1.0/GCF_000687225.1_UrsMar_1.0_genomic.fna.gz \
+  -O "$POLAR_FA.gz"
+gunzip -k "$POLAR_FA.gz"
 ```
+
+Do not repeat the download for every student. Confirm the inputs and software:
 
 ```bash
-head -n 2 "$PREP/${CHROM}.fa"
+ls -lh "$APP_FA" "$POLAR_FA" "$VCF" "$GT"
+ls -lh "$GERP_BW"
+test -n "$TRANSANNO" && "$TRANSANNO" minimap2-to-chain --help | head
+grep '^>' "$APP_FA" | head
+grep '^>' "$POLAR_FA" | head
 ```
 
-**Expected:** a FASTA header `>Scaffold_25` followed by sequence. **Check:** if `samtools` cannot find the scaffold, compare FASTA and VCF names; if the reference lacks a `.fai` index, the instructor must index the verified FASTA in a writable location first.
+**Expected:** the Apennine FASTA contains `>Scaffold_25`; the polar FASTA contains NCBI contig accessions; all files are nonempty; and Transanno prints help text. If the bigWig is not present, the class can still discuss Steps 1–3 and then use the instructor's precomputed Apennine-coordinate score track from Step 5.
 
-### 1.4 — Align the two assemblies
+### 1.2 — Align the two assemblies
 
 **Purpose:** find corresponding segments between Apennine Scaffold_25 and the verified polar assembly. In minimap2, the **first FASTA is the target/destination** and the second is the query/source. The output is a PAF alignment, **not** yet a liftOver chain.
 
 ```bash
-minimap2 -cx asm20 --cs -t 8 "$POLAR_FA" "$PREP/${CHROM}.fa" \
+minimap2 -cx asm20 --cs -t 8 "$POLAR_FA" "$APP_FA" \
   > "$PREP/Apennine_to_polar.paf"
-```
-
-```bash
 head -n 2 "$PREP/Apennine_to_polar.paf"
 ```
 
-**Expected:** PAF rows whose first field is `Scaffold_25` and whose sixth field names a polar contig. `-t 8` uses eight threads; `--cs` adds base-level differences needed by Transanno. `asm20` is an assembly-alignment preset, **not** a hard 5% divergence cutoff. **Check:** an empty PAF means there is no usable alignment, not that GERP scores are zero. [minimap2 guidance](https://github.com/lh3/minimap2/blob/master/cookbook.md).
+**Expected:** PAF rows whose first field is `Scaffold_25` and whose sixth field names a polar contig. `-c` requests base-level alignment and a CIGAR-like `cg` tag; `--cs` writes detailed substitutions and gaps; `-t 8` uses eight threads.
 
-### 1.5 — Convert the alignment to a chain
+`asm20` is a bundle of assembly-alignment parameters, not an instruction that the genomes differ by exactly 20% and not a hard divergence filter. Among the assembly presets, `asm5` is the strictest for highly similar assemblies, `asm10` is intermediate, and `asm20` is the most permissive. We use `asm20` to maintain sensitivity in a cross-species brown-bear-to-polar-bear alignment. Reasonable alternatives are:
+
+- try `asm10` when the assemblies are expected to be highly similar and compare aligned coverage, mapping uniqueness, and chain quality;
+- try `asm5` mainly for very closely related or within-species assemblies;
+- retain `asm20` when stricter presets fragment or lose valid orthologous alignment.
+
+Do not select a preset simply because it maps the most bases: permissive settings can also increase paralogous or repetitive mappings. Compare the uniquely lifted fraction and spot-check loci. The [minimap2 documentation](https://github.com/lh3/minimap2) describes `asm5` for intra-species assembly alignment and recommends tuning assembly presets to cross-species divergence.
+
+**Check:** an empty PAF means there is no usable alignment, not that GERP scores are zero.
+
+### 1.3 — Convert the alignment to a chain
 
 **Purpose:** create the coordinate-mapping file that liftOver will use.
 
 ```bash
 "$TRANSANNO" minimap2-to-chain "$PREP/Apennine_to_polar.paf" \
   --output "$PREP/Apennine_to_polar.chain"
-```
-
-```bash
 head -n 1 "$PREP/Apennine_to_polar.chain"
 ```
 
@@ -123,10 +123,6 @@ head -n 1 "$PREP/Apennine_to_polar.chain"
 **Purpose:** represent each one-based VCF position as a zero-based, one-base BED interval while retaining the original site ID.
 
 ```bash
-VCF=data/Bears_4pops_s25.vcf.gz
-```
-
-```bash
 bcftools query -f '%CHROM\t%POS\n' "$VCF" |
   awk -v c="$CHROM" 'BEGIN{OFS="\t"} $1==c {print $1,$2-1,$2,$1":"$2}' |
   sort -k1,1 -k2,2n -u > "$PREP/Apennine_sites.bed"
@@ -140,9 +136,6 @@ bcftools query -f '%CHROM\t%POS\n' "$VCF" |
 
 ```bash
 head "$PREP/Apennine_sites.bed"
-```
-
-```bash
 wc -l "$PREP/Apennine_sites.bed"
 ```
 
@@ -187,9 +180,6 @@ awk 'BEGIN{OFS="\t"} {n[$4]++; line[$4]=$0}
 ```bash
 wc -l "$PREP/Apennine_sites.bed" "$PREP/polar_sites_all.bed" \
   "$PREP/polar_sites_unique.bed"
-```
-
-```bash
 head "$PREP/polar_sites_unique.bed"
 ```
 
@@ -208,22 +198,12 @@ head "$PREP/polar_sites_unique.bed"
 **Purpose:** define one score-extraction span per polar contig reached by the SNPs, avoiding whole-genome conversion. If running this substep, point `GERP_BW` to the instructor's local copy; do not download a copy for every student.
 
 ```bash
-GERP_BW=data/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw
-```
-
-```bash
 ls -lh "$GERP_BW"
-```
-
-```bash
 awk 'BEGIN{OFS="\t"}
      {if(!($1 in min) || $2<min[$1]) min[$1]=$2;
       if(!($1 in max) || $3>max[$1]) max[$1]=$3}
      END{for(c in min) print c,min[c],max[c]}' \
   "$PREP/polar_sites_unique.bed" > "$PREP/polar_regions.tsv"
-```
-
-```bash
 cat "$PREP/polar_regions.tsv"
 ```
 
@@ -249,9 +229,6 @@ done < "$PREP/polar_regions.tsv"
 ```bash
 cat "$PREP"/GERP_*.bedGraph |
   sort -k1,1 -k2,2n > "$PREP/GERP_polar_regions.bedGraph"
-```
-
-```bash
 bedtools intersect \
   -a "$PREP/polar_sites_unique.bed" \
   -b "$PREP/GERP_polar_regions.bedGraph" \
@@ -289,9 +266,6 @@ awk 'BEGIN{OFS="\t"}
        split(id,a,":"); print a[1],a[2]-1,a[2],score[id]
      }}' "$PREP/sites_with_polar_scores.tsv" |
   sort -k1,1 -k2,2n > "$PREP/GERP_on_Apennine_unique.bed"
-```
-
-```bash
 head "$PREP/GERP_on_Apennine_unique.bed"
 ```
 
@@ -302,14 +276,8 @@ Column 4 of the scored join still holds the **original** Apennine `Scaffold_25:p
 **Purpose:** make the Apennine-coordinate score table reusable in another session.
 
 ```bash
-GERP=results/gerp/GERP_on_Apennine_unique.bed.gz
-```
-
-```bash
+GERP="$OUTDIR/GERP_on_Apennine_unique.bed.gz"
 bgzip -c "$PREP/GERP_on_Apennine_unique.bed" > "$GERP"
-```
-
-```bash
 tabix -f -p bed "$GERP"
 ```
 
@@ -319,14 +287,8 @@ tabix -f -p bed "$GERP"
 
 ```bash
 zcat "$GERP" | head
-```
-
-```bash
 zcat "$GERP" |
   awk '$1!="Scaffold_25" || $3-$2!=1 {bad++} END{print "Invalid rows:",bad+0}'
-```
-
-```bash
 wc -l "$PREP/Apennine_sites.bed" "$PREP/GERP_on_Apennine_unique.bed"
 ```
 
@@ -340,6 +302,15 @@ wc -l "$PREP/Apennine_sites.bed" "$PREP/GERP_on_Apennine_unique.bed"
 
 **Input:** `GT` from [GenoLoader](02-genoloader.md) and `GERP` from Step 5. With a precomputed track, point `GERP` to its actual path and start here.
 
+If the instructor supplied the precomputed score track and you skipped Steps 1–5, restore the required variables first:
+
+```bash
+OUTDIR="$COURSE_DIR/results/gerp"
+GT="$COURSE_DIR/results/snpeff/Bears_4pops_s25.ann.POP_OUT.gt"
+GERP="$OUTDIR/GERP_on_Apennine_unique.bed.gz"
+mkdir -p "$OUTDIR"
+```
+
 ### 6.1 — Convert GenoLoader sites to BED
 
 **Purpose:** put annotated GenoLoader sites into the same one-base Apennine coordinate system as the GERP track.
@@ -347,9 +318,6 @@ wc -l "$PREP/Apennine_sites.bed" "$PREP/GERP_on_Apennine_unique.bed"
 ```bash
 awk -F'\t' 'BEGIN{OFS="\t"} NR>1 && $2~/^[0-9]+$/ {print $1,$2-1,$2,$3,$4,$5}' "$GT" \
   > "$OUTDIR/genoloader_sites.bed"
-```
-
-```bash
 head "$OUTDIR/genoloader_sites.bed"
 ```
 
@@ -373,9 +341,6 @@ bedtools intersect \
 
 ```bash
 wc -l "$OUTDIR/genoloader_sites.bed" "$OUTDIR/sites_with_gerp.tsv"
-```
-
-```bash
 head "$OUTDIR/sites_with_gerp.tsv"
 ```
 
@@ -383,11 +348,75 @@ head "$OUTDIR/sites_with_gerp.tsv"
 
 **Check:** a larger joined count signals duplicate/overlapping score intervals. Ask whether score availability differs among HIGH, missense, and synonymous categories. The same positional score applies to ABB and SBB at one site; their derived dosages may differ.
 
+## Step 7 — Plot score distributions and derived-genotype contributions
+
+**Purpose:** first examine the GERP scores independently of population genotypes, then combine positive GERP scores with each bear's derived-allele dosage. These are descriptive summaries for Scaffold_25, not estimates of realized fitness load.
+
+**Input:** the Apennine-coordinate GERP track, the polarized GenoLoader table, and the ABB/SBB sample lists.
+
+### 7.1 — Run the plotting script
+
+**Purpose:** produce a per-sample table and two separate PDF figures.
+
+```bash
+ABB_LIST="$COURSE_DIR/data/ABB.samples"
+SBB_LIST="$COURSE_DIR/data/SBB.samples"
+
+python scripts/plot_gerp_genotypes.py \
+  "$GERP" \
+  "$GT" \
+  "$ABB_LIST" \
+  "$SBB_LIST" \
+  "$OUTDIR/GERP_derived_scores_by_sample.tsv" \
+  "$OUTDIR/GERP_ABB_SBB_Scaffold_25"
+```
+
+The script keeps GenoLoader rows whose polarization flag begins with `unfolded` or is `allFix`, matches them to unique GERP-scored positions, and separates the SnpEff classes `MODIFIER`, `LOW`, `MODERATE`, and `HIGH`.
+
+For the genotype-weighted summaries, a positive GERP score is treated as evidence of constraint:
+
+- a heterozygous derived genotype contributes `1 × GERP`;
+- a homozygous derived genotype contributes `2 × GERP`;
+- total contribution is the sum of the heterozygous and homozygous-derived components.
+
+Negative scores remain visible in the distribution plot but are set to zero in the genotype-weighted summary. This prevents unconstrained scores from cancelling positive constraint, but it is an explicit teaching choice rather than a universal definition of genetic load.
+
+### 7.2 — Inspect the outputs
+
+**Purpose:** confirm that every expected table and figure was created before interpretation.
+
+```bash
+ls -lh \
+  "$OUTDIR/GERP_derived_scores_by_sample.tsv" \
+  "$OUTDIR/GERP_ABB_SBB_Scaffold_25_score_distribution.pdf" \
+  "$OUTDIR/GERP_ABB_SBB_Scaffold_25_derived_genotype_scores.pdf"
+
+head "$OUTDIR/GERP_derived_scores_by_sample.tsv"
+```
+
+**Expected outputs:**
+
+- `GERP_derived_scores_by_sample.tsv` contains population, individual, impact class, number of called/scored sites, derived-copy count, heterozygous contribution, homozygous-derived contribution, total contribution, and total per called/scored site;
+- `..._score_distribution.pdf` shows the raw GERP distribution at retained SNPs and compares scores among SnpEff impact classes;
+- `..._derived_genotype_scores.pdf` shows individual ABB and SBB values for heterozygous, homozygous-derived, and total positive-GERP contributions. Points are individuals and horizontal lines are population means.
+
+### 7.3 — Interpret the figures carefully
+
+**Purpose:** distinguish evolutionary constraint from predicted molecular consequence and from genetic load.
+
+A high positive GERP score means that a position is more conserved across the mammal alignment than expected under neutrality. It does **not** prove that the derived bear allele is deleterious. SnpEff impact and GERP answer different questions: SnpEff predicts how a variant changes an annotated transcript, while GERP measures long-term evolutionary constraint at that genomic position.
+
+In the derived-genotype figure, compare both the populations and the two genotype components. A larger homozygous-derived contribution can be especially informative in a small, inbred population because recessive alleles are more often exposed in homozygous form. However, the plotted value does not incorporate selection coefficients, dominance, gene expression, or actual fitness. It is best called a **constraint-weighted derived-allele summary**, not realized genetic load.
+
+**Check:** population differences can also arise from unequal numbers of called/scored sites. Use the `called_scored_sites` and `total_per_called_scored_site` columns before interpreting raw totals. Results from one scaffold are an illustration and must not be generalized automatically to the whole genome.
+
 ## Stop and discuss
 
-1. Are HIGH or missense sites more constrained than synonymous sites in the uniquely mapped subset?
-2. Why are unscored or ambiguously mapped positions not assigned score zero?
-3. How could chain direction, assembly mismatch, or a one-base BED error produce convincing but wrong results?
-4. Why are SnpEff impact, GERP constraint, derived status, and realized fitness load distinct?
+1. Do GERP distributions differ among MODIFIER, LOW, MODERATE, and HIGH sites? Should they necessarily follow the SnpEff ranking?
+2. Does an ABB–SBB contrast arise mainly from heterozygous or homozygous-derived contributions?
+3. Why are negative scores retained in the distribution but not subtracted from the positive-GERP derived summary?
+4. Why are unscored or ambiguously mapped positions not assigned score zero?
+5. How could chain direction, assembly mismatch, or a one-base BED error produce convincing but wrong results?
+6. Why should these figures not be described as direct estimates of realized genetic load?
 
 Record your interpretation in the [answer sheet](../answers/student_answers.md).
