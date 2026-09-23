@@ -61,6 +61,8 @@ with open_text(args.gerp) as stream:
 
 gerp_threshold = 2.0
 site_scores = []
+impact_classes = ("MODIFIER", "LOW", "MODERATE", "HIGH")
+site_scores_by_impact = defaultdict(list)
 # called scored sites, derived copies, heterozygous sites > threshold,
 # homozygous-derived sites > threshold
 summary = defaultdict(lambda: [0, 0, 0, 0])
@@ -71,7 +73,7 @@ seen_scored_sites = set()
 
 with open(args.gt, encoding="utf-8", newline="") as stream:
     reader = csv.DictReader(stream, delimiter="\t")
-    needed = set(samples) | {"scaffold", "position", "flag"}
+    needed = set(samples) | {"scaffold", "position", "effect", "flag"}
     missing = needed - set(reader.fieldnames or [])
     if missing:
         parser.error("Missing .gt columns: " + ", ".join(sorted(missing)))
@@ -96,6 +98,9 @@ with open(args.gt, encoding="utf-8", newline="") as stream:
         score = scores[key]
         scored_rows += 1
         site_scores.append(score)
+        effect = row["effect"].upper()
+        if effect in impact_classes:
+            site_scores_by_impact[effect].append(score)
         seen_scored_sites.add(key)
 
         for sample, group in samples.items():
@@ -143,23 +148,34 @@ with open(args.output_tsv, "w", encoding="utf-8", newline="") as stream:
 
 colors = {"ABB": "#B22222", "SBB": "#4682B4"}
 
-# Figure 1: raw score distribution, including negative values and without
-# separating sites by SnpEff impact.
+# Figure 1: raw score distribution, including negative values, overall and by
+# SnpEff impact. SnpEff classes are used only in this descriptive figure.
 distribution_pdf = f"{args.output_prefix}_score_distribution.pdf"
-figure, axis = plt.subplots(figsize=(7, 5))
-axis.hist(site_scores, bins=50, color="#6A7D89", edgecolor="white", linewidth=0.3)
-axis.axvline(0, color="black", linestyle="--", linewidth=1)
-axis.axvline(
+figure, axes = plt.subplots(1, 2, figsize=(10, 4.8))
+axes[0].hist(site_scores, bins=50, color="#6A7D89", edgecolor="white", linewidth=0.3)
+axes[0].axvline(0, color="black", linestyle="--", linewidth=1)
+axes[0].axvline(
     gerp_threshold, color="#B22222", linestyle=":", linewidth=1.5, label="GERP = 2"
 )
-axis.set_xlabel("GERP score")
-axis.set_ylabel("Number of scored SNPs")
-axis.legend(frameon=False)
-axis.grid(axis="y", color="0.92", linewidth=0.7)
-axis.spines["top"].set_visible(False)
-axis.spines["right"].set_visible(False)
+axes[0].set_xlabel("GERP score")
+axes[0].set_ylabel("Number of scored SNPs")
+axes[0].set_title("All retained sites")
+axes[0].legend(frameon=False)
+
+box_values = [site_scores_by_impact[effect] for effect in impact_classes]
+axes[1].boxplot(box_values, tick_labels=impact_classes, showfliers=False)
+axes[1].axhline(0, color="black", linestyle="--", linewidth=1)
+axes[1].axhline(gerp_threshold, color="#B22222", linestyle=":", linewidth=1.5)
+axes[1].set_ylabel("GERP score")
+axes[1].set_title("Scores by SnpEff impact")
+axes[1].tick_params(axis="x", rotation=25)
+
+for axis in axes:
+    axis.grid(axis="y", color="0.92", linewidth=0.7)
+    axis.spines["top"].set_visible(False)
+    axis.spines["right"].set_visible(False)
 figure.suptitle("GERP scores at uniquely mapped Scaffold_25 SNPs")
-figure.tight_layout(rect=(0, 0, 1, 0.95))
+figure.tight_layout(rect=(0, 0, 1, 0.94))
 figure.savefig(distribution_pdf)
 plt.close(figure)
 
