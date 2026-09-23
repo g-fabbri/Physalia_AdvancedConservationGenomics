@@ -214,11 +214,11 @@ find "$SNPEFF_HOME/data/$DB" -maxdepth 1 -type f -printf '%f\n' | sort
 Both binary files should exist and have nonzero sizes. The file listing should also show the two compressed source inputs. If either `snpEffectPredictor.bin` or `sequence.Scaffold_25.bin` is missing, inspect the final build messages before attempting annotation.
 
 
-## Step 3 — Annotate the teaching VCF
+## Step 3 — Annotate the VCF
 
 **Purpose:** predict and record how each alternate allele may affect annotated genes and transcripts—for example, whether it is synonymous, missense, stop-gained, intronic, or intergenic. The SnpEff database must use the same reference assembly and coordinates as the VCF.
 
-**Input:** the teaching VCF and the **mUrsArc1.1** SnpEff database built in Step 2.
+**Input:** the VCF and the **mUrsArc1.1** SnpEff database built in Step 2.
 
 During annotation, SnpEff processes each VCF record as follows:
 
@@ -307,6 +307,7 @@ The ANN field is comma-separated when one allele has annotations for multiple tr
 | **HGVS.c / HGVS.p** | Predicted coding-DNA and protein-level change, when applicable |
 
 One VCF variant may therefore receive several ANN entries with different predicted effects because transcripts can use different exons or reading frames. The annotation is a model-based prediction determined by the reference allele, alternate allele, transcript model, and selected database; it is not direct experimental evidence that the variant changes fitness.
+
 ## Step 4 — Compare predicted-effect classes
 
 **Purpose:** see what the annotations actually contain before treating any class as putatively deleterious.
