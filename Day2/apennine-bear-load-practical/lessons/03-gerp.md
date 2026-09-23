@@ -60,6 +60,9 @@ If the polar FASTA has not already been prepared, the instructor can download an
 wget -c \
   https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/225/GCF_000687225.1_UrsMar_1.0/GCF_000687225.1_UrsMar_1.0_genomic.fna.gz \
   -O "$POLAR_FA.gz"
+```
+
+```bash
 gunzip -k "$POLAR_FA.gz"
 ```
 
@@ -67,9 +70,21 @@ Do not repeat the download for every student. Confirm the inputs and software:
 
 ```bash
 ls -lh "$APP_FA" "$POLAR_FA" "$VCF" "$GT"
+```
+
+```bash
 ls -lh "$GERP_BW"
+```
+
+```bash
 test -n "$TRANSANNO" && "$TRANSANNO" minimap2chain --help | head
+```
+
+```bash
 grep '^>' "$APP_FA" | head
+```
+
+```bash
 grep '^>' "$POLAR_FA" | head
 ```
 
@@ -82,6 +97,9 @@ grep '^>' "$POLAR_FA" | head
 ```bash
 minimap2 -cx asm20 --cs -t 8 "$POLAR_FA" "$APP_FA" \
   > "$PREP/Apennine_to_polar.paf"
+```
+
+```bash
 head -n 2 "$PREP/Apennine_to_polar.paf"
 ```
 
