@@ -1,5 +1,8 @@
-# Optional Part 3 — Examine GERP conservation scores
+# Optional Part 3 — Add GERP constraint scores to Scaffold_25
 
+Estimated terminal time: 15 minutes **if the instructor supplies the chain and score files**. Building the assembly alignment is instructor preparation; the full process is shown so the liftOver is transparent and can be repeated outside class.
+
+This lesson is an **optional extension**. The core Day 2 practical is complete after GenoLoader; the instructor may teach GERP if time allows or leave it for independent work. No GERP output is needed for the core conclusion.
 
 ## Start your terminal
 
@@ -11,10 +14,10 @@ COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$PATH"
 ```
 
-Conda supplies the shared tools, including `minimap2`, `transanno`, `liftOver`, and `bigWigToBedGraph`. During setup, `bash software/link_conda_tools.sh` creates course-local links in Day 2 `software/bin/` where needed. Check the active commands before continuing:
+Conda supplies the shared tools, including `minimap2`, `transanno`, `liftOver`, `bigWigInfo`, and `bigWigToBedGraph`. During setup, `bash software/link_conda_tools.sh` creates course-local links in Day 2 `software/bin/` where needed. Check the active commands before continuing:
 
 ```bash
-command -v minimap2 transanno liftOver bigWigToBedGraph
+command -v minimap2 transanno liftOver bigWigInfo bigWigToBedGraph
 ```
 
 `transanno` is installed from Bioconda by `environment.yml`; students do **not** need to download it separately. If `command -v transanno` prints nothing, update the Conda environment rather than adding an unrelated binary manually. The [Bioconda Transanno recipe](https://bioconda.github.io/recipes/transanno/README.html) documents `conda install transanno`; the [Transanno repository](https://github.com/informationsea/transanno) provides releases and source-build instructions as alternatives when Conda is unavailable.
@@ -25,7 +28,9 @@ SnpEff predicts consequences from gene models; GERP measures evolutionary constr
 
 A **bigWig** (`.bw`) is an indexed, compressed binary track of numerical values along a genome—for example, one GERP conservation score at a genomic position. Unlike a text BED or bedGraph file, it is not meant to be read with `head`. Its index lets `bigWigToBedGraph` retrieve a selected chromosome interval without converting the entire track. The extracted **bedGraph** is a small, readable table with `chrom start end score` columns. [UCSC bigWig guide](https://genome.ucsc.edu/goldenPath/help/bigWig).
 
-The score track for this exercise is Ensembl release 114's [91-mammal GERP bigWig for polar bear](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score), named `gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw`. Its filename identifies the intended **UrsMar_1.0 polar-bear coordinates**. The matching reference assembly is available from the [NCBI UrsMar_1.0 directory](https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/225/GCF_000687225.1_UrsMar_1.0/); the FASTA used here is `GCF_000687225.1_UrsMar_1.0_genomic.fna`.
+The score track for this exercise is Ensembl release 114's [91-mammal GERP bigWig for polar bear](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw), named `gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw`. Its filename identifies the intended **UrsMar_1.0 polar-bear coordinates**.
+
+Use the polar-bear FASTA from the **same Ensembl release** as the conservation track: [Ensembl release 114 polar-bear DNA files](https://ftp.ensembl.org/pub/release-114/fasta/ursus_maritimus/dna/) and `Ursus_maritimus.UrsMar_1.0.dna.toplevel.fa.gz`. This toplevel FASTA uses the same GenBank-style `AVOR...` sequence identifiers as the bigWig. The `GCF_...` RefSeq version represents the same UrsMar_1.0 assembly sequence but uses `NW_...` headers; `bigWigToBedGraph` would therefore return empty output unless those accessions were translated.
 
 The polar FASTA and bigWig must describe the same assembly and contig names. **Scaffold_25 is an Apennine scaffold, not a name to search for in the polar bigWig.** We first map that Apennine scaffold to its corresponding polar region(s), lift the SNP positions, and retrieve polar-coordinate GERP values. Stable site IDs then return those values to Apennine coordinates.
 
@@ -42,7 +47,7 @@ The polar FASTA and bigWig must describe the same assembly and contig names. **S
 ```bash
 CHROM=Scaffold_25
 APP_FA="$COURSE_DIR/data/mUrsArc1.1.genome.s25.fasta"
-POLAR_FA="$COURSE_DIR/data/GCF_000687225.1_UrsMar_1.0_genomic.fna"
+POLAR_FA="$COURSE_DIR/data/Ursus_maritimus.UrsMar_1.0.dna.toplevel.fa"
 GERP_BW="$COURSE_DIR/data/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw"
 VCF="$COURSE_DIR/data/Bears_4pops_s25.vcf.gz"
 GT="$COURSE_DIR/results/snpeff/Bears_4pops_s25.ann.POP_OUT.gt"
@@ -52,58 +57,70 @@ PREP="$OUTDIR/preparation"
 mkdir -p "$PREP"
 ```
 
-`APP_FA` is already restricted to Scaffold_25, so no additional FASTA extraction is necessary. `POLAR_FA` is the complete NCBI UrsMar_1.0 assembly matching the GERP coordinate system. `GERP_BW` is the large indexed score track; students need it only when reproducing instructor-preparation Steps 4–5.
+`APP_FA` is already restricted to Scaffold_25, so no additional FASTA extraction is necessary. `POLAR_FA` is the Ensembl release 114 toplevel UrsMar_1.0 assembly matching the GERP coordinate system and names. `GERP_BW` is the large indexed score track; students need it only when reproducing instructor-preparation Steps 4–5.
 
 If the polar FASTA has not already been prepared, the instructor can download and decompress the matching NCBI file once:
 
 ```bash
 wget -c \
-  https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/225/GCF_000687225.1_UrsMar_1.0/GCF_000687225.1_UrsMar_1.0_genomic.fna.gz \
+  https://ftp.ensembl.org/pub/release-114/fasta/ursus_maritimus/dna/Ursus_maritimus.UrsMar_1.0.dna.toplevel.fa.gz \
   -O "$POLAR_FA.gz"
-```
-
-```bash
 gunzip -k "$POLAR_FA.gz"
 ```
 
 Do not repeat the download for every student. Confirm the inputs and software:
 
 ```bash
-ls -lh "$APP_FA" "$POLAR_FA" "$VCF" "$GT"
-```
-
-```bash
-ls -lh "$GERP_BW"
-```
-
-```bash
+ls -lh "$APP_FA" "$POLAR_FA" "$VCF" "$GT" "$GERP_BW"
 test -n "$TRANSANNO" && "$TRANSANNO" minimap2chain --help | head
-```
-
-```bash
 grep '^>' "$APP_FA" | head
-```
-
-```bash
 grep '^>' "$POLAR_FA" | head
 ```
 
-**Expected:** the Apennine FASTA contains `>Scaffold_25`; the polar FASTA contains NCBI contig accessions; all files are nonempty; and Transanno prints help text. If the bigWig is not present, the class can still discuss Steps 1–3 and then use the instructor's precomputed Apennine-coordinate score track from Step 5.
+**Expected:** the Apennine FASTA contains `>Scaffold_25`; the Ensembl polar FASTA contains `>AVOR...` accessions; all files are nonempty; and Transanno prints help text. If the bigWig is not present, the class can still discuss Steps 1–3 and then use the instructor's precomputed Apennine-coordinate score track from Step 5.
 
-### 1.2 — Align the two assemblies
+### 1.2 — Verify the bigWig assembly and sequence names
+
+**Purpose:** confirm that the polar FASTA and GERP bigWig use identical sequence identifiers before performing an expensive alignment. The assembly name alone is insufficient because RefSeq and GenBank releases of the same assembly can use different accessions.
+
+```bash
+bigWigInfo -chroms "$GERP_BW" | head -n 30
+```
+
+**Expected:** the summary reports thousands of sequences and the chromosome list begins with names such as `AVOR01003489.1`. These are GenBank accessions. `bigWigInfo` also confirms that the 7 GB file is a readable indexed bigWig rather than a truncated download.
+
+Create sorted name lists and verify that the two resources overlap:
+
+```bash
+bigWigInfo -chroms "$GERP_BW" |
+  awk '$2~/^[0-9]+$/ && $3~/^[0-9]+$/ {print $1}' |
+  sort -u > "$PREP/GERP_contigs.txt"
+
+grep '^>' "$POLAR_FA" |
+  sed 's/^>//; s/[[:space:]].*$//' |
+  sort -u > "$PREP/polar_FASTA_contigs.txt"
+
+printf 'Shared FASTA/bigWig contig names: '
+comm -12 "$PREP/polar_FASTA_contigs.txt" "$PREP/GERP_contigs.txt" |
+  wc -l
+
+comm -12 "$PREP/polar_FASTA_contigs.txt" "$PREP/GERP_contigs.txt" |
+  head
+```
+
+**Expected:** a positive shared count and names beginning with `AVOR`. A count of `0` means the headers are incompatible. Do not continue with alignment: use the Ensembl release 114 toplevel FASTA above or explicitly translate accessions with an assembly report.
+
+### 1.3 — Align the two assemblies
 
 **Purpose:** find corresponding segments between Apennine Scaffold_25 and the verified polar assembly. In minimap2, the **first FASTA is the target/destination** and the second is the query/source. The output is a PAF alignment, **not** yet a liftOver chain.
 
 ```bash
-minimap2 -cx asm20 --cs -t 2 "$POLAR_FA" "$APP_FA" \
+minimap2 -cx asm20 --cs -t 8 "$POLAR_FA" "$APP_FA" \
   > "$PREP/Apennine_to_polar.paf"
-```
-
-```bash
 head -n 2 "$PREP/Apennine_to_polar.paf"
 ```
 
-**Expected:** PAF rows whose first field is `Scaffold_25` and whose sixth field names a polar contig. `-c` requests base-level alignment and a CIGAR-like `cg` tag; `--cs` writes detailed substitutions and gaps; `-t 2` uses eight threads.
+**Expected:** PAF rows whose first field is `Scaffold_25` and whose sixth field names a polar contig. `-c` requests base-level alignment and a CIGAR-like `cg` tag; `--cs` writes detailed substitutions and gaps; `-t 8` uses eight threads.
 
 `asm20` is a bundle of assembly-alignment parameters, not an instruction that the genomes differ by exactly 20% and not a hard divergence filter. Among the assembly presets, `asm5` is the strictest for highly similar assemblies, `asm10` is intermediate, and `asm20` is the most permissive. We use `asm20` to maintain sensitivity in a cross-species brown-bear-to-polar-bear alignment. Reasonable alternatives are:
 
@@ -113,9 +130,9 @@ head -n 2 "$PREP/Apennine_to_polar.paf"
 
 Do not select a preset simply because it maps the most bases: permissive settings can also increase paralogous or repetitive mappings. Compare the uniquely lifted fraction and spot-check loci. The [minimap2 documentation](https://github.com/lh3/minimap2) describes `asm5` for intra-species assembly alignment and recommends tuning assembly presets to cross-species divergence.
 
-**Check:** an empty PAF means there is no usable alignment.
+**Check:** an empty PAF means there is no usable alignment, not that GERP scores are zero.
 
-### 1.3 — Convert the alignment to a chain
+### 1.4 — Convert the alignment to a chain
 
 **Purpose:** convert the pairwise assembly alignment into the coordinate-mapping format read by `liftOver`.
 
@@ -156,18 +173,13 @@ head -n 8 "$PREP/Apennine_to_polar.chain"
 Count the chains and inspect their sequence names:
 
 ```bash
-grep -c '^chain[[:space:]]' \
-  "$PREP/Apennine_to_polar.chain"
+grep -c '^chain[[:space:]]' "$PREP/Apennine_to_polar.chain"
+grep '^chain[[:space:]]' "$PREP/Apennine_to_polar.chain" | head
 ```
 
-```bash
-grep '^chain[[:space:]]' \
-  "$PREP/Apennine_to_polar.chain" |
-  head
-```
+`[[:space:]]` deliberately accepts either a tab or a space after `chain`. Transanno commonly writes tab-delimited chain headers, so `grep '^chain '` can incorrectly report zero even when the chain file is valid.
 
 **Check:** the existence of a chain does not prove that its direction is correct. Before processing all SNPs, test a few Apennine BED intervals. The chain used in Step 3 must accept **Apennine** coordinates and emit **polar** coordinates. If every test interval is unmapped, inspect the header and the minimap2/Transanno source–destination convention rather than reversing labels blindly. Also confirm that sequence names and sizes agree with the corresponding FASTA indexes. Confirm the installed syntax with `"$TRANSANNO" minimap2chain --help`. [Transanno documentation](https://github.com/informationsea/transanno).
-
 
 ## Step 2 — Make a named BED file of VCF SNPs
 
@@ -193,9 +205,6 @@ bcftools query -f '%CHROM\t%POS\n' "$VCF" |
 
 ```bash
 head "$PREP/Apennine_sites.bed"
-```
-
-```bash
 wc -l "$PREP/Apennine_sites.bed"
 ```
 
@@ -435,9 +444,6 @@ mkdir -p "$OUTDIR"
 ```bash
 awk -F'\t' 'BEGIN{OFS="\t"} NR>1 && $2~/^[0-9]+$/ {print $1,$2-1,$2,$3,$4,$5}' "$GT" \
   > "$OUTDIR/genoloader_sites.bed"
-
-
-```bash
 head "$OUTDIR/genoloader_sites.bed"
 ```
 
@@ -461,9 +467,6 @@ bedtools intersect \
 
 ```bash
 wc -l "$OUTDIR/genoloader_sites.bed" "$OUTDIR/sites_with_gerp.tsv"
-```
-
-```bash
 head "$OUTDIR/sites_with_gerp.tsv"
 ```
 
@@ -484,9 +487,7 @@ head "$OUTDIR/sites_with_gerp.tsv"
 ```bash
 ABB_LIST="$COURSE_DIR/data/ABB.samples"
 SBB_LIST="$COURSE_DIR/data/SBB.samples"
-```
 
-```bash
 python scripts/plot_gerp_genotypes.py \
   "$GERP" \
   "$GT" \
@@ -515,9 +516,7 @@ ls -lh \
   "$OUTDIR/GERP_derived_scores_by_sample.tsv" \
   "$OUTDIR/GERP_ABB_SBB_Scaffold_25_score_distribution.pdf" \
   "$OUTDIR/GERP_ABB_SBB_Scaffold_25_derived_genotype_scores.pdf"
-```
 
-```bash
 head "$OUTDIR/GERP_derived_scores_by_sample.tsv"
 ```
 
