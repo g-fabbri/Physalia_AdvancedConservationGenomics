@@ -130,7 +130,7 @@ head -n 1 "$PREP/Apennine_to_polar.chain"
 
 **Expected:** a non-empty chain beginning with `chain`. 
 
-**Check:** compare the chain header with both FASTAs and test a few known loci: the chain must accept **Apennine** positions and emit **polar** positions. Do not swap file labels simply to make the command finish. Confirm the installed syntax with `"$TRANSANNO" minimap2-to-chain --help`. [Transanno documentation](https://github.com/informationsea/transanno).
+**Check:** compare the chain header with both FASTAs and test a few known loci: the chain must accept **Apennine** positions and emit **polar** positions. Confirm the installed syntax with `"$TRANSANNO" minimap2chain --help`. [Transanno documentation](https://github.com/informationsea/transanno).
 
 ## Step 2 — Make a named BED file of VCF SNPs
 
