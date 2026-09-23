@@ -115,22 +115,53 @@ Do not select a preset simply because it maps the most bases: permissive setting
 
 **Check:** an empty PAF means there is no usable alignment.
 
-### 1.3 — Convert the alignment to a chain
+1.3 — Convert the alignment to a chain
 
-**Purpose:** create the coordinate-mapping file that liftOver will use.
+**Purpose:** convert the pairwise assembly alignment into the coordinate-mapping format read by `liftOver`.
+
+A **UCSC chain file** describes how continuous blocks in one assembly correspond to blocks in another assembly. It does not contain DNA sequences or GERP scores. Instead, it records chromosome names, coordinate ranges, strand orientation, aligned-block sizes, and the gaps between successive blocks. `liftOver` follows this map to translate an interval from one coordinate system to the other.
+
+Each alignment starts with a header shaped like this:
+
+```text
+chain score tName tSize tStrand tStart tEnd qName qSize qStrand qStart qEnd id
+```
+
+The fields mean:
+
+- `score`: an alignment score used to rank chains; it is not a GERP score;
+- `tName`, `tSize`, `tStart`, `tEnd`: target sequence name, total length, and covered range;
+- `qName`, `qSize`, `qStart`, `qEnd`: query sequence name, total length, and covered range;
+- `tStrand` and `qStrand`: alignment orientation; a minus query strand indicates a reverse-complement mapping;
+- `id`: an identifier for that chain.
+
+Coordinates in the chain format are zero-based and half-open. After the header come one or more block lines:
+
+```text
+size  dt  dq
+size  dt  dq
+size
+```
+
+`size` is the length of an aligned block; `dt` is the gap before the next block in the target; and `dq` is the corresponding gap in the query. The final block contains only its size. A chain file can contain many chains because one scaffold may align in several segments or to several destination contigs.
 
 ```bash
 "$TRANSANNO" minimap2chain "$PREP/Apennine_to_polar.paf" \
   --output "$PREP/Apennine_to_polar.chain"
+head -n 8 "$PREP/Apennine_to_polar.chain"
 ```
+
+**Expected:** a non-empty file containing one or more headers beginning with `chain`, followed by numeric alignment-block lines. The header should contain an Apennine scaffold name and a polar-bear contig accession from the two FASTAs.
+
+Count the chains and inspect their sequence names:
 
 ```bash
-head -n 1 "$PREP/Apennine_to_polar.chain"
+grep -c '^chain ' "$PREP/Apennine_to_polar.chain"
+grep '^chain ' "$PREP/Apennine_to_polar.chain" | head
 ```
 
-**Expected:** a non-empty chain beginning with `chain`. 
+**Check:** the existence of a chain does not prove that its direction is correct. Before processing all SNPs, test a few Apennine BED intervals. The chain used in Step 3 must accept **Apennine** coordinates and emit **polar** coordinates. If every test interval is unmapped, inspect the header and the minimap2/Transanno source–destination convention rather than reversing labels blindly. Also confirm that sequence names and sizes agree with the corresponding FASTA indexes. Confirm the installed syntax with `"$TRANSANNO" minimap2chain --help`. [Transanno documentation](https://github.com/informationsea/transanno).
 
-**Check:** compare the chain header with both FASTAs and test a few known loci: the chain must accept **Apennine** positions and emit **polar** positions. Confirm the installed syntax with `"$TRANSANNO" minimap2chain --help`. [Transanno documentation](https://github.com/informationsea/transanno).
 
 ## Step 2 — Make a named BED file of VCF SNPs
 
