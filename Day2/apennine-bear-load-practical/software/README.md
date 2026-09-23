@@ -24,7 +24,7 @@ This installs:
 - Python with Matplotlib, Java, Git, `wget`, and `unzip`;
 - a C++ compiler;
 - Minimap2 and Transanno;
-- UCSC `liftOver` and `bigWigToBedGraph`.
+- UCSC `liftOver`, `bigWigInfo`, and `bigWigToBedGraph`.
 
 Transanno is installed directly from [Bioconda](https://bioconda.github.io/recipes/transanno/README.html) by `environment.yml`; it does not require a separate manual download. If Conda is unavailable, releases and source-build instructions are provided by the [official Transanno repository](https://github.com/informationsea/transanno).
 
@@ -41,7 +41,7 @@ Check the commands:
 
 ```bash
 command -v bcftools bedtools samtools python java
-command -v minimap2 transanno liftOver bigWigToBedGraph
+command -v minimap2 transanno liftOver bigWigInfo bigWigToBedGraph
 ```
 
 ## 2. Download SnpEff
@@ -103,10 +103,10 @@ The GERP analysis requires more than the four command-line programs. The instruc
 
    [gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw)
 
-2. The **UrsMar_1.0 polar-bear reference FASTA** matching the coordinates in that bigWig, from the [NCBI UrsMar_1.0 assembly directory](https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/225/GCF_000687225.1_UrsMar_1.0/):
+2. The **Ensembl release 114 UrsMar_1.0 toplevel FASTA** matching the `AVOR...` sequence names in that bigWig, from the [polar-bear DNA directory](https://ftp.ensembl.org/pub/release-114/fasta/ursus_maritimus/dna/):
 
    ```text
-   data/GCF_000687225.1_UrsMar_1.0_genomic.fna
+   data/Ursus_maritimus.UrsMar_1.0.dna.toplevel.fa
    ```
 
 3. The prepared Apennine Scaffold_25 FASTA from the reference used to call the teaching VCF:
@@ -121,7 +121,7 @@ The GERP analysis requires more than the four command-line programs. The instruc
    data/Bears_4pops_s25.vcf.gz.csi
    ```
 
-5. Minimap2, Transanno, UCSC `liftOver`, and UCSC `bigWigToBedGraph`, already installed through `environment.yml`.
+5. Minimap2, Transanno, UCSC `liftOver`, `bigWigInfo`, and `bigWigToBedGraph`, already installed through `environment.yml`.
 
 The bigWig is approximately 7 GB and should be downloaded only once. Students do not need their own copy if the instructor prepares and distributes:
 
@@ -139,7 +139,7 @@ conda activate bear-load-practical
 COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
 
-command -v bcftools bedtools samtools minimap2 transanno liftOver bigWigToBedGraph
+command -v bcftools bedtools samtools minimap2 transanno liftOver bigWigInfo bigWigToBedGraph
 java -version
 ls -lh software/snpEff/snpEff.jar
 ls -lh software/genoloader/genoloader
