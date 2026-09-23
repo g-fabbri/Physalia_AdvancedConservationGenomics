@@ -62,9 +62,15 @@ HIGH, missense, and synonymous burden proxies by individual
 
 ~~~bash
 cat "$BLB_LIST" "$POB_LIST" | sort -u > "$OUTDIR/outgroups.samples"
+~~~
+
+~~~bash
 N_ABB=$(wc -l < "$ABB_LIST")
 N_SBB=$(wc -l < "$SBB_LIST")
 N_OUT=$(wc -l < "$OUTDIR/outgroups.samples")
+~~~
+
+~~~bash
 printf 'ABB=%s SBB=%s outgroups=%s\n' "$N_ABB" "$N_SBB" "$N_OUT"
 ~~~
 
