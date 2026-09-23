@@ -98,16 +98,17 @@ The GERP analysis requires more than the four command-line programs. The instruc
 
    [gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw)
 
-2. The **UrsMar_1.0 polar-bear reference FASTA** matching the coordinates in that bigWig.
-3. The exact **Apennine reference FASTA** used to call the teaching VCF.
-4. The indexed Scaffold_25 teaching VCF:
+2. The **UrsMar_1.0 polar-bear reference FASTA** matching the coordinates in that bigWig:
+   [https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/687/225/GCF_000687225.1_UrsMar_1.0]
+4. The exact **Apennine reference FASTA** used to call the teaching VCF.
+5. The indexed Scaffold_25 VCF:
 
    ```text
    data/Bears_4pops_s25.vcf.gz
    data/Bears_4pops_s25.vcf.gz.csi
    ```
 
-5. Minimap2, Transanno, UCSC `liftOver`, and UCSC `bigWigToBedGraph`, already installed through `environment.yml`.
+6. Minimap2, Transanno, UCSC `liftOver`, and UCSC `bigWigToBedGraph`, already installed through `environment.yml`.
 
 The bigWig is approximately 7 GB and should be downloaded only once. Students do not need their own copy if the instructor prepares and distributes:
 
