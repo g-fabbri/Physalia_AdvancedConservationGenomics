@@ -1,6 +1,5 @@
 # Part 2 — Which alleles are derived, and who carries them?
 
-Estimated terminal time: 35 minutes.
 
 ## Start your terminal
 
@@ -10,6 +9,9 @@ From the Day 2 directory containing `data/`, `software/`, and `results/`, run th
 conda activate bear-load-practical
 COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
+```
+
+```bash
 OUTDIR="$COURSE_DIR/results/genoloader"
 ANNOTATED="$COURSE_DIR/results/snpeff/Bears_4pops_s25.ann.vcf"
 ABB_LIST="$COURSE_DIR/data/ABB.samples"
