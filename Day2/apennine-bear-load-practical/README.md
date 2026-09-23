@@ -8,21 +8,6 @@ An allele annotated `HIGH` or `MODERATE` is **not** a measured fitness effect. A
 
 The timed analysis uses **Scaffold_25 only**, from `data/Bears_4pops_s25.vcf.gz`. All site counts and burdens refer to that scaffold, not to the whole genome. `POB` is the sample-list label for polar bears.
 
-## Schedule (3 hours; about 90 minutes at the terminal)
-
-| Time | Theory and practical, alternated |
-|---|---|
-| 00:00–00:25 | Genetic load, recessive versus additive effects, and why bottlenecks matter |
-| 00:25–00:35 | [Orient to the four-species VCF](lessons/00-inputs.md) |
-| 00:35–01:00 | Variant consequences and annotation uncertainty |
-| 01:00–01:20 | [Inspect SnpEff annotations](lessons/01-snpeff.md) |
-| 01:20–01:30 | Break |
-| 01:30–01:55 | Ancestral-state polarization, outgroup disagreement, and introgression |
-| 01:55–02:30 | [Polarize and compare burdens with GenoLoader](lessons/02-genoloader.md) |
-| 02:30–02:45 | Interpret ABB–SBB differences and discuss limitations |
-| 02:45–03:00 | Core synthesis and questions; **if time allows**, start the [optional GERP extension](lessons/03-gerp.md) |
-
-The core practical ends after GenoLoader and the synthesis discussion. GERP is **not required** for completing Day 2; its preparation and commands can also be used later as a follow-up exercise.
 
 ## Instructor preparation and missing local details
 
