@@ -139,6 +139,15 @@ Do not select a preset simply because it maps the most bases: permissive setting
 
 **Purpose:** convert the pairwise assembly alignment into the coordinate-mapping format read by `liftOver`.
 
+```bash
+"$TRANSANNO" minimap2chain "$PREP/Apennine_to_polar.paf" \
+  --output "$PREP/Apennine_to_polar.chain"
+```
+
+```bash
+head -n 8 "$PREP/Apennine_to_polar.chain"
+```
+
 A **UCSC chain file** describes how continuous blocks in one assembly correspond to blocks in another assembly. It does not contain DNA sequences or GERP scores. Instead, it records chromosome names, coordinate ranges, strand orientation, aligned-block sizes, and the gaps between successive blocks. `liftOver` follows this map to translate an interval from one coordinate system to the other.
 
 Each alignment starts with a header shaped like this:
@@ -165,11 +174,7 @@ size
 
 `size` is the length of an aligned block; `dt` is the gap before the next block in the target; and `dq` is the corresponding gap in the query. The final block contains only its size. A chain file can contain many chains because one scaffold may align in several segments or to several destination contigs.
 
-```bash
-"$TRANSANNO" minimap2chain "$PREP/Apennine_to_polar.paf" \
-  --output "$PREP/Apennine_to_polar.chain"
-head -n 8 "$PREP/Apennine_to_polar.chain"
-```
+
 
 **Expected:** a non-empty file containing one or more headers beginning with `chain`, followed by numeric alignment-block lines. The header should contain an Apennine scaffold name and a polar-bear contig accession from the two FASTAs.
 
