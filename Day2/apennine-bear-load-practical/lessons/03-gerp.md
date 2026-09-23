@@ -28,7 +28,7 @@ The score track for this exercise is Ensembl release 114's [91-mammal GERP bigWi
 
 **Input:** the exact Apennine VCF-reference FASTA, the polar score-reference FASTA, minimap2, and Transanno. [Part 0](00-inputs.md) checks the matching `data/Bears_4pops_s25.vcf.gz`. If that file is absent, extract Scaffold_25 from the verified, indexed **genome-wide four-population VCF** before class; do not extract from a VCF containing a different scaffold.
 
-### 1.1 — Prepare the teaching VCF only if it is missing
+### 1.1 — Prepare the VCF only if it is missing
 
 **Purpose:** make a one-scaffold input without changing allele-frequency filters. Skip this substep when the verified teaching VCF is already present.
 
