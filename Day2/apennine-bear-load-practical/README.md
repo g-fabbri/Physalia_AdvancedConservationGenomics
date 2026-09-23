@@ -2,16 +2,16 @@
 
 ## The question
 
-Day 1 asked whether Apennine (ABB) and Slovak (SBB) brown bears have different demographic histories. Today we ask whether they carry different **burdens of putatively damaging derived alleles**. Black bears (BLB) and polar bears (POB) provide outgroup information for deciding which allele is likely ancestral. Functional effects come from SnpEff; GenoLoader polarizes genotypes and records derived-allele dosage. A GERP conservation-score comparison is an optional extension.
+Day 1 asked whether Apennine (ABB) and Slovak (SBB) brown bears have different demographic histories. Today we ask whether they carry different **burdens of putatively deleterious derived alleles**. Black bears (BLB) and polar bears (POB) provide outgroup information for deciding which allele is likely ancestral. Functional effects come from SnpEff; GenoLoader polarizes genotypes and records derived-allele dosage. A GERP conservation-score comparison is an optional extension.
 
 An allele annotated `HIGH` or `MODERATE` is **not** a measured fitness effect. A larger derived-allele count is not automatically a larger realized load. Keep prediction, ancestry, genotype state, and fitness distinct throughout.
 
-The timed analysis uses **Scaffold_25 only**, from `data/Bears_4pops_s25.vcf.gz`. All site counts and burdens refer to that scaffold, not to the whole genome. `POB` is the sample-list label for polar bears.
+The timed analysis uses **Scaffold_25 only**, from `data/Bears_4pops_s25.vcf.gz`. All site counts and burdens refer to that scaffold, not to the whole genome.
 
 
-## Instructor preparation and missing local details
+## Preparation and missing local details
 
-This is a **draft with explicit input placeholders**, not yet a tested runnable lesson. Before class, supply:
+Before class, supply:
 
 - `data/Bears_4pops_s25.vcf.gz` and its `.csi` index; confirm it contains only biallelic SNPs on Scaffold_25 before GenoLoader;
 - the four actual lists `data/ABB.samples`, `data/SBB.samples`, `data/BLB.samples`, and `data/POB.samples`;
@@ -24,5 +24,5 @@ The four sample-list filenames follow the supplied Jarvis `day02/data/` listing.
 
 ## Begin
 
-Before class, follow the [software installation and verification guide](software/README.md). It installs the core tools and the four commands used by the optional GERP lesson for every student. Then start with [the input and sample check](lessons/00-inputs.md) and record outputs in the [answer sheet](answers/student_answers.md).
+Before class, follow the [software installation and verification guide](software/README.md). It installs the core tools and the four commands used by the optional GERP lesson for every student. Then start with [the input and sample check](lessons/00-inputs.md).
 
