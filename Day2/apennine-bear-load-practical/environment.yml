@@ -12,6 +12,7 @@ dependencies:
   - samtools
   - transanno
   - ucsc-bigwigtobedgraph
+  - ucsc-bigwiginfo
   - ucsc-liftover
   - python=3.11
   - matplotlib
