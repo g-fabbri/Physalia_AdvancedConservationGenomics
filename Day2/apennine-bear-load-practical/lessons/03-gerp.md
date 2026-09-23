@@ -377,7 +377,7 @@ bedtools intersect \
 head "$PREP/sites_with_polar_scores.tsv"
 ```
 
-**Expected:** eight columns: the four mapped-site columns followed by four polar bedGraph columns. Column 4 is the original Apennine site ID and column 8 the GERP score.
+**Expected:** eight columns: the four mapped-site columns followed by four polar bedGraph columns. Column 4 is the original Apennine site ID and column 9 the GERP score.
 
 **Check:** `bigWigToBedGraph` reporting an unknown chromosome indicates a likely assembly or contig-name mismatch. Missing values are not zero. Check for sites matching more than one score interval.
 
