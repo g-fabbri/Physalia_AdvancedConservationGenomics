@@ -163,7 +163,7 @@ axes[0].set_ylabel("Number of scored SNPs")
 axes[0].set_title("All retained sites")
 
 box_values = [site_scores[effect] for effect in impact_classes]
-axes[1].boxplot(box_values, labels=impact_classes, showfliers=False)
+axes[1].boxplot(box_values, tick_labels=impact_classes, showfliers=False)
 axes[1].axhline(0, color="black", linestyle="--", linewidth=1)
 axes[1].set_ylabel("GERP score")
 axes[1].set_title("Scores by SnpEff impact")
