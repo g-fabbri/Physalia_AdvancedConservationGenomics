@@ -394,12 +394,15 @@ head "$PREP/sites_with_polar_scores.tsv"
 ```bash
 awk 'BEGIN{OFS="\t"}
      $8 ~ /^-?[0-9]+([.][0-9]+)?([eE][-+]?[0-9]+)?$/ {
-       n[$4]++; score[$4]=$8
+       n[$4]++; score[$4]=$9
      }
      END {for(id in n) if(n[id]==1) {
        split(id,a,":"); print a[1],a[2]-1,a[2],score[id]
      }}' "$PREP/sites_with_polar_scores.tsv" |
   sort -k1,1 -k2,2n > "$PREP/GERP_on_Apennine_unique.bed"
+```
+
+```bash
 head "$PREP/GERP_on_Apennine_unique.bed"
 ```
 
@@ -411,6 +414,9 @@ Column 4 of the scored join still holds the **original** Apennine `Scaffold_25:p
 
 ```bash
 GERP="$OUTDIR/GERP_on_Apennine_unique.bed.gz"
+```
+
+```bash
 bgzip -c "$PREP/GERP_on_Apennine_unique.bed" > "$GERP"
 tabix -f -p bed "$GERP"
 ```
