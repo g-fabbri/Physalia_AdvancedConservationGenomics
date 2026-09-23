@@ -504,19 +504,19 @@ python scripts/plot_gerp_genotypes.py \
   "$GT" \
   "$ABB_LIST" \
   "$SBB_LIST" \
-  "$OUTDIR/GERP_derived_scores_by_sample.tsv" \
+  "$OUTDIR/GERP_derived_sites_GERP_gt4_by_sample.tsv" \
   "$OUTDIR/GERP_ABB_SBB_Scaffold_25"
 ```
 
 The script keeps GenoLoader rows whose polarization flag begins with `unfolded` or is `allFix`, matches them to unique GERP-scored positions, and separates the SnpEff classes `MODIFIER`, `LOW`, `MODERATE`, and `HIGH`.
 
-For the genotype-weighted summaries, a positive GERP score is treated as evidence of constraint:
+For the genotype summaries, the script retains sites with a GERP score **strictly greater than 4** and counts their derived genotypes:
 
-- a heterozygous derived genotype contributes `1 × GERP`;
-- a homozygous derived genotype contributes `2 × GERP`;
-- total contribution is the sum of the heterozygous and homozygous-derived components.
+- dosage `1` is counted as one heterozygous derived site;
+- dosage `2` is counted as one homozygous-derived site;
+- total derived sites are heterozygous plus homozygous-derived sites.
 
-Negative scores remain visible in the distribution plot but are set to zero in the genotype-weighted summary. This prevents unconstrained scores from cancelling positive constraint, but it is an explicit teaching choice rather than a universal definition of genetic load.
+The homozygous category counts **sites**, not derived allele copies: a `2/2` derived dosage is one homozygous-derived site. The cutoff of 4 selects strongly constrained positions for this teaching comparison, but it is an analytical threshold rather than a universal boundary between neutral and deleterious variants.
 
 ### 7.2 — Inspect the outputs
 
@@ -524,18 +524,18 @@ Negative scores remain visible in the distribution plot but are set to zero in t
 
 ```bash
 ls -lh \
-  "$OUTDIR/GERP_derived_scores_by_sample.tsv" \
+  "$OUTDIR/GERP_derived_sites_GERP_gt4_by_sample.tsv" \
   "$OUTDIR/GERP_ABB_SBB_Scaffold_25_score_distribution.pdf" \
-  "$OUTDIR/GERP_ABB_SBB_Scaffold_25_derived_genotype_scores.pdf"
+  "$OUTDIR/GERP_ABB_SBB_Scaffold_25_derived_sites_GERP_gt4.pdf"
 
-head "$OUTDIR/GERP_derived_scores_by_sample.tsv"
+head "$OUTDIR/GERP_derived_sites_GERP_gt4_by_sample.tsv"
 ```
 
 **Expected outputs:**
 
-- `GERP_derived_scores_by_sample.tsv` contains population, individual, impact class, number of called/scored sites, derived-copy count, heterozygous contribution, homozygous-derived contribution, total contribution, and total per called/scored site;
-- `..._score_distribution.pdf` shows the raw GERP distribution at retained SNPs and compares scores among SnpEff impact classes;
-- `..._derived_genotype_scores.pdf` shows individual ABB and SBB values for heterozygous, homozygous-derived, and total positive-GERP contributions. Points are individuals and horizontal lines are population means.
+- `GERP_derived_sites_GERP_gt4_by_sample.tsv` contains population, individual, impact class, number of called/scored sites, derived-copy count, heterozygous derived sites above the threshold, homozygous-derived sites above the threshold, their total, and the total divided by called/scored sites;
+- `..._score_distribution.pdf` shows the raw GERP distribution at retained SNPs, marks the cutoff of 4, and compares scores among SnpEff impact classes;
+- `..._derived_sites_GERP_gt4.pdf` shows individual ABB and SBB counts for heterozygous, homozygous-derived, and total derived sites with GERP greater than 4. Points are individuals and horizontal lines are population means.
 
 ### 7.3 — Interpret the figures carefully
 
@@ -543,7 +543,7 @@ head "$OUTDIR/GERP_derived_scores_by_sample.tsv"
 
 A high positive GERP score means that a position is more conserved across the mammal alignment than expected under neutrality. It does **not** prove that the derived bear allele is deleterious. SnpEff impact and GERP answer different questions: SnpEff predicts how a variant changes an annotated transcript, while GERP measures long-term evolutionary constraint at that genomic position.
 
-In the derived-genotype figure, compare both the populations and the two genotype components. A larger homozygous-derived contribution can be especially informative in a small, inbred population because recessive alleles are more often exposed in homozygous form. However, the plotted value does not incorporate selection coefficients, dominance, gene expression, or actual fitness. It is best called a **constraint-weighted derived-allele summary**, not realized genetic load.
+In the derived-site figure, compare both populations and the two genotype components. More homozygous-derived sites at strongly constrained positions can be especially informative in a small, inbred population because recessive alleles are more often exposed in homozygous form. However, the plotted count does not incorporate selection coefficients, dominance, gene expression, or actual fitness. It is a count of derived genotypes at strongly constrained positions, not realized genetic load.
 
 **Check:** population differences can also arise from unequal numbers of called/scored sites. Use the `called_scored_sites` and `total_per_called_scored_site` columns before interpreting raw totals. Results from one scaffold are an illustration and must not be generalized automatically to the whole genome.
 
@@ -551,7 +551,7 @@ In the derived-genotype figure, compare both the populations and the two genotyp
 
 1. Do GERP distributions differ among MODIFIER, LOW, MODERATE, and HIGH sites? Should they necessarily follow the SnpEff ranking?
 2. Does an ABB–SBB contrast arise mainly from heterozygous or homozygous-derived contributions?
-3. Why are negative scores retained in the distribution but not subtracted from the positive-GERP derived summary?
+3. How would the result change if the GERP cutoff were 2, 3, or 5 instead of 4?
 4. Why are unscored or ambiguously mapped positions not assigned score zero?
 5. How could chain direction, assembly mismatch, or a one-base BED error produce convincing but wrong results?
 6. Why should these figures not be described as direct estimates of realized genetic load?
