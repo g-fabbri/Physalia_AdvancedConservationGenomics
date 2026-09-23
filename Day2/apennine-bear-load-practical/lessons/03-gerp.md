@@ -504,19 +504,19 @@ python scripts/plot_gerp_genotypes.py \
   "$GT" \
   "$ABB_LIST" \
   "$SBB_LIST" \
-  "$OUTDIR/GERP_derived_sites_GERP_gt4_by_sample.tsv" \
+  "$OUTDIR/GERP_derived_sites_GERP_gt2_by_sample.tsv" \
   "$OUTDIR/GERP_ABB_SBB_Scaffold_25"
 ```
 
-The script keeps GenoLoader rows whose polarization flag begins with `unfolded` or is `allFix`, matches them to unique GERP-scored positions, and separates the SnpEff classes `MODIFIER`, `LOW`, `MODERATE`, and `HIGH`.
+The script keeps GenoLoader rows whose polarization flag begins with `unfolded` or is `allFix` and matches them to unique GERP-scored positions. This summary does **not** separate sites by SnpEff effect: all annotated and reliably polarized sites are considered together.
 
-For the genotype summaries, the script retains sites with a GERP score **strictly greater than 4** and counts their derived genotypes:
+For the genotype summary, the script retains sites with a GERP score **strictly greater than 2** and counts their derived genotypes:
 
 - dosage `1` is counted as one heterozygous derived site;
 - dosage `2` is counted as one homozygous-derived site;
 - total derived sites are heterozygous plus homozygous-derived sites.
 
-The homozygous category counts **sites**, not derived allele copies: a `2/2` derived dosage is one homozygous-derived site. The cutoff of 4 selects strongly constrained positions for this teaching comparison, but it is an analytical threshold rather than a universal boundary between neutral and deleterious variants.
+The homozygous category counts **sites**, not derived allele copies: a homozygous-derived genotype is one site. We use 2 rather than 4 because Scaffold_25 contains relatively few polarized sites above 4. The cutoff remains an analytical teaching threshold, not a universal boundary between neutral and deleterious variants.
 
 ### 7.2 — Inspect the outputs
 
@@ -524,18 +524,18 @@ The homozygous category counts **sites**, not derived allele copies: a `2/2` der
 
 ```bash
 ls -lh \
-  "$OUTDIR/GERP_derived_sites_GERP_gt4_by_sample.tsv" \
+  "$OUTDIR/GERP_derived_sites_GERP_gt2_by_sample.tsv" \
   "$OUTDIR/GERP_ABB_SBB_Scaffold_25_score_distribution.pdf" \
-  "$OUTDIR/GERP_ABB_SBB_Scaffold_25_derived_sites_GERP_gt4.pdf"
+  "$OUTDIR/GERP_ABB_SBB_Scaffold_25_derived_sites_GERP_gt2.pdf"
 
-head "$OUTDIR/GERP_derived_sites_GERP_gt4_by_sample.tsv"
+head "$OUTDIR/GERP_derived_sites_GERP_gt2_by_sample.tsv"
 ```
 
 **Expected outputs:**
 
-- `GERP_derived_sites_GERP_gt4_by_sample.tsv` contains population, individual, impact class, number of called/scored sites, derived-copy count, heterozygous derived sites above the threshold, homozygous-derived sites above the threshold, their total, and the total divided by called/scored sites;
-- `..._score_distribution.pdf` shows the raw GERP distribution at retained SNPs, marks the cutoff of 4, and compares scores among SnpEff impact classes;
-- `..._derived_sites_GERP_gt4.pdf` shows individual ABB and SBB counts for heterozygous, homozygous-derived, and total derived sites with GERP greater than 4. Points are individuals and horizontal lines are population means.
+- `GERP_derived_sites_GERP_gt2_by_sample.tsv` contains one row per individual with population, number of called/scored sites, derived-copy count, heterozygous derived sites above the threshold, homozygous-derived sites above the threshold, their total, and the total divided by called/scored sites;
+- `..._score_distribution.pdf` shows the overall raw GERP distribution at retained SNPs and marks the cutoff of 2;
+- `..._derived_sites_GERP_gt2.pdf` is one plot with heterozygous, homozygous-derived, and total derived-site counts for ABB and SBB. Points are individuals and horizontal lines are population means. SnpEff effect classes are not used in this comparison.
 
 ### 7.3 — Interpret the figures carefully
 
@@ -549,11 +549,12 @@ In the derived-site figure, compare both populations and the two genotype compon
 
 ## Stop and discuss
 
-1. Do GERP distributions differ among MODIFIER, LOW, MODERATE, and HIGH sites? Should they necessarily follow the SnpEff ranking?
-2. Does an ABB–SBB contrast arise mainly from heterozygous or homozygous-derived contributions?
-3. How would the result change if the GERP cutoff were 2, 3, or 5 instead of 4?
+1. Does the ABB–SBB contrast arise mainly from heterozygous or homozygous-derived sites?
+2. Why might a small, inbred population have fewer heterozygous but more homozygous-derived constrained sites?
+3. How would the result change if the GERP cutoff were 1, 3, or 4 instead of 2?
 4. Why are unscored or ambiguously mapped positions not assigned score zero?
 5. How could chain direction, assembly mismatch, or a one-base BED error produce convincing but wrong results?
 6. Why should these figures not be described as direct estimates of realized genetic load?
 
 Record your interpretation in the [answer sheet](../answers/student_answers.md).
+
