@@ -219,7 +219,44 @@ liftOver -multiple "$PREP/Apennine_sites.bed" \
   "$PREP/polar_sites_all.bed" "$PREP/unmapped.bed"
 ```
 
-The two outputs have different meanings: `polar_sites_all.bed` contains mapped coordinates, while `unmapped.bed` records failures and reasons. 
+The two outputs have different meanings: `polar_sites_all.bed` contains mapped coordinates, while `unmapped.bed` records failures and reasons. A single input site may have multiple mapped rows, which is why we have **not** called this file unique.
+
+Multiple mappings can occur when an Apennine interval aligns to more than one polar region. Common causes include repetitive sequence, recent segmental duplication, paralogous regions, retained haplotigs or alternate assembly sequence, and overlapping primary/secondary chains produced by the assembly alignment. The permissive `asm20` preset can also retain more weak or repeated matches. These alternatives are useful to expose during quality control, but they do not tell us which polar position carries the orthologous GERP score. We therefore exclude them from this conservative exercise.
+
+Check that both output files were created and inspect their structure:
+
+```bash
+ls -lh "$PREP/polar_sites_all.bed" "$PREP/unmapped.bed"
+head "$PREP/polar_sites_all.bed"
+grep -v '^#' "$PREP/unmapped.bed" | head
+```
+
+The mapped file should contain polar contig names in columns 1–3 and the original Apennine site ID in column 4. The unmapped file may contain comment lines beginning with `#`, followed by the original BED record.
+
+Summarize the result before filtering:
+
+```bash
+printf 'Input sites: '
+wc -l < "$PREP/Apennine_sites.bed"
+
+printf 'Mapped output rows: '
+wc -l < "$PREP/polar_sites_all.bed"
+
+printf 'Distinct mapped input IDs: '
+cut -f4 "$PREP/polar_sites_all.bed" | sort -u | wc -l
+
+printf 'Distinct unmapped input IDs: '
+grep -v '^#' "$PREP/unmapped.bed" | cut -f4 | sort -u | wc -l
+
+printf 'Input IDs with multiple mapped rows: '
+awk '{n[$4]++} END{for(id in n) if(n[id]>1) multiple++;
+     print multiple+0}' "$PREP/polar_sites_all.bed"
+
+printf 'Mapped rows not one base wide: '
+awk '$3-$2!=1 {n++} END{print n+0}' "$PREP/polar_sites_all.bed"
+```
+
+**Expected:** mapped plus unmapped distinct input IDs should approximately account for the original input sites. The number of mapped rows can exceed the number of distinct mapped IDs when `-multiple` finds alternatives. If nearly everything is unmapped, first suspect chain direction or sequence-name incompatibility rather than a biological absence of conservation.
 
 ### 3.2 — Retain unambiguous one-base mappings
 
@@ -232,6 +269,26 @@ awk 'BEGIN{OFS="\t"} {n[$4]++; line[$4]=$0}
   awk 'BEGIN{OFS="\t"} $3-$2==1 {print}' |
   sort -k1,1 -k2,2n > "$PREP/polar_sites_unique.bed"
 ```
+
+The first `awk` retains only IDs represented by exactly one mapped row. The second requires the lifted interval to remain exactly one base wide. The final `sort` orders the retained sites by polar contig and coordinate.
+
+Check the filtered file immediately:
+
+```bash
+ls -lh "$PREP/polar_sites_unique.bed"
+head "$PREP/polar_sites_unique.bed"
+
+printf 'Retained unique one-base sites: '
+wc -l < "$PREP/polar_sites_unique.bed"
+
+printf 'Duplicate IDs remaining: '
+cut -f4 "$PREP/polar_sites_unique.bed" | sort | uniq -d | wc -l
+
+printf 'Non-one-base intervals remaining: '
+awk '$3-$2!=1 {n++} END{print n+0}' "$PREP/polar_sites_unique.bed"
+```
+
+**Expected:** the last two checks both print `0`. The retained count should be no greater than the number of distinct mapped input IDs.
 
 ### 3.3 — Measure mapping losses
 
