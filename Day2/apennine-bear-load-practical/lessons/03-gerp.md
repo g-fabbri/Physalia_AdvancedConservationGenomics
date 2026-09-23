@@ -95,7 +95,7 @@ grep '^>' "$POLAR_FA" | head
 **Purpose:** find corresponding segments between Apennine Scaffold_25 and the verified polar assembly. In minimap2, the **first FASTA is the target/destination** and the second is the query/source. The output is a PAF alignment, **not** yet a liftOver chain.
 
 ```bash
-minimap2 -cx asm20 --cs -t 8 "$POLAR_FA" "$APP_FA" \
+minimap2 -cx asm20 --cs -t 2 "$POLAR_FA" "$APP_FA" \
   > "$PREP/Apennine_to_polar.paf"
 ```
 
@@ -103,7 +103,7 @@ minimap2 -cx asm20 --cs -t 8 "$POLAR_FA" "$APP_FA" \
 head -n 2 "$PREP/Apennine_to_polar.paf"
 ```
 
-**Expected:** PAF rows whose first field is `Scaffold_25` and whose sixth field names a polar contig. `-c` requests base-level alignment and a CIGAR-like `cg` tag; `--cs` writes detailed substitutions and gaps; `-t 8` uses eight threads.
+**Expected:** PAF rows whose first field is `Scaffold_25` and whose sixth field names a polar contig. `-c` requests base-level alignment and a CIGAR-like `cg` tag; `--cs` writes detailed substitutions and gaps; `-t 2` uses eight threads.
 
 `asm20` is a bundle of assembly-alignment parameters, not an instruction that the genomes differ by exactly 20% and not a hard divergence filter. Among the assembly presets, `asm5` is the strictest for highly similar assemblies, `asm10` is intermediate, and `asm20` is the most permissive. We use `asm20` to maintain sensitivity in a cross-species brown-bear-to-polar-bear alignment. Reasonable alternatives are:
 
@@ -113,7 +113,7 @@ head -n 2 "$PREP/Apennine_to_polar.paf"
 
 Do not select a preset simply because it maps the most bases: permissive settings can also increase paralogous or repetitive mappings. Compare the uniquely lifted fraction and spot-check loci. The [minimap2 documentation](https://github.com/lh3/minimap2) describes `asm5` for intra-species assembly alignment and recommends tuning assembly presets to cross-species divergence.
 
-**Check:** an empty PAF means there is no usable alignment, not that GERP scores are zero.
+**Check:** an empty PAF means there is no usable alignment.
 
 ### 1.3 — Convert the alignment to a chain
 
