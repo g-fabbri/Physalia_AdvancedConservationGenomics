@@ -547,15 +547,6 @@ In the derived-site figure, compare both populations and the two genotype compon
 
 **Check:** population differences can also arise from unequal numbers of called/scored sites. Use the `called_scored_sites` and `total_per_called_scored_site` columns before interpreting raw totals. Results from one scaffold are an illustration and must not be generalized automatically to the whole genome.
 
-## Stop and discuss
 
-1. Does the ABB–SBB contrast arise mainly from heterozygous or homozygous-derived sites?
-2. Why might a small, inbred population have fewer heterozygous but more homozygous-derived constrained sites?
-3. How would the result change if the GERP cutoff were 1, 3, or 4 instead of 2?
-4. Why are unscored or ambiguously mapped positions not assigned score zero?
-5. How could chain direction, assembly mismatch, or a one-base BED error produce convincing but wrong results?
-6. Why should these figures not be described as direct estimates of realized genetic load?
-
-Record your interpretation in the [answer sheet](../answers/student_answers.md).
 
 
