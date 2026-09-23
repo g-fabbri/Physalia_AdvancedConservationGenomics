@@ -1,6 +1,5 @@
 # Part 0 — Meet the four-species dataset
 
-Estimated terminal time: 10 minutes.
 
 ## Start your terminal
 
