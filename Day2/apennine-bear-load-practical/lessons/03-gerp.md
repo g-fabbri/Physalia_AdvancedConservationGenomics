@@ -375,6 +375,9 @@ mkdir -p "$OUTDIR"
 ```bash
 awk -F'\t' 'BEGIN{OFS="\t"} NR>1 && $2~/^[0-9]+$/ {print $1,$2-1,$2,$3,$4,$5}' "$GT" \
   > "$OUTDIR/genoloader_sites.bed"
+
+
+```bash
 head "$OUTDIR/genoloader_sites.bed"
 ```
 
@@ -398,6 +401,9 @@ bedtools intersect \
 
 ```bash
 wc -l "$OUTDIR/genoloader_sites.bed" "$OUTDIR/sites_with_gerp.tsv"
+```
+
+```bash
 head "$OUTDIR/sites_with_gerp.tsv"
 ```
 
@@ -418,7 +424,9 @@ head "$OUTDIR/sites_with_gerp.tsv"
 ```bash
 ABB_LIST="$COURSE_DIR/data/ABB.samples"
 SBB_LIST="$COURSE_DIR/data/SBB.samples"
+```
 
+```bash
 python scripts/plot_gerp_genotypes.py \
   "$GERP" \
   "$GT" \
@@ -447,7 +455,9 @@ ls -lh \
   "$OUTDIR/GERP_derived_scores_by_sample.tsv" \
   "$OUTDIR/GERP_ABB_SBB_Scaffold_25_score_distribution.pdf" \
   "$OUTDIR/GERP_ABB_SBB_Scaffold_25_derived_genotype_scores.pdf"
+```
 
+```bash
 head "$OUTDIR/GERP_derived_scores_by_sample.tsv"
 ```
 
