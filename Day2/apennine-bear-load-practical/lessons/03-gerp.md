@@ -156,8 +156,14 @@ head -n 8 "$PREP/Apennine_to_polar.chain"
 Count the chains and inspect their sequence names:
 
 ```bash
-grep -c '^chain ' "$PREP/Apennine_to_polar.chain"
-grep '^chain ' "$PREP/Apennine_to_polar.chain" | head
+grep -c '^chain[[:space:]]' \
+  "$PREP/Apennine_to_polar.chain"
+```
+
+```bash
+grep '^chain[[:space:]]' \
+  "$PREP/Apennine_to_polar.chain" |
+  head
 ```
 
 **Check:** the existence of a chain does not prove that its direction is correct. Before processing all SNPs, test a few Apennine BED intervals. The chain used in Step 3 must accept **Apennine** coordinates and emit **polar** coordinates. If every test interval is unmapped, inspect the header and the minimap2/Transanno source–destination convention rather than reversing labels blindly. Also confirm that sequence names and sizes agree with the corresponding FASTA indexes. Confirm the installed syntax with `"$TRANSANNO" minimap2chain --help`. [Transanno documentation](https://github.com/informationsea/transanno).
