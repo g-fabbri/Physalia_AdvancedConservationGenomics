@@ -193,6 +193,9 @@ bcftools query -f '%CHROM\t%POS\n' "$VCF" |
 
 ```bash
 head "$PREP/Apennine_sites.bed"
+```
+
+```bash
 wc -l "$PREP/Apennine_sites.bed"
 ```
 
@@ -216,7 +219,7 @@ liftOver -multiple "$PREP/Apennine_sites.bed" \
   "$PREP/polar_sites_all.bed" "$PREP/unmapped.bed"
 ```
 
-The two outputs have different meanings: `polar_sites_all.bed` contains mapped coordinates, while `unmapped.bed` records failures and reasons. A single input site may have multiple mapped rows, which is why we have **not** called this file unique.
+The two outputs have different meanings: `polar_sites_all.bed` contains mapped coordinates, while `unmapped.bed` records failures and reasons. 
 
 ### 3.2 — Retain unambiguous one-base mappings
 
