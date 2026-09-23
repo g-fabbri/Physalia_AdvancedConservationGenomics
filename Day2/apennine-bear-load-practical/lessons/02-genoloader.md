@@ -82,6 +82,9 @@ printf 'ABB=%s SBB=%s outgroups=%s\n' "$N_ABB" "$N_SBB" "$N_OUT"
 
 ~~~bash
 cat "$OUTDIR/outgroups.samples"
+~~~
+
+~~~bash
 comm -12 <(sort "$BLB_LIST") <(sort "$POB_LIST")
 ~~~
 
