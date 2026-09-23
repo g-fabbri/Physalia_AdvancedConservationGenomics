@@ -122,10 +122,15 @@ Do not select a preset simply because it maps the most bases: permissive setting
 ```bash
 "$TRANSANNO" minimap2chain "$PREP/Apennine_to_polar.paf" \
   --output "$PREP/Apennine_to_polar.chain"
+```
+
+```bash
 head -n 1 "$PREP/Apennine_to_polar.chain"
 ```
 
-**Expected:** a non-empty chain beginning with `chain`. **Check:** compare the chain header with both FASTAs and test a few known loci: the chain must accept **Apennine** positions and emit **polar** positions. Do not swap file labels simply to make the command finish. Confirm the installed syntax with `"$TRANSANNO" minimap2-to-chain --help`. [Transanno documentation](https://github.com/informationsea/transanno).
+**Expected:** a non-empty chain beginning with `chain`. 
+
+**Check:** compare the chain header with both FASTAs and test a few known loci: the chain must accept **Apennine** positions and emit **polar** positions. Do not swap file labels simply to make the command finish. Confirm the installed syntax with `"$TRANSANNO" minimap2-to-chain --help`. [Transanno documentation](https://github.com/informationsea/transanno).
 
 ## Step 2 — Make a named BED file of VCF SNPs
 
