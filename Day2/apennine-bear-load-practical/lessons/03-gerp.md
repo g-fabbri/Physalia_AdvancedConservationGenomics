@@ -36,9 +36,18 @@ Only when the Scaffold_25 VCF has **not** already been prepared, and after confi
 
 ```bash
 SOURCE_VCF=/jarvis/scratch/usr/biello/bear/snpeff/VCF/marpolblk.sorted.merged.alignable.final.SNP.vcf.gz
+```
+
+```bash
 bcftools view -r Scaffold_25 -Oz \
   -o data/Bears_4pops_s25.vcf.gz "$SOURCE_VCF"
+```
+
+```bash
 bcftools index -f data/Bears_4pops_s25.vcf.gz
+```
+
+```bash
 bcftools query -l data/Bears_4pops_s25.vcf.gz
 ```
 
@@ -65,6 +74,9 @@ mkdir -p "$PREP"
 
 ```bash
 samtools faidx "$APP_FA" "$CHROM" > "$PREP/${CHROM}.fa"
+```
+
+```bash
 head -n 2 "$PREP/${CHROM}.fa"
 ```
 
@@ -77,6 +89,9 @@ head -n 2 "$PREP/${CHROM}.fa"
 ```bash
 minimap2 -cx asm20 --cs -t 8 "$POLAR_FA" "$PREP/${CHROM}.fa" \
   > "$PREP/Apennine_to_polar.paf"
+```
+
+```bash
 head -n 2 "$PREP/Apennine_to_polar.paf"
 ```
 
@@ -89,6 +104,9 @@ head -n 2 "$PREP/Apennine_to_polar.paf"
 ```bash
 "$TRANSANNO" minimap2-to-chain "$PREP/Apennine_to_polar.paf" \
   --output "$PREP/Apennine_to_polar.chain"
+```
+
+```bash
 head -n 1 "$PREP/Apennine_to_polar.chain"
 ```
 
@@ -106,6 +124,9 @@ head -n 1 "$PREP/Apennine_to_polar.chain"
 
 ```bash
 VCF=data/Bears_4pops_s25.vcf.gz
+```
+
+```bash
 bcftools query -f '%CHROM\t%POS\n' "$VCF" |
   awk -v c="$CHROM" 'BEGIN{OFS="\t"} $1==c {print $1,$2-1,$2,$1":"$2}' |
   sort -k1,1 -k2,2n -u > "$PREP/Apennine_sites.bed"
@@ -119,6 +140,9 @@ bcftools query -f '%CHROM\t%POS\n' "$VCF" |
 
 ```bash
 head "$PREP/Apennine_sites.bed"
+```
+
+```bash
 wc -l "$PREP/Apennine_sites.bed"
 ```
 
@@ -163,6 +187,9 @@ awk 'BEGIN{OFS="\t"} {n[$4]++; line[$4]=$0}
 ```bash
 wc -l "$PREP/Apennine_sites.bed" "$PREP/polar_sites_all.bed" \
   "$PREP/polar_sites_unique.bed"
+```
+
+```bash
 head "$PREP/polar_sites_unique.bed"
 ```
 
@@ -182,12 +209,21 @@ head "$PREP/polar_sites_unique.bed"
 
 ```bash
 GERP_BW=data/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw
+```
+
+```bash
 ls -lh "$GERP_BW"
+```
+
+```bash
 awk 'BEGIN{OFS="\t"}
      {if(!($1 in min) || $2<min[$1]) min[$1]=$2;
       if(!($1 in max) || $3>max[$1]) max[$1]=$3}
      END{for(c in min) print c,min[c],max[c]}' \
   "$PREP/polar_sites_unique.bed" > "$PREP/polar_regions.tsv"
+```
+
+```bash
 cat "$PREP/polar_regions.tsv"
 ```
 
@@ -213,6 +249,9 @@ done < "$PREP/polar_regions.tsv"
 ```bash
 cat "$PREP"/GERP_*.bedGraph |
   sort -k1,1 -k2,2n > "$PREP/GERP_polar_regions.bedGraph"
+```
+
+```bash
 bedtools intersect \
   -a "$PREP/polar_sites_unique.bed" \
   -b "$PREP/GERP_polar_regions.bedGraph" \
@@ -250,6 +289,9 @@ awk 'BEGIN{OFS="\t"}
        split(id,a,":"); print a[1],a[2]-1,a[2],score[id]
      }}' "$PREP/sites_with_polar_scores.tsv" |
   sort -k1,1 -k2,2n > "$PREP/GERP_on_Apennine_unique.bed"
+```
+
+```bash
 head "$PREP/GERP_on_Apennine_unique.bed"
 ```
 
@@ -261,7 +303,13 @@ Column 4 of the scored join still holds the **original** Apennine `Scaffold_25:p
 
 ```bash
 GERP=results/gerp/GERP_on_Apennine_unique.bed.gz
+```
+
+```bash
 bgzip -c "$PREP/GERP_on_Apennine_unique.bed" > "$GERP"
+```
+
+```bash
 tabix -f -p bed "$GERP"
 ```
 
@@ -271,8 +319,14 @@ tabix -f -p bed "$GERP"
 
 ```bash
 zcat "$GERP" | head
+```
+
+```bash
 zcat "$GERP" |
   awk '$1!="Scaffold_25" || $3-$2!=1 {bad++} END{print "Invalid rows:",bad+0}'
+```
+
+```bash
 wc -l "$PREP/Apennine_sites.bed" "$PREP/GERP_on_Apennine_unique.bed"
 ```
 
@@ -293,6 +347,9 @@ wc -l "$PREP/Apennine_sites.bed" "$PREP/GERP_on_Apennine_unique.bed"
 ```bash
 awk -F'\t' 'BEGIN{OFS="\t"} NR>1 && $2~/^[0-9]+$/ {print $1,$2-1,$2,$3,$4,$5}' "$GT" \
   > "$OUTDIR/genoloader_sites.bed"
+```
+
+```bash
 head "$OUTDIR/genoloader_sites.bed"
 ```
 
@@ -316,6 +373,9 @@ bedtools intersect \
 
 ```bash
 wc -l "$OUTDIR/genoloader_sites.bed" "$OUTDIR/sites_with_gerp.tsv"
+```
+
+```bash
 head "$OUTDIR/sites_with_gerp.tsv"
 ```
 
