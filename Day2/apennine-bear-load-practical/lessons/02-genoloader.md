@@ -137,6 +137,9 @@ GT="${ANNOTATED%.vcf}.POP_OUT.gt"
 
 ~~~bash
 ls -lh "$GT"
+~~~
+
+~~~bash
 wc -l "$GT"
 ~~~
 
@@ -148,6 +151,9 @@ The file must have a nonzero size and more than one line. One line is the header
 
 ~~~bash
 head -n 3 "$GT"
+~~~
+
+~~~bash
 awk -F'\t' 'NR>1 {n[$5]++} END {for (flag in n) print flag,n[flag]}' "$GT" | sort
 ~~~
 
@@ -189,8 +195,13 @@ python scripts/summarize_genoloader.py \
   "$OUTDIR/derived_burden_by_sample.tsv" \
   "$OUTDIR/derived_frequency_by_impact.tsv" \
   "$OUTDIR/GenoLoader_ABB_SBB_Scaffold_25"
+~~~
 
+~~~bash
 column -t "$OUTDIR/derived_burden_by_sample.tsv" | head -n 16
+~~~
+
+~~~bash
 column -t "$OUTDIR/derived_frequency_by_impact.tsv"
 ~~~
 
@@ -259,13 +270,8 @@ Do not infer statistical significance from overlapping or separated points in th
 
 **Purpose:** separate observed Scaffold_25 patterns from claims about genome-wide genetic load.
 
-1. Does ABB have more homozygous-derived `HIGH` sites per individual than SBB? Is the same true for total derived copies?
-2. Are any differences also present at synonymous sites? What would that imply about ancestry, sampling, or technical bias?
-3. Why can a small, inbred population expose recessive alleles while also losing some strongly deleterious variants through drift and purging?
-4. How many loci were excluded because the outgroups disagreed or were not confidently callable?
-5. What changes if black bears and polar bears are used **separately** as outgroups? Treat that as a sensitivity analysis, not a way to choose the preferred answer.
 
-Write a cautious conclusion in the [answer sheet](../answers/student_answers.md). This completes the **core Day 2 practical**. If the instructor decides there is time, continue to the [optional GERP lesson](03-gerp.md).
+
 
 
 
