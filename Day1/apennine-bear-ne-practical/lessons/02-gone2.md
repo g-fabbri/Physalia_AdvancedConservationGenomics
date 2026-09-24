@@ -219,12 +219,9 @@ The exact layout can vary slightly among GONE2 versions, but the file records in
 **Check:** if GONE2 produces only a `GONE2_STATS` file and no `GONE2_Ne` file, inspect the end of the summary for the reason:
 
 ~~~bash
-tail -n 20 "$OUTDIR/ABB_GONE2_STATS"
+ls -lhrt "$OUTDIR/*"
 ~~~
 
-~~~bash
-tail -n 20 "$OUTDIR/SBB_GONE2_STATS"
-~~~
 
 ### Step 4.2 — Inspect the Ne trajectories
 
