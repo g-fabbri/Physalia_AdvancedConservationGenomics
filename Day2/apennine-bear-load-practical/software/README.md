@@ -99,7 +99,7 @@ The GERP analysis requires more than the four command-line programs. The instruc
 
 1. The Ensembl release 114 polar-bear GERP score file:
 
-   [gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw)
+   [gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score)
 
 2. The **Ensembl release 114 UrsMar_1.0 toplevel FASTA** matching the `AVOR...` sequence names in that bigWig, from the [polar-bear DNA directory](https://ftp.ensembl.org/pub/release-114/fasta/ursus_maritimus/dna/):
 
