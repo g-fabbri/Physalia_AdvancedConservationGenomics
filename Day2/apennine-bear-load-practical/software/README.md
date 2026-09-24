@@ -31,8 +31,6 @@ Transanno is installed directly from [Bioconda](https://bioconda.github.io/recip
 Create the paths used in the lessons:
 
 ```bash
-bash software/link_conda_tools.sh
-
 COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
 ```
