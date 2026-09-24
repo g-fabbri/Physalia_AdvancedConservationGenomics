@@ -7,14 +7,14 @@ Run these commands from the Day 2 directory containing `environment.yml`, `softw
 For a new installation:
 
 ```bash
-conda env create -f environment.yml
+conda env create -f software/environment.yml
 conda activate bear-load-practical
 ```
 
 If the environment already exists:
 
 ```bash
-conda env update -n bear-load-practical -f environment.yml --prune
+conda env update -n bear-load-practical -f software/environment.yml --prune
 conda activate bear-load-practical
 ```
 
