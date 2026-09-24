@@ -7,7 +7,7 @@ Complete this setup before class. Students should only activate the prepared env
 From the course root:
 
 ~~~bash
-conda env create -f environment.yml
+conda env create -f software/environment.yml
 conda activate bear-ne-practical
 ~~~
 
@@ -40,7 +40,7 @@ make -C software/GONE2 gone
 Install the [Bioconda SMC++ package](https://anaconda.org/bioconda/smcpp) in a **separate optional environment** before offering the [optional lesson](../lessons/03-smcpp-optional.md). The main `bear-ne-practical` environment pins Python 3.11, but Bioconda currently lists SMC++ builds for Python 3.10 and 3.9; adding it to the main environment would require changing that pin or solving a different package set.
 
 ~~~bash
-conda env create -f environment-smcpp.yml
+conda env create -f software/environment-smcpp.yml
 conda activate bear-ne-smcpp
 conda list smcpp
 smc++ vcf2smc -h | head
