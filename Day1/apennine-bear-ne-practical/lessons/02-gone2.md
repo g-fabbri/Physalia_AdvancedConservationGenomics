@@ -219,7 +219,7 @@ The exact layout can vary slightly among GONE2 versions, but the file records in
 **Check:** if GONE2 produces only a `GONE2_STATS` file and no `GONE2_Ne` file, inspect the end of the summary for the reason:
 
 ~~~bash
-ls -lhrt "$OUTDIR/*"
+ls -lhrt "$OUTDIR"
 ~~~
 
 
