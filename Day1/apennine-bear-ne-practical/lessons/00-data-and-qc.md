@@ -34,6 +34,7 @@ cd Physalia_AdvancedConservationGenomics/Day1
 ~~~bash
 ln -s /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/data .
 ln -s /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/software .
+ln -s /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/scripts .
 ~~~
 
 ~~~bash
