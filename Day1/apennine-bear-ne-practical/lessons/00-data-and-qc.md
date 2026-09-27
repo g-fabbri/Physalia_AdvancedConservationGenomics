@@ -15,7 +15,10 @@ cd AdvConGen/Day1
 ~~~
 
 ~~~bash
-ln -s /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/data .
+cp -r /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/data .
+~~~
+
+~~~bash
 ln -s /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/software .
 ln -s /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/scripts .
 ~~~
