@@ -20,6 +20,28 @@ command -v bcftools
 The command should print the path to `bcftools` inside the `bear-ne-practical` environment.
 
 
+## Prepare your working directory
+
+~~~bash
+pwd
+~~~
+
+~~~bash
+mkdir -p Physalia_AdvancedConservationGenomics/Day1
+cd Physalia_AdvancedConservationGenomics/Day1
+~~~
+
+~~~bash
+ln -s /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/data .
+ln -s /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/software .
+~~~
+
+~~~bash
+mkdir results
+~~~
+
+
+
 ## Step 1 — Name the input files
 
 **Purpose:** use short, consistent names and avoid repeatedly typing paths.
