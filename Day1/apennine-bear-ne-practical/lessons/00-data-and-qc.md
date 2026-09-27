@@ -101,13 +101,7 @@ ls -lh "$APN_SINGLE" "$SVK_SINGLE" "$POP" "$MASK"
 
 ~~~bash
 bcftools query -l "$APN_SINGLE"
-~~~
-
-~~~bash
 bcftools query -l "$SVK_SINGLE"
-~~~
-
-~~~bash
 bcftools query -l "$POP"
 ~~~
 
@@ -117,13 +111,7 @@ bcftools query -l "$POP"
 
 ~~~bash
 bcftools query -l "$APN_SINGLE" | wc -l
-~~~
-
-~~~bash
 bcftools query -l "$SVK_SINGLE" | wc -l
-~~~
-
-~~~bash
 bcftools query -l "$POP" | wc -l
 ~~~
 
