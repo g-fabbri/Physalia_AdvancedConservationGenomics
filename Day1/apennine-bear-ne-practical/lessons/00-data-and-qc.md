@@ -168,19 +168,6 @@ gzip -cd "$MASK" | cut -f1 | sort -u | head
 
 **Expected:** both VCF commands include **Scaffold_25**. The mask command displays chromosome or scaffold labels present in the BED file.
 
-**Check:** verify specifically that the mask contains the selected scaffold:
-
-~~~bash
-gzip -cd "$MASK" | awk -v chrom="$CHROM" '$1==chrom {found=1; exit} END {if (found) print chrom, "found"; else print chrom, "NOT FOUND"}'
-~~~
-
-Expected:
-
-~~~text
-Scaffold_25 found
-~~~
-
-Do not continue if the result is **NOT FOUND**.
 
 ## Step 5 — Count VCF records
 
