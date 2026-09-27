@@ -1,7 +1,7 @@
 # References and software
 
 - Benazzo A. et al. (2017). Apennine brown bear genomic history. [Article](https://doi.org/10.1073/pnas.1707279114).
-- Fabbri G., Biello R. et al. (2025) Coexisting with humans: genomic and behavioral consequences in a small and isolated bear population. [Article] (https://academic.oup.com/mbe/article/42/12/msaf292/8355027)
+- Fabbri G., Biello R. et al. (2025) Coexisting with humans: genomic and behavioral consequences in a small and isolated bear population. [Article] ([https://academic.oup.com/mbe/article/42/12/msaf292/8355027](https://doi.org/10.1093/molbev/msaf292))
 - [NCBI BioProject PRJNA395974](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA395974).
 - Schiffels S. & Durbin R. (2014). MSMC. [DOI](https://doi.org/10.1038/ng.3015).
 - [Official MSMC2](https://github.com/stschiff/msmc2) and [msmc-tools](https://github.com/stschiff/msmc-tools).
