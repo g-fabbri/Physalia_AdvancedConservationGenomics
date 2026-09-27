@@ -185,8 +185,8 @@ The model therefore contains **17 independently estimated rates across 19 atomic
 **Expected:** MSMC2 writes several files for each prefix. The principal result tables are:
 
 ~~~text
-results/msmc2/ABB_4573.final.txt
-results/msmc2/SBB_U1916.final.txt
+ls -lhrt results/msmc2/ABB_4573.final.txt
+ls -lhrt results/msmc2/SBB_U1916.final.txt
 ~~~
 
 Each `.final.txt` file is a tab-delimited description of the fitted piecewise trajectory for one individual:
