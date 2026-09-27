@@ -10,8 +10,8 @@ pwd
 ~~~
 
 ~~~bash
-mkdir -p Physalia_AdvancedConservationGenomics/Day1
-cd Physalia_AdvancedConservationGenomics/Day1
+mkdir -p AdvConGen/Day1
+cd AdvConGen/Day1
 ~~~
 
 ~~~bash
@@ -40,11 +40,6 @@ command -v bcftools
 ~~~
 
 The command should print the path to `bcftools` inside the `bear-ne-practical` environment.
-
-
-
-
-
 
 
 ## Step 1 — Name the input files
@@ -107,7 +102,13 @@ ls -lh data
 
 ~~~bash
 bcftools query -l "$APN_SINGLE"
+~~~
+
+~~~bash
 bcftools query -l "$SVK_SINGLE"
+~~~
+
+~~~bash
 bcftools query -l "$POP"
 ~~~
 
@@ -117,7 +118,13 @@ bcftools query -l "$POP"
 
 ~~~bash
 bcftools query -l "$APN_SINGLE" | wc -l
+~~~
+
+~~~bash
 bcftools query -l "$SVK_SINGLE" | wc -l
+~~~
+
+~~~bash
 bcftools query -l "$POP" | wc -l
 ~~~
 
@@ -127,6 +134,9 @@ Create population sample lists from the naming convention:
 
 ~~~bash
 bcftools query -l "$POP" | awk '/^U/' > data/slovak.samples
+~~~
+
+~~~bash
 bcftools query -l "$POP" | awk '!/^U/' > data/apennine.samples
 ~~~
 
@@ -135,7 +145,13 @@ Check the population assignments:
 ~~~bash
 printf 'Apennine bears: '; wc -l < data/apennine.samples
 printf 'Slovak bears: '; wc -l < data/slovak.samples
+~~~
+
+~~~bash
 cat data/apennine.samples
+~~~
+
+~~~bash
 cat data/slovak.samples
 ~~~
 
@@ -149,8 +165,17 @@ cat data/slovak.samples
 
 ~~~bash
 bcftools query -f '%CHROM\n' "$APN_SINGLE" | sort -u
+~~~
+
+~~~bash
 bcftools query -f '%CHROM\n' "$SVK_SINGLE" | sort -u
+~~~
+
+~~~bash
 bcftools query -f '%CHROM\n' "$POP" | sort -u
+~~~
+
+~~~bash
 gzip -cd "$MASK" | cut -f1 | sort -u | head
 ~~~
 
