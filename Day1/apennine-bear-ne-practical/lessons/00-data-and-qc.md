@@ -92,10 +92,6 @@ ls -lh "$APN_SINGLE" "$SVK_SINGLE" "$POP" "$MASK"
 
 **Check:** “No such file or directory” means the working directory or input path is wrong. Run:
 
-~~~bash
-pwd
-ls -lh data
-~~~
 
 ## Step 3 — Inspect the samples
 
