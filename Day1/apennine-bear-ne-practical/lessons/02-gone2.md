@@ -131,6 +131,16 @@ cut -f1 "$INPUTDIR/SBB_${CHROM}.map" | sort -u
 
 The PED files should contain 10 and 8 rows. Each MAP check should print only **1**.
 
+~~~bash
+head "$INPUTDIR/ABB_${CHROM}.map"
+head "$INPUTDIR/SBB_${CHROM}.map"
+~~~
+
+~~~bash
+less "$INPUTDIR/ABB_${CHROM}.ped"
+~~~
+
+
 ## Step 3 — Run GONE2
 
 **Purpose:** estimate a recent Ne trajectory for each population under identical settings.
