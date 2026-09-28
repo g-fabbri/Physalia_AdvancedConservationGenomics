@@ -156,7 +156,7 @@ We will therefore rank SNPs according to their loadings and select the most info
 
 Have a look at the scatter plots including **PC1–PC2** and **PC3–PC4**.
 
-> **Do you think PC2 and PC3 are useful to distinguish possible substructure in the dataset?**
+> **Do you think PC2, PC3, and PC4 are useful to distinguish possible substructure in the dataset?**
 
 ---
 
