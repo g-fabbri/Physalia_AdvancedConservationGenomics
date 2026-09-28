@@ -324,4 +324,4 @@ bcftools query -f '%INFO/ANN\n' "$ANNOTATED" | \
 
 **Expected:** counts labelled `HIGH`, `MODERATE`, `LOW`, and/or `MODIFIER`. This quick check uses the **first** transcript annotation per VCF record; it is not a complete transcript-aware summary.
 
-**Check:** record which categories are common. Discuss how transcript choice and reference gene-model quality could change the labels. Continue to [polarization and burden](02-genoloader.md).
+**Check:** record which categories are common. 
