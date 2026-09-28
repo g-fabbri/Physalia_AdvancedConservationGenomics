@@ -86,7 +86,7 @@ ls -lh
 
 The `-l` option displays details, while `-h` reports file sizes in a human-readable format. Symbolic links are shown with an arrow pointing to their shared location.
 
-From the Day 1 course directory, activate the course environment:
+**From the Day 1 course directory, activate the course environment:**
 
 ~~~bash
 conda activate bear-ne-practical
