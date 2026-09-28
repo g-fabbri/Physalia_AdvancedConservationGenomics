@@ -1,35 +1,90 @@
 # Terminal orientation and data QC
 
 
-## Start your terminal
+## Prepare your working directory
 
-Prepare your working directory:
+These commands create a personal working directory and connect it to the course files.
 
-~~~bash
+### 1 — Check your current location
+
+```bash
 pwd
-~~~
+```
 
-~~~bash
+`pwd` means **print working directory**. It displays the directory in which you are currently working.
+
+### 2 — Create the Day 1 directory
+
+```bash
 mkdir -p AdvConGen/Day1
+```
+
+`mkdir` creates a directory. The `-p` option also creates any missing parent directories and prevents an error if they already exist.
+
+### 3 — Enter the new directory
+
+```bash
 cd AdvConGen/Day1
-~~~
+```
 
-~~~bash
+`cd` means **change directory**. All subsequent commands will run from your personal Day 1 directory.
+
+### 4 — Copy the input data
+
+```bash
 cp -r /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/data .
-~~~
+```
 
-~~~bash
+`cp` copies files, while `-r` copies the complete directory and its contents. The final `.` means “copy it into the current directory.”
+
+Each student receives a personal copy of the data that can be modified without affecting the shared course files.
+
+### 5 — Link the software directory
+
+```bash
 ln -s /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/software .
+```
+
+`ln -s` creates a **symbolic link**, or shortcut, to the shared software directory. The software is not duplicated.
+
+### 6 — Link the scripts directory
+
+```bash
 ln -s /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/scripts .
-~~~
+```
 
-~~~bash
-mkdir results
-~~~
+This creates a shortcut to the shared course scripts. Any updates made by the instructor will therefore be immediately available to everyone.
 
+### 7 — Create the results directory
 
-command
-ls to check directories created
+```bash
+mkdir -p results
+```
+
+This creates a personal directory where the outputs generated during the exercises will be stored.
+
+### 8 — Check the directory structure
+
+```bash
+ls
+```
+
+`ls` lists the files and directories in the current location. You should see:
+
+```text
+data
+results
+scripts
+software
+```
+
+You can obtain a more detailed listing with:
+
+```bash
+ls -lh
+```
+
+The `-l` option displays details, while `-h` reports file sizes in a human-readable format. Symbolic links are shown with an arrow pointing to their shared location.
 
 From the Day 1 course directory, activate the course environment:
 
