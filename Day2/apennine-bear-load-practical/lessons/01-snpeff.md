@@ -17,6 +17,7 @@ OUTDIR="$COURSE_DIR/results/snpeff"
 mkdir -p "$OUTDIR"
 ```
 
+
 Conda supplies the shared tools; standalone programs are kept under Day 2 `software/`. SnpEff is called through its JAR at `software/snpEff/snpEff.jar`, so it does not need a PATH entry. `VCF` identifies the four-population Scaffold_25 input, while `OUTDIR` identifies the directory where the annotated VCF and later genetic-load results are written. Defining them here makes this lesson safe to start from a new terminal.
 
 **Check:**
