@@ -31,10 +31,10 @@ cd AdvConGen/Day1
 
 ### 4 — Copy the input data
 
-**Replace user with your username**
+**Replace USER with your username**
 
 ```bash
-cp -r /home/user/Share/Physalia_AdvancedConservationGenomics/Day1/data .
+cp -r /home/USER/Share/Physalia_AdvancedConservationGenomics/Day1/data .
 ```
 
 `cp` copies files, while `-r` copies the complete directory and its contents. The final `.` means “copy it into the current directory.”
@@ -44,7 +44,7 @@ Each student receives a personal copy of the data that can be modified without a
 ### 5 — Link the software directory
 
 ```bash
-ln -s /home/user/Share/Physalia_AdvancedConservationGenomics/Day1/software .
+ln -s /home/USER/Share/Physalia_AdvancedConservationGenomics/Day1/software .
 ```
 
 `ln -s` creates a **symbolic link**, or shortcut, to the shared software directory. The software is not duplicated.
@@ -52,7 +52,7 @@ ln -s /home/user/Share/Physalia_AdvancedConservationGenomics/Day1/software .
 ### 6 — Link the scripts directory
 
 ```bash
-ln -s /home/user/Share/Physalia_AdvancedConservationGenomics/Day1/scripts .
+ln -s /home/USER/Share/Physalia_AdvancedConservationGenomics/Day1/scripts .
 ```
 
 This creates a shortcut to the shared course scripts. Any updates made by the instructor will therefore be immediately available to everyone.
