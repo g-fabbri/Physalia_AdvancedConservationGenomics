@@ -32,7 +32,7 @@ cd AdvConGen/Day1
 ### 4 — Copy the input data
 
 ```bash
-cp -r /home/ubuntu/Share/Physalia_AdvancedConservationGenomics/Day1/data .
+cp -r /home/user*/Share/Physalia_AdvancedConservationGenomics/Day1/data .
 ```
 
 `cp` copies files, while `-r` copies the complete directory and its contents. The final `.` means “copy it into the current directory.”
