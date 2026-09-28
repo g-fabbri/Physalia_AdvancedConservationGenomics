@@ -28,6 +28,9 @@ mkdir results
 ~~~
 
 
+command
+ls to check directories created
+
 From the Day 1 course directory, activate the course environment:
 
 ~~~bash
