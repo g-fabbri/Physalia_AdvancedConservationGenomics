@@ -155,7 +155,9 @@ Only the chromosome label is changed. Marker IDs, marker order, genetic position
 wc -l \
   "$INPUTDIR/ABB_${CHROM}.ped" \
   "$INPUTDIR/SBB_${CHROM}.ped"
+```
 
+```bash
 cut -f1 "$INPUTDIR/ABB_${CHROM}.map" | sort -u
 cut -f1 "$INPUTDIR/SBB_${CHROM}.map" | sort -u
 ```
