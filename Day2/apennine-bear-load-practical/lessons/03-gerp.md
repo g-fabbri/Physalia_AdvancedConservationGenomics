@@ -19,7 +19,7 @@ command -v minimap2 transanno liftOver bigWigInfo bigWigToBedGraph
 
 `transanno` is installed from Bioconda by `environment.yml`; students do **not** need to download it separately. If `command -v transanno` prints nothing, update the Conda environment rather than adding an unrelated binary manually. The [Bioconda Transanno recipe](https://bioconda.github.io/recipes/transanno/README.html) documents `conda install transanno`; the [Transanno repository](https://github.com/informationsea/transanno) provides releases and source-build instructions as alternatives when Conda is unavailable.
 
-SnpEff predicts consequences from gene models; GERP measures evolutionary constraint at an alignment column. Neither identifies a bear allele's fitness effect. We will score the **Scaffold_25 SNPs** used in Parts 1–2.
+We will score the **Scaffold_25 SNPs** used in Parts 1–2.
 
 ### What is a bigWig?
 
