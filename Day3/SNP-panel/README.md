@@ -83,8 +83,7 @@ In this section, we will use **PCA** as the first exploratory analysis, as we wi
 ### R code
 
 > 📄 **R script:** `script_pca.R`
->
-> Add/link the R script here once your GitHub folder structure is finalized.
+
 
 ---
 
@@ -97,8 +96,7 @@ This is a much faster version of **STRUCTURE/ADMIXTURE**, but the output is simi
 ### R code
 
 > 📄 **R script:** `script_snmf.R`
->
-> Add/link the R script here once your GitHub folder structure is finalized.
+
 
 ---
 
@@ -111,8 +109,7 @@ This will allow us to evaluate, with numerical values, how differentiated the cl
 ### R code
 
 > 📄 **R script:** `script_fst_allpop.R`
->
-> Add/link the R script here once your GitHub folder structure is finalized.
+
 
 ---
 
@@ -153,8 +150,7 @@ We will therefore rank SNPs according to their loadings and select the most info
 ### R code
 
 > 📄 **R script:** `script_loadings.R`
->
-> Add/link the R script here once your GitHub folder structure is finalized.
+
 
 ### Extra
 
@@ -179,8 +175,7 @@ SNPs with the highest F<sub>ST</sub> values will be considered the most informat
 ### R code
 
 > 📄 **R script:** `script_fst_node.R`
->
-> Add/link the R script here once your GitHub folder structure is finalized.
+
 
 ---
 
@@ -199,8 +194,7 @@ We will use Random Forest to rank SNPs according to their importance and select 
 ### R code
 
 > 📄 **R script:** `script_rf.R`
->
-> Add/link the R script here once your GitHub folder structure is finalized.
+
 
 ### Extra
 
@@ -226,8 +220,7 @@ The idea is to provide the known origin of the samples, randomly divide each pop
 ### R code
 
 > 📄 **R script:** `script_assignPOP.R`
->
-> Add/link the R script here once your GitHub folder structure is finalized.
+
 
 ## Question
 
@@ -255,5 +248,4 @@ Notice their **assignment scores** to the different clusters and discuss how you
 ### R code
 
 > 📄 **R script:** `script_assignPOP.R`
->
-> Add/link the R script here once your GitHub folder structure is finalized.
+
