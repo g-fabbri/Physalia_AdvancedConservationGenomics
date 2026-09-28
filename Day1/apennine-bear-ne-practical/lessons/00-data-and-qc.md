@@ -43,6 +43,8 @@ Each student receives a personal copy of the data that can be modified without a
 
 ### 5 — Link the software directory
 
+**Replace USER with your username**
+
 ```bash
 ln -s /home/USER/Share/Physalia_AdvancedConservationGenomics/Day1/software .
 ```
@@ -50,6 +52,8 @@ ln -s /home/USER/Share/Physalia_AdvancedConservationGenomics/Day1/software .
 `ln -s` creates a **symbolic link**, or shortcut, to the shared software directory. The software is not duplicated.
 
 ### 6 — Link the scripts directory
+
+**Replace USER with your username**
 
 ```bash
 ln -s /home/USER/Share/Physalia_AdvancedConservationGenomics/Day1/scripts .
