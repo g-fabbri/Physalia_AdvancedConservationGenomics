@@ -66,23 +66,30 @@ bcftools index -t "$SBB_VCF"
 
 **Expected:** **ABB_s25.vcf.gz** contains the 10 ABB individuals and **SBB_s25.vcf.gz** contains the 8 SBB individuals.
 
+
 ## Step 2 — Create the PED/MAP files
 
-**Purpose:** apply the same variant filters to each population and create the PLINK files read by GONE2.
+**Purpose:** convert each population VCF into the PED/MAP format required by GONE2, then adjust the chromosome labels.
 
-PLINK's text format uses two matching files with the same prefix:
+PLINK's text format uses two files with the same prefix:
 
-- the **PED file** contains one row per individual. Its first six columns describe the sample and family, followed by two allele entries for every marker;
-- the **MAP file** contains one row per marker, giving its chromosome, marker ID, genetic-map position, and physical base-pair position.
+- The **PED file** contains one row per individual. The first six columns describe the sample and family, followed by two allele entries for every marker.
+- The **MAP file** contains one row per marker: chromosome, marker ID, genetic-map position, and physical base-pair position.
 
-The marker order in the MAP file must exactly match the genotype order in every PED row. Together, the files tell GONE2 which alleles each bear carries and where those markers occur along the scaffold.
+The marker order in the MAP file must exactly match the genotype order in every PED row.
 
-~~~bash
+### 2.1 — Define the input directory
+
+```bash
 INPUTDIR=results/gone2/input
 mkdir -p "$INPUTDIR"
-~~~
+```
 
-~~~bash
+### 2.2 — Convert the VCF files with PLINK
+
+**Purpose:** retain canonical, biallelic SNPs and convert each population VCF into PED/MAP files.
+
+```bash
 for POPULATION in ABB SBB; do
   VCF="data/${POPULATION}_s25.vcf.gz"
   PREFIX="$INPUTDIR/${POPULATION}_${CHROM}"
@@ -95,50 +102,69 @@ for POPULATION in ABB SBB; do
     --biallelic-only strict \
     --recode \
     --out "${PREFIX}_original_label"
+done
+```
+
+The loop applies exactly the same conversion to ABB and SBB.
+
+- `--double-id` uses the VCF sample ID as both the family and individual ID.
+- `--allow-extra-chr` permits scaffold names such as `Scaffold_25`.
+- `--snps-only just-acgt` retains SNPs containing only A, C, G or T.
+- `--biallelic-only strict` retains sites with exactly two alleles.
+- `--recode` writes text-format PED and MAP files.
+
+The temporary output files retain the original scaffold label:
+
+```text
+ABB_Scaffold_25_original_label.ped
+ABB_Scaffold_25_original_label.map
+SBB_Scaffold_25_original_label.ped
+SBB_Scaffold_25_original_label.map
+```
+
+### 2.3 — Prepare the files for GONE2
+
+**Purpose:** preserve the PED genotypes while replacing the scaffold name in the MAP file with chromosome code `1`, which GONE2 accepts.
+
+```bash
+for POPULATION in ABB SBB; do
+  PREFIX="$INPUTDIR/${POPULATION}_${CHROM}"
 
   cp "${PREFIX}_original_label.ped" "${PREFIX}.ped"
-  awk 'BEGIN {OFS="\t"} {$1=1; print $1,$2,$3,$4}' \
-    "${PREFIX}_original_label.map" > "${PREFIX}.map"
+
+  awk 'BEGIN {OFS="\t"} {
+    $1=1
+    print $1,$2,$3,$4
+  }' "${PREFIX}_original_label.map" > "${PREFIX}.map"
 done
-~~~
+```
 
-The loop performs exactly the same commands for ABB and SBB. The derived MAP uses chromosome code **1**, which GONE2 accepts. Marker IDs and physical positions are unchanged.
+The `cp` command creates the final PED file without modifying its genotypes.
 
-| PLINK option | Meaning |
-|---|---|
-| **--snps-only just-acgt** | Retain canonical A/C/G/T SNPs |
-| **--biallelic-only strict** | Retain strictly biallelic sites |
+The `awk` command processes the MAP file:
 
-**Expected:**
+- `$1=1` changes the first column from `Scaffold_25` to chromosome code `1`.
+- `$2`, `$3`, and `$4` preserve the marker ID, genetic-map position and physical position.
+- `OFS="\t"` writes a tab-separated MAP file.
 
-~~~text
-results/gone2/input/ABB_Scaffold_25.ped
-results/gone2/input/ABB_Scaffold_25.map
-results/gone2/input/SBB_Scaffold_25.ped
-results/gone2/input/SBB_Scaffold_25.map
-~~~
+Only the chromosome label is changed. Marker IDs, marker order, genetic positions and physical positions remain unchanged.
 
-**Check:**
+### 2.4 — Check the final files
 
-~~~bash
-wc -l "$INPUTDIR/ABB_${CHROM}.ped" "$INPUTDIR/SBB_${CHROM}.ped"
-~~~
+```bash
+wc -l \
+  "$INPUTDIR/ABB_${CHROM}.ped" \
+  "$INPUTDIR/SBB_${CHROM}.ped"
 
-~~~bash
 cut -f1 "$INPUTDIR/ABB_${CHROM}.map" | sort -u
 cut -f1 "$INPUTDIR/SBB_${CHROM}.map" | sort -u
-~~~
+```
 
-The PED files should contain 10 and 8 rows. Each MAP check should print only **1**.
+The PED files should contain 10 ABB individuals and 8 SBB individuals. Both MAP checks should print only:
 
-~~~bash
-head "$INPUTDIR/ABB_${CHROM}.map"
-head "$INPUTDIR/SBB_${CHROM}.map"
-~~~
-
-~~~bash
-less "$INPUTDIR/ABB_${CHROM}.ped"
-~~~
+```text
+1
+```
 
 
 ## Step 3 — Run GONE2
