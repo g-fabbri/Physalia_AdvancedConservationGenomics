@@ -187,6 +187,7 @@ Possible annotations include:
 - `synonymous_variant`: the DNA sequence changes, but the amino acid does not;
 - `missense_variant`: the variant changes an amino acid;
 - `stop_gained`: the variant introduces a premature stop codon;
+- 'splice_acceptor_variant': the variant affecting the splice-acceptor site, normally located immediately before an exon at the intron–exon boundary:
 - `intron_variant`: the variant is located within an intron;
 - `intergenic_region`: the variant lies outside annotated genes.
 
