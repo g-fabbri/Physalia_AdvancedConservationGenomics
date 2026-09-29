@@ -18,7 +18,66 @@ To keep the practical manageable, we will analyse only **Scaffold 25**.
 
 ## Start your terminal
 
-From your Day 2 directory, run:
+## Prepare your working directory
+
+These commands create a personal working directory and connect it to the course files.
+
+**Check your current location**
+
+```bash
+pwd
+```
+
+**Create the Day 2 directory**
+
+```bash
+mkdir -p AdvConGen/Day2
+```
+
+**Enter the new directory**
+
+```bash
+cd AdvConGen/Day2
+```
+
+**Copy the input data**
+
+**Replace USER with your username**
+
+```bash
+cp -r /home/USER/Share/Physalia_AdvancedConservationGenomics/Day2/data .
+```
+
+Each student receives a personal copy of the data that can be modified without affecting the shared course files.
+
+**Link the software/scripts directories**
+
+**Replace USER with your username**
+
+```bash
+ln -s /home/USER/Share/Physalia_AdvancedConservationGenomics/Day2/software .
+ln -s /home/USER/Share/Physalia_AdvancedConservationGenomics/Day2/scripts .
+ln -s /home/USER/Share/Physalia_AdvancedConservationGenomics/Day2/gerp_input .
+```
+
+This creates a shortcut to the shared course scripts. Any updates made by the instructor will therefore be immediately available to everyone.
+
+**Create the results directory**
+
+```bash
+mkdir -p results
+```
+
+This creates a personal directory where the outputs generated during the exercises will be stored.
+
+**Check the directory structure**
+
+```bash
+ls
+```
+
+
+**From your Day 2 directory, run:**
 
 ```bash
 conda activate bear-load-practical
@@ -26,13 +85,6 @@ conda activate bear-load-practical
 COURSE_DIR=$(pwd)
 export PATH="$COURSE_DIR/software/bin:$PATH"
 ```
-
-Check your current directory:
-
-```bash
-pwd
-```
-
 ## Step 1 — Define the input files
 
 The prepared VCF and sample lists are stored in the `data/` directory:
