@@ -190,8 +190,6 @@ Possible annotations include:
 - `intron_variant`: the variant is located within an intron;
 - `intergenic_region`: the variant lies outside annotated genes.
 
-One variant can receive several annotations because it may overlap multiple transcripts or affect different transcript isoforms in different ways.
-
 SnpEff does not change the sample genotypes or determine whether an allele is ancestral or derived. It adds predicted functional annotations to the original VCF.
 
 ```bash
