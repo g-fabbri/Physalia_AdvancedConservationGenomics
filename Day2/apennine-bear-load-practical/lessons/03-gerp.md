@@ -4,16 +4,35 @@
 
 In this lesson, we will use **GERP scores** to identify derived variants located at evolutionarily conserved genomic positions.
 
-A positive GERP score indicates that a position has changed less often than expected under neutrality. Higher scores therefore suggest stronger evolutionary constraint and potentially greater functional importance.
+A positive GERP score indicates that a position has changed less often across species than expected under neutrality. Higher scores therefore suggest stronger evolutionary constraint and potentially greater functional importance.
 
 GERP and SnpEff provide complementary information:
 
 - **SnpEff** predicts how a variant may affect an annotated gene or transcript;
 - **GERP** measures how conserved the genomic position is across species;
+- **GenoLoader** identifies the derived allele and records who carries it.
 
-By combining these results, we can ask whether ABB and SBB individuals differ in the number of derived variants found at strongly conserved positions.
+By combining these results, we can ask whether ABB and SBB differ in the number of derived variants found at strongly conserved positions.
 
-A high GERP score does not prove that a variant is deleterious. It provides evidence that the position may be functionally important, but it does not measure selection coefficients, dominance or fitness effects.
+### Choosing an available GERP track
+
+GERP scores are calculated from multi-species genome alignments and are normally distributed as precomputed tracks for particular reference species and genome assemblies.
+
+Before starting an analysis, we should check:
+
+1. whether a GERP track already exists for our study species;
+2. which genome assembly and version it uses;
+3. whether its chromosome or scaffold names match our data.
+
+If a score track exists for the same species and assembly used by the VCF, the positions can be compared directly.
+
+In our case, a precomputed GERP track is not available for the Apennine-bear `mUrsArc1.1` assembly. We therefore use a track from a closely related species: the polar bear. Ensembl provides a 91-mammal GERP track using the polar-bear `UrsMar_1.0` assembly.
+
+Because our SNPs and the GERP scores use different assemblies, we must align Apennine Scaffold 25 to the polar-bear genome and translate the SNP coordinates before extracting the scores.
+
+Using the polar-bear track does not mean that the polar-bear allele is assumed to be ancestral. The polar-bear assembly is used only as the coordinate system for the available precomputed GERP scores.
+
+A high GERP score does not prove that a variant is deleterious. It provides evidence that the position may be functionally important, but it does not measure selection coefficients, dominance or actual fitness effects.
 
 ## Overview of the analysis
 
