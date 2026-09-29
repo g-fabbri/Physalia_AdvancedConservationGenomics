@@ -2,14 +2,18 @@
 
 In this lesson, we will use **SnpEff** to predict the possible functional effects of SNPs on annotated genes and transcripts.
 
-SnpEff requires:
+SnpEff provides many ready-made databases for commonly studied species and reference genomes. When one of these databases matches the assembly used to produce the VCF, it can be downloaded and used directly.
+
+Our Apennine brown bear assembly is not included among the prepared SnpEff databases, so we need a **custom database**. To create one, SnpEff requires:
 
 - a reference genome sequence;
 - a matching gene annotation;
 - a configuration entry identifying the custom genome;
 - a VCF produced using the same reference assembly.
 
-For this practical, all the required files have already been prepared for **Scaffold 25**. Students do not need to modify the SnpEff configuration or prepare the database files.
+It is important that the FASTA, annotation and VCF all use the same assembly, scaffold names and coordinate system. Otherwise, SnpEff may assign variants to the wrong features or fail to annotate them.
+
+For this practical, all the required files have already been prepared for **Scaffold 25**. Students will build the custom SnpEff database, but they do not need to modify the configuration or prepare the input files.
 
 ## Start your terminal
 
