@@ -1,4 +1,4 @@
-# Part 0 — Meet the four-population dataset
+# Part 0 — Meet the four-population/species dataset
 
 In Day 2, we will work with a VCF containing four bear populations or species:
 
