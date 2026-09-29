@@ -4,7 +4,9 @@ In this lesson, we will use **SnpEff** to predict the possible functional effect
 
 SnpEff provides many ready-made databases for commonly studied species and reference genomes. When one of these databases matches the assembly used to produce the VCF, it can be downloaded and used directly.
 
-Our Apennine brown bear assembly is not included among the prepared SnpEff databases, so we need a **custom database**. To create one, SnpEff requires:
+Our Apennine brown bear assembly is not included among the prepared SnpEff databases, so we need a **custom database**. 
+
+To run, SnpEff requires:
 
 - a reference genome sequence;
 - a matching gene annotation;
