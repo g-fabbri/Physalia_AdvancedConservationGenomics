@@ -1,6 +1,6 @@
 # Part 2 — Which alleles are derived, and who carries them?
 
-In this lesson, we will use **GenoLoader** to:
+In this lesson, we will use **GenoLoader** (https://github.com/emitruc/genoloader) to:
 
 1. infer the ancestral and derived allele at each SNP;
 2. count how many derived alleles each bear carries;
