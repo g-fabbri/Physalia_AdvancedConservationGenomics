@@ -10,7 +10,6 @@ GERP and SnpEff provide complementary information:
 
 - **SnpEff** predicts how a variant may affect an annotated gene or transcript;
 - **GERP** measures how conserved the genomic position is across species;
-- **GenoLoader** identifies the derived allele and records who carries it.
 
 By combining these results, we can ask whether ABB and SBB differ in the number of derived variants found at strongly conserved positions.
 
