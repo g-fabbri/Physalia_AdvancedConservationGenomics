@@ -180,7 +180,7 @@ This should print the path of every program. If one is missing, check that the c
 bigWigInfo -chroms "$GERP_BW" | head -n 30
 ```
 
-The bigWig should contain polar-bear sequence names beginning with identifiers such as `AVOR`.
+The bigWig should contain polar-bear sequence names beginning with identifiers such as `AVOR` and 'KK'.
 
 Check the polar-bear FASTA:
 
