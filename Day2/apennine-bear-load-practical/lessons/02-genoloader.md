@@ -220,15 +220,6 @@ The script reads the polarized `.gt` table and calculates:
 - mean derived-allele frequencies in ABB and SBB;
 - directional Rxy values.
 
-Inspect the summary tables:
-
-```bash
-column -t "$OUTDIR/derived_burden_by_sample.tsv" | head
-```
-
-```bash
-column -t "$OUTDIR/derived_frequency_by_impact.tsv"
-```
 
 List the generated figures:
 
