@@ -127,12 +127,12 @@ Define the input files:
 CHROM=Scaffold_25
 
 APP_FA="$COURSE_DIR/data/mUrsArc1.1.genome.s25.fasta"
-POLAR_FA="$COURSE_DIR/data/Ursus_maritimus.UrsMar_1.0.dna.toplevel.fa"
+POLAR_FA="$COURSE_DIR/gerp_input/Ursus_maritimus.UrsMar_1.0.dna.toplevel.fa"
 
 VCF="$COURSE_DIR/data/Bears_4pops_s25.vcf.gz"
 GT="$COURSE_DIR/results/snpeff/Bears_4pops_s25.ann.POP_OUT.gt"
 
-GERP_BW="$COURSE_DIR/data/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw"
+GERP_BW="$COURSE_DIR/gerp_input/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw"
 ```
 
 The variables identify:
