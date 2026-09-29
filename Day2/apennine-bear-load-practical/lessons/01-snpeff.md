@@ -172,7 +172,27 @@ ls -lh \
 
 ## Step 3 — Annotate the VCF
 
-**Purpose:** predict how each alternate allele may affect genes and transcripts.
+**Purpose:** use the custom SnpEff database to predict how each alternate allele may affect annotated genes and transcripts.
+
+For every variant, SnpEff:
+
+1. locates the position in the reference genome;
+2. identifies any overlapping genes, transcripts, exons or coding regions;
+3. compares the reference and alternate alleles;
+4. predicts possible consequences for each affected transcript;
+5. writes the predictions into the VCF `ANN` field.
+
+Possible annotations include:
+
+- `synonymous_variant`: the DNA sequence changes, but the amino acid does not;
+- `missense_variant`: the variant changes an amino acid;
+- `stop_gained`: the variant introduces a premature stop codon;
+- `intron_variant`: the variant is located within an intron;
+- `intergenic_region`: the variant lies outside annotated genes.
+
+One variant can receive several annotations because it may overlap multiple transcripts or affect different transcript isoforms in different ways.
+
+SnpEff does not change the sample genotypes or determine whether an allele is ancestral or derived. It adds predicted functional annotations to the original VCF.
 
 ```bash
 ANNOTATED="$OUTDIR/Bears_4pops_s25.ann.vcf"
