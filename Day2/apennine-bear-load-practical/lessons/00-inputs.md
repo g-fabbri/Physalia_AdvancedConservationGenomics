@@ -7,7 +7,7 @@ In Day 2, we will work with a VCF containing four bear populations or species:
 - **BLB:** black bears — outgroup;
 - **POB:** polar bears — outgroup.
 
-ABB and SBB are the populations whose genetic variation we want to compare. Black and polar bears will be used as outgroups to help determine which alleles are ancestral and which are derived.
+ABB and SBB are the populations we want to compare. Black and polar bears will be used as outgroups to help determine which alleles are ancestral and which are derived.
 
 All samples were called against the Apennine-bear reference genome. Therefore, the VCF `REF` allele is the allele in the reference assembly, but it is not necessarily the ancestral allele.
 
