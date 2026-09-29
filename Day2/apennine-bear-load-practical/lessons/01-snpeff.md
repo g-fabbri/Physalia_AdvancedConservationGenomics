@@ -15,7 +15,7 @@ To run, SnpEff requires:
 
 It is important that the FASTA, annotation and VCF all use the same assembly, scaffold names and coordinate system. Otherwise, SnpEff may assign variants to the wrong features or fail to annotate them.
 
-For this practical, all the required files have already been prepared for **Scaffold 25**. Students will build the custom SnpEff database, but they do not need to modify the configuration or prepare the input files.
+For this practical, all the required files have already been prepared for **Scaffold 25**. Students will annotate the VCF with the custom SnpEff database, but they do not need to modify the configuration or prepare the input files.
 
 ## Start your terminal
 
