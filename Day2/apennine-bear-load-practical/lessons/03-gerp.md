@@ -243,7 +243,6 @@ grep '^chain[[:space:]]' \
 
 The chain must translate **Apennine coordinates into polar-bear coordinates**.
 
-> Steps 1–5 are instructor preparation. Students may begin at Step 6 using the supplied Apennine-coordinate GERP file.
 
 ## Step 2 — Convert the VCF positions to BED
 
