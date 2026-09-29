@@ -124,7 +124,7 @@ ls -lh \
 
 If the configuration entry and both files are present, the custom database is ready to be built.
 
-## Step 2 — Build the custom SnpEff database
+## Step 2 — Build the custom SnpEff database (ALREADY PREPARED)
 
 **Purpose:** compile the reference sequence and gene annotation into a database that SnpEff can use efficiently.
 
