@@ -86,7 +86,7 @@ Scaffold_25:100000
 
 cannot be found directly in the polar-bear GERP file because the two assemblies use different sequence names and coordinates.
 
-We use the Ensembl release 114 [91-mammal GERP bigWig for polar bear](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw):
+We use the Ensembl release 114 [91-mammal GERP bigWig for polar bear](https://ftp.ensembl.org/pub/release-114/compara/conservation_scores/91_mammals.gerp_conservation_score/):
 
 ```text
 gerp_conservation_scores.ursus_maritimus.UrsMar_1.0.bw
