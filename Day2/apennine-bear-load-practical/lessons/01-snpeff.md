@@ -285,10 +285,6 @@ bcftools query -f '%INFO/ANN\n' "$ANNOTATED" | \
   ' | sort
 ```
 
-This quick summary counts the impact category from the first transcript annotation reported for each variant. It is useful for checking the results, but it is not a complete transcript-aware analysis.
+This quick summary counts the impact category from the first transcript annotation reported for each variant. It is useful for checking the results, but it is not a complete genetic load analysis.
 
-### Question for discussion
 
-Why should we avoid interpreting every `HIGH`-impact variant as a deleterious mutation?
-
-Consider annotation quality, alternative transcripts, genotype state, allele frequency and whether the affected gene is biologically important.
