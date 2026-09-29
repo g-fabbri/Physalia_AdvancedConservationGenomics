@@ -199,12 +199,22 @@ minimap2 -cx asm20 --cs -t 2 \
   > "$PREP/Apennine_to_polar.paf"
 ```
 
-Here:
+This command aligns Apennine Scaffold 25 to the polar-bear reference genome.
 
-- the polar-bear genome is the target coordinate system;
-- Apennine Scaffold 25 is the query;
-- `asm20` uses parameters suitable for relatively divergent assemblies;
-- `-t 2` uses two CPU threads.
+The order of the FASTA files is important:
+
+- `"$POLAR_FA"` is the **target** assembly and provides the destination coordinates;
+- `"$APP_FA"` is the **query** sequence whose positions we want to translate.
+
+The options mean:
+
+- `-x asm20` selects a preset for aligning related genome assemblies with moderate sequence divergence. The name does not impose a strict 20% divergence threshold;
+- `-c` adds base-level alignment information in a CIGAR-like `cg` field, which is required when converting the alignment into a chain;
+- `--cs` records substitutions, matches and gaps in a detailed alignment tag;
+- `-t 2` uses two CPU threads;
+- `>` redirects the alignment output into `Apennine_to_polar.paf`.
+
+The resulting **PAF file** describes which regions of Apennine Scaffold 25 align to which polar-bear sequences, including their coordinates, orientations and alignment lengths. It is an alignment file, not yet a liftOver coordinate map; in the next step, it will be converted into a chain file.
 
 Check the alignment:
 
