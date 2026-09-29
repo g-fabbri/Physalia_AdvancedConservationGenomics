@@ -16,7 +16,7 @@ To keep the practical manageable, we will analyse only **Scaffold 25**.
 
 <img width="1672" height="941" alt="bears" src="https://github.com/user-attachments/assets/fe759e80-2d70-4a5c-9bfe-15cde52b9686" />
 
-## Start your terminal
+
 
 ## Prepare your working directory
 
