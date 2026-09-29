@@ -233,6 +233,10 @@ Check that the `ANN` field has been added to the VCF header:
 ```bash
 bcftools view -h "$ANNOTATED" | grep 'ID=ANN'
 ```
+This header line explains the structure of the SnpEff annotations stored in the `INFO` column. It describes the pipe-separated fields used for information such as the alternate allele, predicted consequence, impact category, gene, transcript and coding change.
+
+Finding the header definition confirms that SnpEff added support for `ANN`, but it does not prove that every variant was successfully annotated. We therefore also inspect the `ANN` values in individual variant records.
+
 
 Inspect the first three annotated variants:
 
