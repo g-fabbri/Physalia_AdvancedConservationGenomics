@@ -227,6 +227,14 @@ List the generated figures:
 ls -lh "$OUTDIR"/GenoLoader_ABB_SBB_Scaffold_25_*.pdf
 ```
 
+```text
+GenoLoader_ABB_SBB_Scaffold_25_total_derived_by_impact.pdf
+GenoLoader_ABB_SBB_Scaffold_25_MODIFIER.pdf
+GenoLoader_ABB_SBB_Scaffold_25_MODERATE.pdf
+GenoLoader_ABB_SBB_Scaffold_25_LOW.pdf
+GenoLoader_ABB_SBB_Scaffold_25_HIGH.pdf
+```
+
 ## How are the counts calculated?
 
 At each site:
