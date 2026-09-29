@@ -1,84 +1,116 @@
-# Part 0 — Meet the four-species dataset
+# Part 0 — Meet the four-population dataset
 
+In Day 2, we will work with a VCF containing four bear populations or species:
 
-## Start your terminal
+- **ABB:** Apennine brown bears — focal population;
+- **SBB:** Slovak brown bears — focal population;
+- **BLB:** black bears — outgroup;
+- **POB:** polar bears — outgroup.
 
-From the Day 2 directory containing `data/`, `software/`, and `results/`, run this in each new terminal:
+ABB and SBB are the populations whose genetic variation we want to compare. Black and polar bears will be used as outgroups to help determine which alleles are ancestral and which are derived.
 
-```bash
-conda activate bear-load-practical
-COURSE_DIR=$(pwd)
-export PATH="$COURSE_DIR/software/bin:$COURSE_DIR/software/genoloader:$PATH"
-```
+All samples were called against the Apennine-bear reference genome. Therefore, the VCF `REF` allele is the allele in the reference assembly, but it is not necessarily the ancestral allele.
 
-Conda supplies the shared tools; standalone programs are kept under Day 2 `software/`. The instructor places command-line executables needed for GERP in `software/bin/`. Check your location with `pwd` before continuing.
-
-ABB and SBB are the **focal populations**. BLB (black bears) and POB (polar bears) are **outgroups** used to infer ancestral states; they are not added to either focal population. All four groups were called against the Apennine reference assembly, so REF is the assembly allele, not necessarily the ancestral allele. This practical examines **Scaffold_25 only**.
+To keep the practical manageable, we will analyse only **Scaffold 25**.
 
 
 <img width="1672" height="941" alt="bears" src="https://github.com/user-attachments/assets/fe759e80-2d70-4a5c-9bfe-15cde52b9686" />
 
-## Step 1 — Name the inputs
+## Start your terminal
 
-**Purpose:** use the prepared Scaffold_25 VCF and four actual sample lists throughout the lesson, without extracting or re-filtering the full genome during class.
+From your Day 2 directory, run:
 
-**Input:** indexed VCF and plain-text sample lists, one ID per line.
+```bash
+conda activate bear-load-practical
 
-### 1.1 — Set the input paths
+COURSE_DIR=$(pwd)
+export PATH="$COURSE_DIR/software/bin:$PATH"
+```
 
-**Purpose:** give the prepared VCF and sample lists.
+Check your current directory:
 
-~~~bash
-VCF=data/Bears_4pops_s25.vcf.gz
-ABB_LIST=data/ABB.samples
-SBB_LIST=data/SBB.samples
-BLB_LIST=data/BLB.samples
-POB_LIST=data/POB.samples
-~~~
+```bash
+pwd
+```
 
-**Expected:** no output. These variables exist only in the current terminal.
+## Step 1 — Define the input files
 
-### 1.2 — Confirm the files and sample counts
+The prepared VCF and sample lists are stored in the `data/` directory:
 
-**Purpose:** catch missing inputs or incomplete sample lists before analysis.
+```bash
+VCF="$COURSE_DIR/data/Bears_4pops_s25.vcf.gz"
 
-~~~bash
-ls -lh "$VCF" "$VCF.csi" "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"
-~~~
+ABB_LIST="$COURSE_DIR/data/ABB.samples"
+SBB_LIST="$COURSE_DIR/data/SBB.samples"
+BLB_LIST="$COURSE_DIR/data/BLB.samples"
+POB_LIST="$COURSE_DIR/data/POB.samples"
+```
 
-~~~bash
+The VCF contains the genotypes, while each sample list contains one sample ID per line.
+
+Check that the files exist:
+
+```bash
+ls -lh \
+  "$VCF" \
+  "$VCF.csi" \
+  "$ABB_LIST" \
+  "$SBB_LIST" \
+  "$BLB_LIST" \
+  "$POB_LIST"
+```
+
+## Step 2 — Check the samples
+
+Count the total number of samples in the VCF:
+
+```bash
 bcftools query -l "$VCF" | wc -l
-~~~
+```
 
-~~~bash
-for LIST in "$ABB_LIST" "$SBB_LIST" "$BLB_LIST" "$POB_LIST"; do
+Count the samples assigned to each group:
+
+```bash
+for LIST in \
+  "$ABB_LIST" \
+  "$SBB_LIST" \
+  "$BLB_LIST" \
+  "$POB_LIST"; do
+
   printf '%s: ' "$LIST"
   wc -l < "$LIST"
 done
-~~~
+```
 
-Every file must exist; the four list counts should sum to the expected number of VCF samples if no samples are intentionally unassigned. A list entry absent from the VCF must be resolved before polarization.
+The counts from the four sample lists should add up to the total number of samples in the VCF.
 
-## Step 2 — Inspect variant representation
+## Step 3 — Check the variants
 
-**Purpose:** verify the scaffold and variant representation before interpreting per-individual counts. The filename suggests Scaffold_25, but we check its contents rather than assume.
+Inspect the first three variant records:
 
-### 2.1 — Inspect records and scaffold names
-
-**Purpose:** confirm that the indexed VCF contains the intended scaffold and count its variant records.
-
-~~~bash
+```bash
 bcftools view -H "$VCF" | head -n 3
-~~~
+```
 
-~~~bash
+Count the variants:
+
+```bash
 bcftools index -n "$VCF"
-~~~
+```
 
-~~~bash
+Check which scaffold is present:
+
+```bash
 bcftools query -f '%CHROM\n' "$VCF" | sort -u
-~~~
+```
 
-**Expected:** variant rows, a record count, and exactly one chromosome name: **Scaffold_25**. The record count is **not** the number of callable bases. Check with the instructor that the input has been restricted to biallelic SNPs before GenoLoader; do not silently discard records during the lesson.
+The final command should print only:
 
-**Check:** chromosome names in the VCF must match the SnpEff database. Because this is one scaffold, differences in counts cannot establish a genome-wide difference in genetic load. Continue to [SnpEff](01-snpeff.md).
+```text
+Scaffold_25
+```
+
+The scaffold name must match the reference FASTA and the SnpEff database used in the next lesson.
+
+Because this practical uses only one scaffold, the results are illustrative and should not automatically be interpreted as genome-wide estimates of genetic load.
+
