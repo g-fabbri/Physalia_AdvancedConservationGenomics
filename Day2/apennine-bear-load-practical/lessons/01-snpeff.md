@@ -179,7 +179,7 @@ For every variant, SnpEff:
 1. locates the position in the reference genome;
 2. identifies any overlapping genes, transcripts, exons or coding regions;
 3. compares the reference and alternate alleles;
-4. predicts possible consequences for each affected transcript;
+4. predicts how the alternate allele may change each affected transcript, for example by altering an amino acid, introducing a premature stop codon or occurring within a non-coding region;
 5. writes the predictions into the VCF `ANN` field.
 
 Possible annotations include:
