@@ -155,9 +155,12 @@ The most important options are:
 | `-Xmx4g` | Allow Java to use up to 4 GB of memory |
 
 The command creates two important binary files:
-- snpEffectPredictor.bin contains the compiled annotation model. It stores the positions, structures and relationships of genes, transcripts, exons, coding regions and other annotated features. SnpEff uses it to determine which features overlap each variant.
-- sequence.Scaffold_25.bin contains the Scaffold 25 reference sequence in SnpEff’s internal format. SnpEff uses the nucleotide sequence to reconstruct codons and predict whether a variant causes effects such as a synonymous change, missense change or premature stop codon.
-These files allow SnpEff to load the custom database quickly without reading and rebuilding the original FASTA and GFF3 files every time.
+
+- **`snpEffectPredictor.bin`** contains the compiled annotation model. It stores the positions, structures and relationships of genes, transcripts, exons, coding regions and other annotated features. SnpEff uses it to determine which features overlap each variant.
+
+- **`sequence.Scaffold_25.bin`** contains the Scaffold 25 reference sequence in SnpEff's internal format. SnpEff uses this nucleotide sequence to reconstruct codons and predict effects such as synonymous changes, missense changes and premature stop codons.
+
+These binary files allow SnpEff to load the custom database quickly, without reading and rebuilding the original FASTA and GFF3 files every time.
 
 Check that they were created:
 
