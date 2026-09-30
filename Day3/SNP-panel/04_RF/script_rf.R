@@ -1,58 +1,16 @@
+## Attention!!!
+## The script below works if you have run script_pca.R first
+
 library(MASS)
 library(randomForest)
 library(ade4)
 library(adegenet)
 library(plyr)
 
-# Set your working directory (or navigate to it in R Studio)
-setwd("D:/Side projects/Physalia course/Day3/tutorial_snpchip/04_rf")
-
-
-
-## Read in the data
-testudo_node1 <- read.structure("../testudo_dataset.stru",
-                                n.ind = 70,
-                                n.loc = 3182,
-                                onerowperind = FALSE,
-                                col.lab = 1,
-                                col.pop = 2,
-                                row.marknames = 1,
-                                NA.char = "0")
-
-pops <- read.table("../01_pca/Info_dataset_classification_PCA.txt", header = T)
-
-
-## Check missingness patterns
-# By sample
-prop_ind <- propTyped(testudo_node1, by = "ind")
-
-# By marker
-prop_loc <- propTyped(testudo_node1, by = "loc")
-
-
-# Decide threshold for markers (depends on your dataset)
-prop_loc_keep <- (1 - length(which(pops$Classification == 4 | pops$Classification == 5))/nrow(pops))
-
-# Filter
-gen_filt <- testudo_node1[
-  prop_ind >= 0.8,
-  loc = prop_loc >= prop_loc_keep
-]
-
-pops_filt <- pops[pops$Sample %in% rownames(gen_filt$tab),]
-
-
-
-## Format dataset for RF
-x.test <- tab(gen_filt, freq = TRUE, NA.method = "asis")
-x.test <- x.test[, seq(1, ncol(x.test), by = 2)]
-x.test.fixed <- na.roughfix(x.test)
-
-testudo_factor <- as.data.frame(x.test.fixed, row.names = pops_filt$Sample)
-testudo_factor$pop <- as.factor(pops_filt$Classification)
+# Format dataset
+testudo_factor <- as.data.frame(x.tab.filt, row.names = pops_filt$Sample)
+testudo_factor$pop <- as.factor(pops_filt$nclust.classification)
 testudo_factor <- testudo_factor[, c("pop", setdiff(names(testudo_factor), "pop"))]
-
-
 
 ## Find the best value for parameter mtry
 set.seed(3549)
@@ -116,4 +74,4 @@ mda_summary <- data.frame(
 mda_summary <- mda_summary[order(-mda_summary$Mean_MDA),]
 
 # Save results of the 10 runs together
-write.table(mda_summary, file = "RF_MDA_10runs_summary.txt", sep = "\t", quote = F, row.names = FALSE)
+write.table(mda_summary, file = "04_rf/RF_MDA_10runs_summary.txt", sep = "\t", quote = F, row.names = FALSE)
