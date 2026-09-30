@@ -146,7 +146,7 @@ We will therefore rank SNPs according to their loadings and select the most info
 
 ### R code
 
-> 📄 **R script:** `script_loadings.R`
+> 📄 **R script:** `01_PCA/script_loadings.R`
 
 
 ### Extra
