@@ -216,7 +216,7 @@ The idea is to provide the known origin of the samples, randomly divide each pop
 
 ### R code
 
-> 📄 **R script:** `05_assign/script_assignPOP.R`
+> 📄 **R script:** `05_test/script_selfAssign.R`
 
 
 ## Question
@@ -244,5 +244,5 @@ Notice their **assignment scores** to the different clusters and discuss how you
 
 ### R code
 
-> 📄 **R script:** `05_assign/script_assignPOP.R`
+> 📄 **R script:** `06_assign/script_newAssign.R`
 
