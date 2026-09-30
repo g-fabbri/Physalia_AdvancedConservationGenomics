@@ -56,21 +56,18 @@ In order to correctly read the dataset into R, we need to know:
 * How many samples are present?
 * How many loci are present?
 * How is missing data coded? (e.g. `NA`, `0`, `-9`)
+* Are samples coded on single or double rows?
 
-So, let’s answer these questions:
+```bash
+# How many loci?
+head -1 testudo_dataset.stru | awk '{print NF}'
 
-* **How many samples?**
-* **How many loci?**
+# Are samples on one or two rows? (i.e., unique or duplicated IDs?)
+tail -n+2 testudo_dataset.stru | cut -f1 | head
 
-Take note of these values in the `metadata.xlsx` Excel file that you can download from the GitHub folder:
-
-```text
-Day3/tutorial_snpchip/metadata.xlsx
+# How many samples?
+tail -n+2 testudo_dataset.stru | cut -f1 | uniq | wc -l
 ```
-
-> 💡 **Tip:** If you struggle with the coding, you can find the solution in:
->
-> `Day3/tutorial_snpchip/solutions`
 
 ---
 
@@ -82,7 +79,7 @@ In this section, we will use **PCA** as the first exploratory analysis, as we wi
 
 ### R code
 
-> 📄 **R script:** `script_pca.R`
+> 📄 **R script:** `01_PCA/script_pca.R`
 
 
 ---
@@ -95,7 +92,7 @@ This is a much faster version of **STRUCTURE/ADMIXTURE**, but the output is simi
 
 ### R code
 
-> 📄 **R script:** `script_snmf.R`
+> 📄 **R script:** `02_snmf/script_snmf.R`
 
 
 ---
@@ -108,7 +105,7 @@ This will allow us to evaluate, with numerical values, how differentiated the cl
 
 ### R code
 
-> 📄 **R script:** `script_fst_allpop.R`
+> 📄 **R script:** `03_Fst/script_fst_allpop.R`
 
 
 ---
@@ -174,7 +171,7 @@ SNPs with the highest F<sub>ST</sub> values will be considered the most informat
 
 ### R code
 
-> 📄 **R script:** `script_fst_node.R`
+> 📄 **R script:** `03_Fst/script_fst_node.R`
 
 
 ---
@@ -193,7 +190,7 @@ We will use Random Forest to rank SNPs according to their importance and select 
 
 ### R code
 
-> 📄 **R script:** `script_rf.R`
+> 📄 **R script:** `04_RF/script_rf.R`
 
 
 ### Extra
@@ -219,7 +216,7 @@ The idea is to provide the known origin of the samples, randomly divide each pop
 
 ### R code
 
-> 📄 **R script:** `script_assignPOP.R`
+> 📄 **R script:** `05_assign/script_assignPOP.R`
 
 
 ## Question
@@ -247,5 +244,5 @@ Notice their **assignment scores** to the different clusters and discuss how you
 
 ### R code
 
-> 📄 **R script:** `script_assignPOP.R`
+> 📄 **R script:** `05_assign/script_assignPOP.R`
 
