@@ -16,7 +16,7 @@ dat_long <- dat %>%
 dat_long$panel <- factor(dat_long$panel)
 
 # Repeated-measures ANOVA
-anova_model <- aov(accuracy ~ panel + Error(rep/panel),
+anova_model <- aov(accuracy ~ panel,
                    data = dat_long)
 
 summary(anova_model)
