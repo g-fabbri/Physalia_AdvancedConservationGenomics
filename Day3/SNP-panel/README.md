@@ -232,6 +232,12 @@ If you have extra time, you can try providing different proportions of:
 
 It can be particularly relevant to see if you can reduce the number of SNPs selected while keeping a good assignment accuracy, as this could reduce the costs of future genotyping of new samples.
 
+Finally, we need to compare the average accuracy in assignment of the three SNP panels to choose the best one. We can first run an ANOVA to see if there are differences at all, and then proceed with pairwise post-hoc comparisons:
+
+### R code
+
+> 📄 **R script:** `05_test/script_compare_accuracy.R`
+
 ---
 
 # 5. Apply the SNP panel to new samples
